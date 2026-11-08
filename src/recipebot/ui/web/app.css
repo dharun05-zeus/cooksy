@@ -30,7 +30,8 @@ code { background: var(--panel-2); padding: 1px 6px; border-radius: 6px; font-si
 .tiny { font-size: 11.5px; }
 .full { width: 100%; }
 
-.app { display: grid; grid-template-columns: 250px minmax(0, 1fr) 540px; height: 100vh; }
+/* The chat panel takes a share of the window: wide screens get a much bigger chat. */
+.app { display: grid; grid-template-columns: 250px minmax(0, 1fr) clamp(480px, 42vw, 760px); height: 100vh; }
 
 /* ---------- icons (inline SVG masks) ---------- */
 .i { display: inline-block; width: 18px; height: 18px; background: currentColor; flex: none;
@@ -321,7 +322,7 @@ details.fold { border-top: 1px solid var(--line); padding-top: 8px; }
 
 /* ---------- responsive ---------- */
 @media (max-width: 1250px) {
-  .app { grid-template-columns: 220px minmax(0, 1fr) 460px; }
+  .app { grid-template-columns: 220px minmax(0, 1fr) clamp(440px, 44vw, 540px); }
   .how { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 900px) {
