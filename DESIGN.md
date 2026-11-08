@@ -292,7 +292,7 @@ applesauce (about 2/3 cup, estimated) and soy yogurt as equally weak alternative
 many phrased unlike the prompt examples), statistics (vs. a plain-Python reference),
 matching (constraints, lists and ranking re-derived per result), substitution (properties
 of the adapted recipe), eight scripted conversations covering the assignment's required
-cases, and a one-shot comparison where the same LLM answers without the pipeline. 153 unit
+cases, and a one-shot comparison where the same LLM answers without the pipeline. 151 unit
 tests (`pytest`) cover the parser rules, guards, state, engines, substitution scenarios
 (strong, weak, conflicting, missing quantity, ties, moisture risk, no reliable substitute,
 follow-ups) and the web API.
