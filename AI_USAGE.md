@@ -1,34 +1,51 @@
 # Use of AI tools
 
-> Author: please review this file and adjust it so it describes your own process exactly.
+I built this project with **Claude Code** (Anthropic's Claude) as an AI pair programmer.
+I owned the requirements, the key decisions, the review of each stage and the testing;
+the AI wrote the code and drafted the documentation under my direction.
 
-## AI coding assistant
+## My role
 
-This project was built with **Claude Code** (Anthropic's Claude) as a pair programmer.
+- **Requirements and constraints.** I analysed the assignment and set the constraints the
+  design had to meet: completely free to run, runnable on an interviewer's machine without my
+  accounts or keys, every fact grounded in the dataset, and a result that shows real use of an
+  LLM rather than a keyword bot.
+- **Technology decisions.** I compared the options (rules only, Gemini's free tier, a local
+  model) and decided on an LLM-first design. When my Gemini key turned out to be on a billed
+  project, I chose a free local model (Qwen3 4B through Ollama) as the default, so the
+  interviewer needs no API key or quota.
+- **Critical review of the plan.** Before any code was written I asked for the plan to be
+  evaluated against the assignment, then required every weakness found to be fixed and the
+  revised plan checked again. This led to the evidence-based substitution design, the
+  separate ingredient-normalization module, and keeping all facts out of the LLM's hands.
+- **Planning and direction.** I split the work into four stages (data and statistics;
+  search, matching and conversation; LLM and substitution; evaluation and delivery) and
+  reviewed each stage before starting the next.
+- **Quality control.** I asked for a full bug review of the first two stages before
+  continuing, and for another before the final stage. These reviews found and fixed real
+  problems, for example substitutions replacing the wrong line in recipes with section
+  headings.
+- **Testing.** I set up the LLM (Ollama and an API key), ran the assistant, and checked its
+  answers, its speed on my laptop, and the evaluation report.
 
-| Where | What the AI did | What I did |
-|---|---|---|
-| Planning | Proposed and critiqued architectures; compared LLM options (local Qwen vs. Gemini vs. Groq) against the assignment and my constraints (free, runs on an interviewer's machine) | Chose the approach: LLM-first, a free local model, every fact computed by code |
-| Data analysis | Profiled the three JSON files and surfaced quirks (the `ADVERTISEMENT` suffix, one-paragraph instructions, placeholder records, duplicates) | Decided how each should be handled |
-| Code | Wrote most of the code in `src/`, `scripts/` and `eval/` | Directed the work, reviewed it, ran it, and asked for changes and bug fixes |
-| Testing | Wrote unit tests and the fixture dataset, and found bugs by running real cases (e.g. substitution evidence drawn from banana drinks for banana bread, line numbers shifted by section headings) | Reviewed the failures and the fixes |
-| Evaluation | Wrote the evaluation cases and labelled the 60-line normalization sample | Reviewed the labels and the cases |
-| Documentation | Drafted README, DESIGN and this file | Edited them |
+## The AI assistant's role
 
-I can explain every part of the system: the data pipeline, ingredient normalization, BM25
-search, the matching and ranking rules, the substitution evidence, the LLM guards and the
-grounding check.
+| Area | What the AI did |
+|---|---|
+| Code | Wrote the code in `src/`, `scripts/` and `eval/` to my specifications, and fixed the bugs found in review |
+| Data analysis | Profiled the three JSON files and reported quirks (the `ADVERTISEMENT` suffix, one-paragraph instructions, placeholder records, duplicates) for me to decide on |
+| Tests and evaluation | Wrote the unit tests, the evaluation cases and the evaluation runner, and labelled the 60-line normalization sample |
+| Documentation | Drafted the README, DESIGN and the evaluation discussion |
 
 ## LLMs inside the application
 
 The assistant itself uses an LLM at run time (see DESIGN.md §11):
 
 - **Qwen3 4B via Ollama** (default, local), or **Gemini** if an API key is configured.
-- The LLM converts messages into structured requests, chooses substitutes from evidenced
+- The LLM turns messages into structured requests, chooses substitutes from evidenced
   candidates and writes the edits, and (optionally) writes a short summary.
 - It never produces dataset facts: counts, rankings, recipe IDs and ingredient lists come from
-  code, and LLM output is validated (JSON schema, guards, substitution validation, grounding
-  check).
+  code, and LLM output is validated (JSON schema, guards, substitution checks, grounding check).
 
 ## Data
 
