@@ -36,7 +36,7 @@ Offline build (scripts/build_index.py):
            → recipes.parquet + ingredients.parquet + build_report.json
 ```
 
-## 4. Data decisions (Day 1, verified on the real files)
+## 4. Data decisions (verified on the real files)
 
 | Finding | Decision |
 |---|---|
@@ -62,7 +62,7 @@ unit `can`, amount 822 g, canonical `tomato`, form `canned`, prep `drained`.
 3. **Name and prep**: the first comma-separated part that still names something is the
    name; the rest is preparation. Phrases like "to taste" and "for garnish" are cut.
 4. **Alternatives**: "butter or margarine" keeps `butter` as the ingredient and records
-   `margarine` as an alternative (used as direct substitution evidence on Day 3).
+   `margarine` as an alternative (used as direct substitution evidence).
 5. **Canonical name**: accents folded, form words (fresh, frozen, canned, dried) recorded,
    descriptors removed, last word singularized, synonyms applied (`scallion` → `green onion`).
 6. **Base (family)**: varieties count as the same ingredient (`cherry tomato` → `tomato`),
