@@ -7,3 +7,7 @@ __pycache__/
 .claude/
 # Downloaded and generated data only (not src/recipebot/data/)
 /data/
+# Offline evaluation output: regenerate with `uv run python eval/run_eval.py --provider none`
+/eval/REPORT_offline.md
+/eval/results/none.json
+/eval/transcripts/*_none.md

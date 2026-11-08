@@ -75,13 +75,13 @@ def stats(result: StatsResult) -> dict:
 
 
 def _quantity(q) -> dict:
-    return {"status": q.status, "text": q.text, "basis": q.basis,
-            "sources": [{"id": i, "line": t} for i, t in q.sources]}
+    return {"status": q.status, "text": q.text, "basis": q.basis}
 
 
 def substitution(result: SubstitutionResult, chosen_by: str) -> dict:
-    ev = result.evidence
-    adapted, chosen, moisture = result.adapted, result.chosen, result.moisture
+    """What the substitution card shows (app.js `substitutionCard`); the full text answer,
+    with every detail, is sent alongside."""
+    ev, adapted, chosen = result.evidence, result.adapted, result.chosen
     original = {line.strip() for line in result.original_ingredients}
     return {
         "type": "substitution",
@@ -90,49 +90,36 @@ def substitution(result: SubstitutionResult, chosen_by: str) -> dict:
         "target": ev.target,
         "target_lines": [text for _, text in ev.target_lines],
         "original_ingredients": result.original_ingredients,
-        "roles": ev.roles,
-        "main_roles": ev.main_roles,
-        "baked": ev.baked,
-        "restricted": ev.restricted,
-        "comparison_scope": ev.comparison_scope,
-        "neighbours_without": ev.neighbours_without,
-        "same_dish_without": [{"id": i, "title": t} for i, t in ev.same_dish_without],
-        "notes": [{"id": i, "sentence": s} for i, s in ev.notes],
-        "expected_effects": ev.expected_effects,
-        "evidence_types": EVIDENCE_TYPES,
-        "ranking_rule": RANKING_RULE,
-        "ranking_notes": ev.ranking_notes,
-        "uncertainty": ev.uncertainty,
-        "candidates": [
-            {"name": c.name, "strength": c.strength, "fit": c.fit, "summary": c.summary(),
-             "evidence_type": c.evidence_type(), "direct": c.direct > 0,
-             "support": c.support, "coverage": c.coverage, "coverage_text": c.coverage_text(),
-             "covers_main": c.covers_main, "quantity": _quantity(c.quantity),
-             "supporting": c.supporting, "limitation": c.limitation(), "flags": c.flags}
-            for c in ev.candidates
-        ],
-        "message": result.message,
         "status": result.status,
-        "status_label": result.status_label,
         "chosen_by": chosen_by,
-        "requested": result.requested,
-        "method": result.method,
-        "validation_errors": result.validation_errors,
-        "remaining_conflicts": result.remaining_conflicts,
         "baking": result.baking,
-        "moisture": None if moisture is None else {
-            "risk": moisture.risk, "notes": moisture.notes, "ratio": moisture.ratio,
-            "baseline": moisture.baseline, "after": moisture.after},
-        "texture": [{"property": p, "prediction": t} for p, t in result.texture],
-        "limitations": result.limitations,
         "adapted": None if adapted is None or chosen is None else {
             "substitute": chosen.name,
-            "strength": chosen.strength,
-            "fit": chosen.fit,
             "quantity": _quantity(chosen.quantity),
             "ingredients": [{"text": line, "changed": line.strip() not in original}
                             for line in adapted.ingredients],
             "instructions": adapted.instructions,
-            "changes": adapted.changes,
         },
+        # why this choice
+        "ranking_rule": RANKING_RULE,
+        "ranking_notes": ev.ranking_notes,
+        "uncertainty": ev.uncertainty,
+        # evidence
+        "candidates": [
+            {"name": c.name, "strength": c.strength, "fit": c.fit, "direct": c.direct > 0,
+             "support": c.support, "coverage_text": c.coverage_text(),
+             "quantity": _quantity(c.quantity), "supporting": c.supporting,
+             "limitation": c.limitation()}
+            for c in ev.candidates
+        ],
+        "comparison_scope": ev.comparison_scope,
+        "same_dish_without": [{"id": i, "title": t} for i, t in ev.same_dish_without],
+        "notes": [{"id": i, "sentence": s} for i, s in ev.notes],
+        "evidence_types": EVIDENCE_TYPES,
+        # predictions and limits
+        "texture": [{"property": p, "prediction": t} for p, t in result.texture],
+        "moisture": None if result.moisture is None else {
+            "risk": result.moisture.risk, "notes": result.moisture.notes},
+        "expected_effects": ev.expected_effects,
+        "limitations": result.limitations,
     }

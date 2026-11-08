@@ -36,10 +36,9 @@ def _evidence(**kw) -> Evidence:
 
 
 def _adapted(ingredients, instructions=None, substitute="applesauce") -> AdaptedRecipe:
-    return AdaptedRecipe(substitute=substitute, ingredients=ingredients,
-                         instructions=instructions or ["Mix the dough with the applesauce.",
-                                                       "Bake until golden."],
-                         changes=[], predicted_effects=[])
+    return AdaptedRecipe(substitute, ingredients,
+                         instructions or ["Mix the dough with the applesauce.", "Bake until golden."],
+                         changes=[])
 
 
 def engine(bot) -> SubstitutionEngine:
@@ -75,18 +74,6 @@ def test_rewrite_that_keeps_the_target_is_rejected(bot):
     assert any("still mentions the target" in e for e in errors)
 
 
-def test_replacement_line_must_hold_only_the_substitute(bot):
-    adapted = _adapted(["1 cup margarine", "2 cups all-purpose flour", "2 cups flour, 1/4 cup applesauce"])
-    errors = engine(bot).validate(adapted, ORIGINAL, STEPS, _evidence())
-    assert any("must contain only the substitute" in e for e in errors)
-
-
-def test_substitute_must_be_an_evidenced_candidate(bot):
-    adapted = _adapted(ORIGINAL[:2] + ["1 banana"], substitute="banana")
-    errors = engine(bot).validate(adapted, ORIGINAL, STEPS, _evidence())
-    assert any("not one of the candidates" in e for e in errors)
-
-
 def test_steps_are_checked_for_the_target_only(bot):
     # Replacing cream "without dairy": a step that mentions the recipe's parmesan is not a
     # failed rewrite (the remaining parmesan is reported separately).
@@ -94,10 +81,8 @@ def test_steps_are_checked_for_the_target_only(bot):
                    target_names=["cream", "heavy cream"], restricted=["cream", "dairy"],
                    candidates=[Candidate("coconut milk", direct=2, strength="moderate")])
     original = ["1 cup heavy cream", "1/2 cup parmesan"]
-    adapted = AdaptedRecipe(substitute="coconut milk",
-                            ingredients=["1 cup coconut milk", "1/2 cup parmesan"],
-                            instructions=["Simmer the coconut milk, then stir in the parmesan."],
-                            changes=[], predicted_effects=[])
+    adapted = AdaptedRecipe("coconut milk", ["1 cup coconut milk", "1/2 cup parmesan"],
+                            ["Simmer the coconut milk, then stir in the parmesan."], changes=[])
     errors = engine(bot).validate(adapted, original, ["Simmer the cream."], ev)
     assert not any("step" in e for e in errors)
 

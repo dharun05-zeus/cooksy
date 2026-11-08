@@ -85,8 +85,7 @@ class SearchResult:
     hits: list[SearchHit]
     total_matches: int  # recipes that match a search term and pass every filter
     filters: list[str]
-    notes: list[str]
-    unknown_terms: list[str] = field(default_factory=list)
+    notes: list[str]  # includes search words found nowhere in the dataset
 
 
 def search(store: RecipeStore, index: SearchIndex, query: str, f: RecipeFilter,
@@ -121,7 +120,7 @@ def search(store: RecipeStore, index: SearchIndex, query: str, f: RecipeFilter,
                      "recipes matching the search words (uncertain cases are removed too).")
     if unknown:
         notes.append("Not found anywhere in the dataset: " + ", ".join(unknown))
-    return SearchResult(full_query, hits, int(eligible.sum()), out.filters, notes, unknown)
+    return SearchResult(full_query, hits, int(eligible.sum()), out.filters, notes)
 
 
 def _constraint_evidence(store: RecipeStore, row, f: RecipeFilter) -> list[str]:

@@ -88,7 +88,6 @@ class Candidate:
     flags: list[str] = field(default_factory=list)
     strength: str = "weak"
     fit: str = "unknown"  # good | partial | unknown | poor: do its roles match the target's?
-    direct_scope: str = ""  # "baked" / "non-baked" recipes, or "other kinds of" dishes
     comparative_scope: str = ""  # "same dish" or the wider dish type
     coverage: dict[str, str] = field(default_factory=dict)  # target role -> full|partial|none
     covers_main: bool = False  # provides the target's main role, at least partly
@@ -125,20 +124,6 @@ class Candidate:
 
     def coverage_score(self) -> float:
         return sum({"full": 1.0, "partial": 0.5}.get(how, 0.0) for how in self.coverage.values())
-
-    def summary(self) -> str:
-        parts = []
-        if self.direct:
-            parts.append(f"offered as an alternative to the target in {self.direct} "
-                         f"{self.direct_scope} recipes".replace("  ", " "))
-        if self.comparative_support:
-            parts.append(f"used by {self.comparative_support} {self.comparative_scope} recipes "
-                         f"without the target ({self.share_without:.0%} of them vs "
-                         f"{self.share_with:.0%} of those with it)".replace("recipes recipes",
-                                                                            "recipes"))
-        if self.fit != "unknown":
-            parts.append(f"{self.fit} fit for the target's role")
-        return "; ".join(parts + self.flags) or "no supporting recipes found"
 
     def limitation(self) -> str:
         if self.strength == "conflicting":
@@ -208,7 +193,7 @@ class MoistureCheck:
     notes: list[str] = field(default_factory=list)
 
 
-class StepEdit(BaseModel):
+class StepEdit(BaseModel):  # Pydantic: the LLM's JSON is validated against it
     number: int = Field(description="the instruction step number being rewritten")
     text: str = Field(description="the rewritten step")
 
@@ -220,21 +205,12 @@ class AdaptationPlan(BaseModel):
     step_edits: list[StepEdit] = Field(description="one edit per step that mentions the target")
 
 
-class AdaptedRecipe(BaseModel):
-    substitute: str = Field(description="the chosen candidate name, or 'none'")
-    ingredients: list[str] = Field(description="the full adapted ingredient list")
-    instructions: list[str] = Field(description="the full adapted instruction steps")
-    changes: list[str] = Field(description="each change and why, citing the evidence")
-    predicted_effects: list[str] = Field(description="likely effects on taste, texture or "
-                                                     "preparation (predictions)")
-
-
-STATUS_LABELS = {
-    "supported": "Supported adaptation (dataset evidence and quantity; not tested in a kitchen)",
-    "experimental": "Experimental adaptation (weak evidence or estimated quantity)",
-    "incomplete": "Incomplete experimental adaptation (quantity not established by the dataset)",
-    "not_adapted": "No adapted recipe",
-}
+@dataclass
+class AdaptedRecipe:
+    substitute: str
+    ingredients: list[str]  # the full adapted list; only the target lines differ
+    instructions: list[str]
+    changes: list[str]  # each change, and the quantity's source
 
 
 @dataclass
@@ -257,10 +233,6 @@ class SubstitutionResult:
     texture: list[tuple[str, str]] = field(default_factory=list)  # (property, prediction)
     baking: str = ""  # temperature and time from the original steps
     limitations: list[str] = field(default_factory=list)
-
-    @property
-    def status_label(self) -> str:
-        return STATUS_LABELS[self.status]
 
     def evidence_ids(self) -> set[str]:
         ids = {self.recipe_id} | {rid for rid, _ in self.evidence.notes}
@@ -438,9 +410,8 @@ class SubstitutionEngine:
             return
         positions = p["recipe_id"].map(self.store.position).to_numpy()
         same_kind = p[self.is_baked[positions] == ev.baked]
-        scope = "baked" if ev.baked else "non-baked"
-        if same_kind.empty:
-            same_kind, scope = p, "other kinds of"
+        if same_kind.empty:  # no line from the same kind of dish: use the others
+            same_kind = p
         seen: dict[str, set[str]] = defaultdict(set)
         for r in same_kind.itertuples():
             forward = r.primary in names or r.primary_base in names
@@ -448,7 +419,6 @@ class SubstitutionEngine:
             if name in names or name not in self.known:
                 continue
             cand = candidates.setdefault(name, Candidate(name))
-            cand.direct_scope = scope
             if r.recipe_id not in seen[name]:
                 seen[name].add(r.recipe_id)
                 cand.direct += 1
@@ -797,15 +767,24 @@ class SubstitutionEngine:
     # ----- ranking -------------------------------------------------------------------
 
     def _rank_key(self, c: Candidate) -> tuple:
-        return (c.strength in ("conflicting", "excluded"), not c.covers_main,
-                STRENGTH_ORDER[c.strength], CLOSENESS_ORDER[c.closeness], -c.coverage_score(),
-                -c.support, QUANTITY_ORDER[c.quantity.status], c.name)
+        """Sort key: lower sorts first. One entry per ranking rule (RANKING_RULE); to change
+        the order, move an entry here AND its reason in `_why`, which uses the same order."""
+        return (
+            c.strength in ("conflicting", "excluded"),  # 1. may break a restriction: last
+            not c.covers_main,                          # 2. must provide the main role
+            STRENGTH_ORDER[c.strength],                 # 3. evidence strength
+            CLOSENESS_ORDER[c.closeness],               # 4. direct, same dish, related
+            -c.coverage_score(),                        # 5. more of the roles covered
+            -c.support,                                 # 6. more supporting recipes
+            QUANTITY_ORDER[c.quantity.status],          # 7. supported, estimated, unknown
+            c.name,                                     # tie: alphabetical (reported)
+        )
 
     def _why(self, a: Candidate, b: Candidate, ev: Evidence) -> str:
         """The first ranking rule that separates a (higher) from b."""
         ka, kb = self._rank_key(a), self._rank_key(b)
         main = " and ".join(ev.main_roles) or "main role"
-        reasons = [
+        reasons = [  # same order as _rank_key
             f"{b.name} may contain a restricted ingredient",
             f"{b.name} does not provide the {ev.noun}'s main role ({main})",
             f"{a.name} has {a.strength} evidence, {b.name} {b.strength}",
@@ -896,7 +875,6 @@ class SubstitutionEngine:
         result.moisture = self._moisture(ev, chosen)
         result.texture = self._texture(ev, chosen, result.moisture)
         adapted = self.build(original, steps, ev, chosen)
-        adapted.predicted_effects = [f"{prop}: {text}" for prop, text in result.texture]
         result.adapted, result.method = adapted, "fallback"
         errors = self.validate(adapted, original, steps, ev)
         if errors:  # a code-built line should never fail; if one does, say so and stop
@@ -1012,8 +990,7 @@ class SubstitutionEngine:
         if changed:
             changes.append(f"step(s) {', '.join(map(str, changed))}: {ev.target} replaced with "
                            f"{sub}; everything else as in the original")
-        return AdaptedRecipe(substitute=sub, ingredients=ingredients, instructions=instructions,
-                             changes=changes, predicted_effects=[])
+        return AdaptedRecipe(sub, ingredients, instructions, changes)
 
     def _llm_steps(self, llm: LLMClient, row, steps: list[str], mentions: list[int],
                    ev: Evidence, result: SubstitutionResult) -> None:
@@ -1064,12 +1041,9 @@ class SubstitutionEngine:
 
     def validate(self, adapted: AdaptedRecipe, original: list[str], steps: list[str],
                  ev: Evidence) -> list[str]:
+        """Safety net for the built recipe: other lines verbatim, nothing restricted, only
+        ingredients that appear in the dataset, no step still naming the target."""
         errors = []
-        names = {c.name for c in ev.candidates}
-        if adapted.substitute.lower() == "none":
-            return []
-        if adapted.substitute not in names:
-            errors.append(f"substitute '{adapted.substitute}' is not one of the candidates")
         target_positions = {pos for pos, _ in ev.target_lines}
         kept = {line.strip() for line in adapted.ingredients}
         for pos, line in enumerate(original):
@@ -1092,12 +1066,6 @@ class SubstitutionEngine:
             if parsed.canonical and parsed.canonical not in self.store.by_canonical \
                     and parsed.base not in self.store.by_base:
                 errors.append(f"'{parsed.canonical}' does not appear in the dataset")
-            # A replacement line holds the substitute only; it must not slip in more of
-            # something else ("2 cups mashed bananas, 1/4 cup applesauce").
-            substitute = self.store.resolve(adapted.substitute, "strict").base
-            if parsed.base != substitute and parsed.canonical != fold(adapted.substitute):
-                errors.append(f"replacement line '{line}' must contain only the substitute "
-                              f"({adapted.substitute}), one ingredient per line")
         for number, step in enumerate(adapted.instructions, 1):
             # "coconut cream" in a step is the substitute, not the target
             if self._mentions_target(step, ev, ignore=adapted.substitute):
