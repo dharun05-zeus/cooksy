@@ -129,6 +129,11 @@ def index() -> FileResponse:
     return FileResponse(WEB_DIR / "index.html")
 
 
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon() -> FileResponse:
+    return FileResponse(WEB_DIR / "favicon.svg", media_type="image/svg+xml")
+
+
 @app.get("/api/status")
 def status() -> dict:
     c = sessions.components

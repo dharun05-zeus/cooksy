@@ -29,7 +29,21 @@ the AI wrote the code and drafted the documentation under my direction.
   answers, its speed on my laptop, and the evaluation report.
 - **User interface design.** I chose the visual design of the web UI and specified that it
   must show only features the system really has (no cooking times, ratings or nutrition,
-  which the dataset does not contain).
+  which the dataset does not contain). I provided the home-page mockup that the hero,
+  feature pills and diet cards follow, supplied the chef illustration, and asked for a
+  larger chat panel.
+- **Specification of the substitution feature.** After testing the assignment's banana
+  bread example myself, I judged that the answer did not meet the brief and wrote a detailed
+  specification for reworking it: quantities only from the dataset (supported, estimated or
+  explicitly unknown, never a silent 1:1), a role-by-role analysis of what each substitute
+  can and cannot replace, a transparent ranking that keeps evidence strength separate from
+  functional fit, a moisture check against the existing ingredients, labelled texture
+  predictions, an adaptation status, and eight test scenarios.
+- **Finding problems by using the product.** I tested conversations by hand and reported
+  the failures, which were then fixed with tests: a removed restriction that stayed active
+  ("mushrooms are okay"), a diet shown as "no vegetarian", answers that were too long and
+  technical (now a short summary first), and missing cuisine and photo data, which I asked
+  to be checked against the dataset before deciding how to present it.
 
 ## The AI assistant's role
 
@@ -39,14 +53,16 @@ the AI wrote the code and drafted the documentation under my direction.
 | Data analysis | Profiled the three JSON files and reported quirks (the `ADVERTISEMENT` suffix, one-paragraph instructions, placeholder records, duplicates) for me to decide on |
 | Tests and evaluation | Wrote the unit tests, the evaluation cases and the evaluation runner, and labelled the 60-line normalization sample |
 | Documentation | Drafted the README, DESIGN and the evaluation discussion |
+| Web UI | Implemented the page to my mockup (layout, icons, responsive behaviour) and made the chef image's background transparent |
 
 ## LLMs inside the application
 
 The assistant itself uses an LLM at run time (see DESIGN.md §11):
 
 - **Qwen3 4B via Ollama** (default, local), or **Gemini** if an API key is configured.
-- The LLM turns messages into structured requests, chooses substitutes from evidenced
-  candidates and writes the edits, and (optionally) writes a short summary.
+- The LLM turns messages into structured requests, rewords the recipe steps a substitution
+  changes, and (optionally) writes a short summary. Code chooses the substitute and its
+  quantity.
 - It never produces dataset facts: counts, rankings, recipe IDs and ingredient lists come from
   code, and LLM output is validated (JSON schema, guards, substitution checks, grounding check).
 

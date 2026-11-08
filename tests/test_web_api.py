@@ -19,8 +19,16 @@ def client(monkeypatch, store, index):
 
 
 def test_page_and_status(client):
-    assert "Cooksy" in client.get("/").text
+    page = client.get("/")
+    assert "Cooksy" in page.text
+    assert page.headers["cache-control"] == "no-cache"  # updates show without a hard refresh
     assert client.get("/api/status").json()["llm"] is None
+
+
+def test_page_assets_exist(client):
+    for path in ("/favicon.ico", "/static/favicon.svg", "/static/hero-chef.png",
+                 "/static/app.css", "/static/app.js"):
+        assert client.get(path).status_code == 200, path
 
 
 def test_overview_uses_real_counts(client):

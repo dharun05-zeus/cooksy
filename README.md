@@ -1,8 +1,8 @@
-# Recipe Intelligence Assistant
+# Cooksy
 
-A conversational assistant over the [Recipe Box](https://eightportions.com/datasets/Recipes/)
-dataset (~125,000 recipes) that **searches, analyzes, matches and adapts recipes**, with every
-fact grounded in the dataset.
+**Cooksy** is a conversational recipe assistant over the
+[Recipe Box](https://eightportions.com/datasets/Recipes/) dataset (~125,000 recipes) that
+**searches, analyzes, matches and adapts recipes**, with every fact grounded in the dataset.
 
 - **Search and Q&A**: dish names, ingredients or descriptions; follow-ups like "I cannot have
   dairy" refine the current search; "show me the second one".
@@ -13,10 +13,13 @@ fact grounded in the dataset.
   can read, showing matched, missing and extra ingredients; constraints are never relaxed
   silently.
 - **Evidence-based substitution**: replacements backed by recipes in the dataset (cited by
-  ID), labelled direct or indirect, with an adapted ingredient list and instructions.
+  ID, labelled direct or indirect), ranked by stated rules, with a quantity taken from the
+  dataset or marked unknown (never guessed), a moisture check against similar recipes,
+  predicted texture changes, and an adapted recipe. The answer opens with a short plain
+  summary; the evidence is folded below it.
 
-The LLM understands the request and reasons about substitutions; **code computes every fact**
-and checks the LLM's output. See [DESIGN.md](DESIGN.md) for the architecture and decisions,
+The LLM understands the request and rewords recipe steps; **code computes every fact**,
+chooses substitutes, and checks the LLM's output. See [DESIGN.md](DESIGN.md) for the architecture and decisions,
 [eval/REPORT.md](eval/REPORT.md) for the evaluation, and [AI_USAGE.md](AI_USAGE.md).
 
 ## Setup (about 10 minutes)
@@ -63,8 +66,10 @@ Web UI (then open http://localhost:8000):
 uv run recipebot web
 ```
 
-Chat on the right; diet filters, "What can I cook?" and statistics forms on the left run
-instantly without the LLM and share the same conversation.
+Chat on the right; diet cards, "What can I cook?" and statistics forms on the left run
+instantly without the LLM and share the same conversation. The search box on the home page
+also takes voice input in browsers that support it (Chrome, Edge, Safari). If the page looks
+outdated after an update, press Ctrl+F5 once.
 
 Command line:
 
@@ -87,7 +92,9 @@ In the CLI: `/state` shows active constraints, `/reset` starts over, `/quit` exi
 Things to try: *"Find a penne pasta recipe"* → *"I cannot have dairy"* → *"Show me the first
 one"*; *"How many recipes contain both garlic and onion? What percentage is that?"*;
 *"I have tempeh and kimchi. Suggest recipes with at most one step."* (no match);
-*"Find chocolate chip cookies"* → *"I cannot have dairy. Replace the butter in the first one."*
+*"Find chocolate chip cookies"* → *"I cannot have dairy. Replace the butter in the first one."*;
+*"Take this banana bread recipe and remove eggs."* → *"Use applesauce instead."*;
+*"Find vegetarian pasta without mushrooms."* → *"Actually, mushrooms are okay. But exclude dairy."*
 
 ## Evaluation and tests
 
@@ -127,10 +134,17 @@ tests/             unit tests on a 9-record fixture dataset
 ## Limitations
 
 - The dataset has no cooking times, servings, nutrition or cuisine labels; questions about
-  them are answered with "the dataset does not record …".
+  them are answered with "the dataset does not record …". Recipe photos are not shown: about
+  two-thirds of records name a picture file, but the images are a separate, much larger
+  download.
+- Substitution amounts come only from the dataset, so many are "not established" (the
+  answer then labels the recipe an incomplete experimental adaptation). Texture effects are
+  predictions from a hand-written role table, not tested results.
 - Allergen and diet checks read recipe text with word lists; they are conservative
   (uncertain items are excluded) but are **not a medical safety guarantee**.
 - Ingredient normalization is rule-based (59/60 on a random sample); brand names and unusual
   phrasings can still be misread.
 - A 4B model on a CPU is slow and makes parsing mistakes on some phrasings; guards catch many
   (see the report). A larger model or Gemini improves both.
+- Voice input uses the browser's speech recognition; in Chrome that sends the audio to
+  Google. Typing works everywhere.
