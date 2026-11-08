@@ -4,7 +4,7 @@ Parser: ollama (qwen3:4b). Covers: substitution, restriction respected, other co
 
 **User:** Find chocolate chip cookies.
 
-*parser: ollama (qwen3:4b), 4.0s*
+*parser: ollama (qwen3:4b), 4.1s*
 
 ```text
 12,819 recipes share at least one word with 'chocolate chip cookies'. The 5 most relevant:
@@ -37,7 +37,7 @@ Easy Chocolate Chip Cookies without butter: supported by the dataset, high confi
 - Swap: replace 1/2 cup butter, softened with shortening; same amount as the original (the dataset offers this)
 - Why: 4 recipes in the dataset offer it as an alternative to butter, and it adds fat and tenderness like butter does.
 - Other options: olive oil (2/3 cup), vegetable shortening (same amount)
-- Expect: Richness and tenderness: shortening provides fat, so this may stay close to the original; tenderness: shortening provides tenderness, so this may stay close to the original.
+- Expect: Flavor: shortening does not provide flavor, so the result may taste different.
 - Bake: as the original, 350 degrees F (175 degrees C); 11 to 15 minutes. Check with a toothpick.
 - Still to replace: 1 (18.25 ounce) package yellow cake mix; 2 cups semisweet chocolate chips
 

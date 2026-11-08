@@ -4,7 +4,7 @@ Parser: ollama (qwen3:4b). Covers: weak or conflicting evidence, quantity not in
 
 **User:** Take this banana bread recipe and remove eggs. Use only ingredients that appear in the dataset.
 
-*parser: ollama (qwen3:4b), 22.7s*
+*parser: ollama (qwen3:4b), 21.3s*
 
 ```text
 Using 'Banana Banana Bread' [ar:kq.naD.8G19M4UU9dVvJgHtpfo.l/eC], the top match for 'banana bread' that contains eggs.
@@ -79,7 +79,7 @@ This is not a guarantee that the dish is safe for an allergy.
 
 **User:** Use applesauce instead.
 
-*parser: ollama (qwen3:4b), 26.7s*
+*parser: ollama (qwen3:4b), 28.4s*
 
 ```text
 Banana Banana Bread without eggs: experimental, low confidence  [ar:kq.naD.8G19M4UU9dVvJgHtpfo.l/eC]

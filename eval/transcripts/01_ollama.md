@@ -4,7 +4,7 @@ Parser: ollama (qwen3:4b). Covers: multi-turn follow-up, restriction applies to 
 
 **User:** Find a penne pasta recipe.
 
-*parser: ollama (qwen3:4b), 3.9s*
+*parser: ollama (qwen3:4b), 4.7s*
 
 ```text
 3,352 recipes share at least one word with 'penne pasta'. The 5 most relevant:
@@ -30,7 +30,7 @@ Ask for 'the first one' (or any number) to see its full recipe.
 
 **User:** I cannot have dairy.
 
-*parser: ollama (qwen3:4b), 8.3s*
+*parser: ollama (qwen3:4b), 8.8s*
 
 ```text
 662 recipes share at least one word with 'penne pasta' and satisfy your constraints. The 5 most relevant:
@@ -61,6 +61,7 @@ Ask for 'the first one' (or any number) to see its full recipe.
    Ingredients: 2 pounds sweet Italian sausage, roughly chopped; 3/4 cups olive oil, divided; 1 1/2 cups onion, diced and divided; 1 tablespoon dried oregano, crushed; 2 tablespoons garlic, chopped; 6 cups plus 6 whole tomatoes, chopped; 1/4 cup parsley, chopped; 1 cup basil, julienned and divided; 2 cups frozen peas; 2 pounds penne pasta; 3 ears corn, blanched; Salt and pepper
 
 Filters applied to the whole dataset: exact duplicates removed (same title and ingredient set); excludes dairy
+Note: No dairy: removed 71,142 recipes that contain it and 4,778 where it is uncertain (e.g. margarine, chocolate); hard constraints remove uncertain cases too.
 Note: Your constraints removed 2,690 of the 3,352 recipes matching the search words (uncertain cases are removed too).
 Ask for 'the first one' (or any number) to see its full recipe.
 Active constraints: no dairy.
@@ -68,7 +69,7 @@ Active constraints: no dairy.
 
 **User:** Show me the ingredients for the first one.
 
-*parser: ollama (qwen3:4b), 9.3s*
+*parser: ollama (qwen3:4b), 10.5s*
 
 ```text
 Penne Pasta with Spinach and Bacon  [ar:23to8XzUux0FF.g5ZFsqnxvhByMzfJ.]  (source: Allrecipes)

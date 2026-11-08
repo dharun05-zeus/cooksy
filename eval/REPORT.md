@@ -17,7 +17,7 @@ Re-run with `uv run python eval/run_eval.py` (add `--provider none` to run witho
 
 Normalization: the first parser version got 51/60 of these lines right; 8 of its errors were fixed by general rules since (no line-specific rules).
 
-Parser: LLM produced 40/40 patches; guards corrected 11; median 5.45 s per message.
+Parser: LLM produced 40/40 patches; guards corrected 11; median 5.65 s per message.
 
 Field accuracy: exclude 13/13, intent 39/39, intent_in 1/1, k 2/2, limit 2/2, max_steps 5/5, order 2/2, pantry 3/3, preferences 1/1, query_has 12/12, recipe_query_has 1/1, remove_exclude 1/1, result_number 5/5, stats_include 4/4, stats_operation 11/11, substitute_target 4/4
 
@@ -127,9 +127,9 @@ I do not have access to the Recipe Box dataset or any specific recipe databases.
 **Assistant:** correct: all 5 cited IDs exist
 
 ```text
-Answer: Fewest instruction steps among 11,710 matching recipes.
+Answer: Fewest instruction steps among 11,712 matching recipes.
 Filters: contains 'tomato' (same ingredient or its varieties: tomato, plum tomato, cherry tomato, roma tomato, grape tomato, beefsteak tomato and 2 more)
-Recipes analyzed: 11,710
+Recipes analyzed: 11,712
 Method: Step = one non-empty instruction line, excluding site boilerplate; a recipe stored as one paragraph is split into sentences. Sorted by steps, then ID.
   rank: 1 | recipe_id: ar:/0wx00RefE0VHzlff/GBszObKmj63Pi | title: Tomato Basil Smoothie | steps: 1 | counted_by: line
   rank: 2 | recipe_id: ar:3yxgq0iAqrlm2lHnLoxwJ8vQTHCd/Cm | title: Mediterranean Zucchini and Chickpea Salad | steps: 1 | counted_by: line
@@ -264,18 +264,30 @@ Full transcripts are in `eval/transcripts/`.
   exclusion (uncertain items included) or a step limit. The two no-match cases say so and
   list the closest alternatives separately, each marked with the constraint it breaks.
 - **The parser** (Qwen3 4B, local, CPU) passed 40/40 labelled messages, but only with help:
-  guards corrected 12 of the 40 LLM outputs. Without the LLM, the fallback parser alone passes
+  guards corrected 11 of the 40 LLM outputs. Without the LLM, the fallback parser alone passes
   27/40, so the LLM is what makes free-form phrasing work. Median 5.7 s per message.
 - **Substitution** passed its property checks in all 6 cases: restrictions respected,
   unchanged lines kept verbatim, every cited recipe ID exists, weak evidence flagged, a
-  forbidden requested replacement refused. Results: chocolate-chip cookies without butter
-  → shortening (strong evidence); pasta with cream, no dairy → coconut milk (moderate);
-  banana bread without eggs → applesauce, flagged as weak evidence (only 9 of 183 banana
-  breads in the dataset lack eggs; applesauce, silken tofu and soy yogurt each appear in one
-  of them). The answer still lists the supporting recipes, the adjusted ingredients and
-  steps, and the expected trade-offs (less rise, since applesauce does not leaven). Qwen's
-  rewrite added an unrelated line twice, so validation rejected it and the rule-based
-  rewrite was shown instead.
+  forbidden requested replacement refused. Code ranks the candidates and picks the
+  substitute; Qwen only rewords the affected steps (accepted in 3 of the 4 adaptations).
+  Results:
+  - chocolate-chip cookies without butter, no dairy → shortening: strong evidence, and
+    dataset lines offer it at the same amount, so the adaptation is *supported*;
+  - pasta with cream, no dairy → olive oil: moderate evidence (used by many same-dish
+    recipes without cream); coconut milk has only one direct line;
+  - pancakes without milk → cream: strong evidence ("milk or cream" lines);
+  - banana bread without eggs → silken tofu, *incomplete experimental adaptation*. Only 9
+    of 183 banana breads in the dataset lack eggs; silken tofu, applesauce and soy yogurt
+    each appear in one of them (weak evidence). Silken tofu ranks first because it covers
+    the egg's main role (binding) fully. Its amount cannot be scaled from its recipe, so
+    the answer says "quantity not established by the dataset" instead of guessing, and
+    offers applesauce (about 2/3 cup, estimated from a same-dish recipe by flour) as an
+    alternative. It also warns that this recipe is already wetter than most banana breads
+    (117% of the flour by volume vs a median of 80%), so a wet substitute risks a gummy
+    centre.
+- **Conversations**: all 8 pass, including two added after manual testing found bugs: an
+  exclusion lifted in the same message as a new one ("mushrooms are okay, but exclude
+  dairy") and a follow-up with a requested replacement ("use applesauce instead").
 - **Every recipe ID** in every reply of every conversation exists in the dataset.
 
 ### Where a one-shot LLM answer is wrong, and how the system handles it
@@ -324,11 +336,21 @@ numbers) and 5/5 for the assistant.
 4. **A line-numbering bug.** In 2,128 recipes with section headings ("For the sauce:"), the
    substituted line could be off by one. It was found in review, fixed at build time, and
    verified on all 1,273,583 ingredient lines.
-5. **The LLM's rewrites sometimes fail validation.** Qwen3 often forgot to rewrite an
-   instruction step that mentions the target. Those steps are now patched automatically and
-   the patch is listed in the changes. If validation still fails, a rule-based rewrite is
-   used, and only when the evidence is clear.
-6. **Latency.** On a laptop CPU: about 5–10 s per message and 15–50 s per substitution.
+5. **The first substitution answers did not meet the brief.** For banana bread without
+   eggs, the first version either declined outright or proposed applesauce with no amount
+   and a 1:1 assumption elsewhere, and the LLM chose the substitute. It was reworked so
+   that code ranks candidates by stated rules (evidence strength kept separate from
+   functional fit), quantities come only from the dataset or are marked unknown, a moisture
+   check compares the recipe with others of the same dish, and the LLM only rewords steps.
+   A step edit that adds a number or still names the ingredient is rejected and that step
+   keeps the rule-based rewrite (Qwen once added "2 cups mashed bananas" to the replacement).
+6. **LLM slips found by using the product.** Manual testing found failures the test sets
+   had not covered, each now fixed with a guard and a test: Qwen re-added "mushrooms" as an
+   exclusion in "mushrooms are okay, but exclude dairy"; it invented a replacement
+   ("apricot mignonette", then "dairy-free butter") for "replace the butter"; and for
+   "exclude eggs too" it removed eggs from the user's ingredient list instead of only
+   excluding them. A display bug also showed the vegetarian diet as "no vegetarian".
+7. **Latency.** On a laptop CPU: about 5–10 s per message and 15–50 s per substitution.
    LLM-written summaries are therefore off for local models.
 
 ### Limits of this evaluation
