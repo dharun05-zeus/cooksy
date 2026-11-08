@@ -241,6 +241,9 @@ table.t th { color: var(--muted); font-weight: 600; }
 details.sub-section summary { cursor: pointer; }
 details.sub-section[open] summary { margin-bottom: 4px; }
 .ranking li { font-size: 12px; }
+.kv.summary { grid-template-columns: 110px 1fr; font-size: 13px; gap: 6px 10px; }
+.kv.summary dt { font-weight: 600; }
+details.fold { border-top: 1px solid var(--line); padding-top: 8px; }
 
 .tabs { display: flex; gap: 6px; margin: 10px 0 8px; background: var(--panel-2); padding: 4px; border-radius: 12px; }
 .tab { flex: 1; border: 0; background: transparent; padding: 7px; border-radius: 9px; font-weight: 600; color: var(--muted); }

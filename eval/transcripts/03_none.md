@@ -4,7 +4,7 @@ Parser: rules. Covers: multi-turn follow-up, explainable ranking
 
 **User:** I have eggs, onions, tomatoes, and rice. Suggest five recipes using as many of these as possible, with no peanuts and at most six instruction steps. Prefer recipes that need the fewest additional ingredients.
 
-*parser: rules, 0.5s*
+*parser: rules, 1.0s*
 
 ```text
 Your ingredients (as understood): egg, onion, tomato, rice
@@ -46,7 +46,7 @@ Active constraints: no peanuts, at most 6 steps.
 
 **User:** Exclude eggs too.
 
-*parser: rules, 0.3s*
+*parser: rules, 0.6s*
 
 ```text
 Your ingredients (as understood): onion, tomato, rice

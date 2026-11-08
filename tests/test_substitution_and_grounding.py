@@ -222,7 +222,9 @@ def test_no_evidence_in_the_dataset_declines(bot):
     result = engine(bot).adapt("fn:f3", "egg", [])
     assert result.adapted is None and result.status == "not_adapted"
     assert "would rather not guess" in result.message
-    assert "No adapted recipe" in templates.render_substitution(result, "rules")
+    text = templates.render_substitution(result, "rules")
+    assert text.startswith("Margarine Cookies without egg") and "would rather not guess" in text
+    assert "Adapted recipe" not in text
 
 
 # ----- scenario 4: quantities -------------------------------------------------------
@@ -385,12 +387,19 @@ def test_render_and_payload_label_status_quantity_and_predictions(bot):
                                 original_ingredients=ORIGINAL, status=e.status(cand),
                                 texture=e._texture(ev, cand, None))
     text = templates.render_substitution(result, "the ranking rules in code")
-    assert "Incomplete experimental adaptation" in text
-    assert "Replacement quantity (unknown): " + UNKNOWN_QUANTITY in text
+    # the short answer comes first, in plain words
+    assert text.startswith("Margarine Cookies without egg: experimental, amount unknown, "
+                           "low confidence")
+    assert "- Swap: replace 1 egg with applesauce; the dataset doesn't say how much to use" in text
+    assert text.index("- Swap:") < text.index("Adapted recipe") < text.index("DETAILS")
+    assert "Incomplete recipe" in text
+    assert "Amount (unknown): " + UNKNOWN_QUANTITY in text
     assert "Predicted texture changes (predictions, not verified by the dataset)" in text
     assert "Caution: the evidence for applesauce is weak" in text
     assert "Indirect evidence: a related recipe uses it" in text
     data = payloads.substitution(result, "rules")
+    assert data["summary"]["confidence"] == "low"
+    assert data["summary"]["rows"][0][0] == "Swap"
     assert data["status"] == "incomplete"
     assert data["adapted"]["quantity"]["status"] == "unknown"
     assert data["candidates"][0]["fit"] == "partial" and data["candidates"][0]["direct"] is False

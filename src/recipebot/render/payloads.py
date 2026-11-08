@@ -9,7 +9,7 @@ from recipebot.engines.stats import StatsResult
 from recipebot.engines.store import RecipeStore
 from recipebot.engines.substitution import RANKING_RULE, SubstitutionResult
 from recipebot.nlp.steps import instruction_lines, split_sentences
-from recipebot.render.templates import EVIDENCE_TYPES
+from recipebot.render.templates import EVIDENCE_TYPES, substitution_summary
 
 
 def recipe(store: RecipeStore, recipe_id: str) -> dict | None:
@@ -85,6 +85,7 @@ def substitution(result: SubstitutionResult, chosen_by: str) -> dict:
     original = {line.strip() for line in result.original_ingredients}
     return {
         "type": "substitution",
+        "summary": substitution_summary(result),
         "recipe": {"id": result.recipe_id, "title": result.title},
         "target": ev.target,
         "target_lines": [text for _, text in ev.target_lines],

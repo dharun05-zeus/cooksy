@@ -4,7 +4,7 @@ Parser: rules. Covers: no-match case, constraint never relaxed silently
 
 **User:** I have tempeh and kimchi. Suggest recipes with at most one instruction step.
 
-*parser: rules, 0.2s*
+*parser: rules, 0.4s*
 
 ```text
 Your ingredients (as understood): tempeh, kimchi

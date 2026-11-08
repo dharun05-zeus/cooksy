@@ -12,7 +12,7 @@ Re-run with `uv run python eval/run_eval.py` (add `--provider none` to run witho
 | stats | 10/10 | every number equals an independent reference computation |
 | matching | 7/7 | no constraint violated; matched/extra lists and ranking order re-derived |
 | substitution | 6/6 | restriction respected, unchanged lines verbatim, evidence IDs exist, weak evidence flagged |
-| conversations | 6/7 | scripted multi-turn conversations, incl. the PDF examples |
+| conversations | 7/7 | scripted multi-turn conversations, incl. the PDF examples |
 | one-shot LLM vs assistant | 0/5 vs 5/5 | same questions, answers checked against the dataset (one-shot: 2 declined, 3 gave unsupported numbers; see the discussion) |
 
 Normalization: the first parser version got 51/60 of these lines right; 8 of its errors were fixed by general rules since (no line-specific rules).
@@ -25,7 +25,6 @@ Field accuracy: exclude 13/13, intent 39/39, intent_in 1/1, k 2/2, limit 2/2, ma
 
 - **normalization** — 1 whole rind from 1 wedge Parmesan, optional: expected parmesan rind, got rind from wedge parmesan
 - **parser** — quick vegetarian dinner with chickpeas: query_has: expected ['chickpea'], got vegetarian dinner
-- **conversations** — Substitution with strong evidence (PDF Task 3): turn 2: reply lacks 'Replacement quantity (supported)'
 
 ## One-shot LLM vs the assistant
 
@@ -250,7 +249,7 @@ Full transcripts are in `eval/transcripts/`.
 - PASS — [Aggregate statistics (PDF Task 1)](transcripts/02_ollama.md) (aggregate statistics, stated filters and denominator)
 - PASS — [Ingredient matching with a follow-up (PDF Task 2)](transcripts/03_ollama.md) (multi-turn follow-up, explainable ranking)
 - PASS — [No eligible recipe (PDF Task 2)](transcripts/04_ollama.md) (no-match case, constraint never relaxed silently)
-- FAIL — [Substitution with strong evidence (PDF Task 3)](transcripts/05_ollama.md) (substitution, restriction respected, other conflicts reported)
+- PASS — [Substitution with strong evidence (PDF Task 3)](transcripts/05_ollama.md) (substitution, restriction respected, other conflicts reported)
 - PASS — [Substitution with weak or conflicting evidence (PDF Task 3)](transcripts/06_ollama.md) (weak or conflicting evidence, quantity not invented, follow-up with a requested replacement)
 - PASS — [Unsupported attribute (PDF Task 1)](transcripts/07_ollama.md) (refusing to fabricate)
 

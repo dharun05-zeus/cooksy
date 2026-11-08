@@ -42,15 +42,15 @@
     - user: Find chocolate chip cookies.
       expect: {reply_has: ["cookie"]}
     - user: I cannot have dairy. Replace the butter in the first one.
-      expect: {reply_has: ["Selected replacement:", "Candidates from the dataset, ranked", "Ranking rules:", "Replacement quantity (supported)", "not a guarantee"], state: {exclude_has: dairy}}
+      expect: {reply_has: ["- Swap:", "- Why:", "Selected replacement:", "Evidence from the dataset, ranked", "ranking rules:", "Amount (supported)", "not a guarantee"], state: {exclude_has: dairy}}
 
 - name: Substitution with weak or conflicting evidence (PDF Task 3)
   covers: [weak or conflicting evidence, quantity not invented, follow-up with a requested replacement]
   turns:
     - user: Take this banana bread recipe and remove eggs. Use only ingredients that appear in the dataset.
-      expect: {reply_has: ["Candidates from the dataset, ranked", "Versions of this dish in the dataset made without eggs", "Adaptation status:", "Expected trade-offs of removing eggs"], reply_has_any: ["weak", "conflicting", "No candidate can be selected"], reply_lacks: ["same amount as the original"]}
+      expect: {reply_has: ["- Expect:", "Evidence from the dataset, ranked", "Versions of this dish in the dataset made without eggs"], reply_has_any: ["low confidence", "no reliable swap found"], reply_lacks: ["same amount as the original"]}
     - user: Use applesauce instead.
-      expect: {reply_has: ["Selected replacement: applesauce", "selected by you (requested)", "Replacement quantity"]}
+      expect: {reply_has: ["- Swap: replace 2 eggs, beaten with applesauce", "(your choice)", "selected by you (requested)", "Amount ("]}
 
 - name: Unsupported attribute (PDF Task 1)
   covers: [refusing to fabricate]

@@ -4,7 +4,7 @@ Parser: ollama (qwen3:4b). Covers: multi-turn follow-up, explainable ranking
 
 **User:** I have eggs, onions, tomatoes, and rice. Suggest five recipes using as many of these as possible, with no peanuts and at most six instruction steps. Prefer recipes that need the fewest additional ingredients.
 
-*parser: ollama (qwen3:4b), 19.4s; guard corrections: ["add_exclude += ['peanuts']", 'max_steps None -> 6']*
+*parser: ollama (qwen3:4b), 20.2s; guard corrections: ["add_exclude += ['peanuts']", 'max_steps None -> 6']*
 
 ```text
 Your ingredients (as understood): egg, onion, tomato, rice
@@ -46,7 +46,7 @@ Active constraints: no peanuts, at most 6 steps.
 
 **User:** Exclude eggs too.
 
-*parser: ollama (qwen3:4b), 19.2s; guard corrections: ["add_exclude += ['eggs']"]*
+*parser: ollama (qwen3:4b), 20.6s; guard corrections: ["add_exclude += ['eggs']"]*
 
 ```text
 Your ingredients (as understood): onion, tomato, rice

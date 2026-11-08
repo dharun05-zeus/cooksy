@@ -1783,7 +1783,7 @@
         "strength": "weak",
         "message": "",
         "validation_errors": [],
-        "seconds": 19.3
+        "seconds": 12.4
       },
       {
         "name": "chocolate chip cookies, butter, no dairy (strong evidence)",
@@ -1795,7 +1795,7 @@
         "strength": "strong",
         "message": "",
         "validation_errors": [],
-        "seconds": 12.1
+        "seconds": 10.8
       },
       {
         "name": "pasta with heavy cream, cream, no dairy (PDF example)",
@@ -1807,7 +1807,7 @@
         "strength": "moderate",
         "message": "",
         "validation_errors": [],
-        "seconds": 46.8
+        "seconds": 39.7
       },
       {
         "name": "pancakes without milk",
@@ -1819,7 +1819,7 @@
         "strength": "strong",
         "message": "",
         "validation_errors": [],
-        "seconds": 1.0
+        "seconds": 0.7
       },
       {
         "name": "requested replacement that breaks the restriction",
@@ -1831,7 +1831,7 @@
         "strength": "excluded",
         "message": "Your requested replacement 'cream cheese' breaks your restrictions, so I did not use it.",
         "validation_errors": [],
-        "seconds": 1.1
+        "seconds": 0.7
       },
       {
         "name": "target not in the recipe",
@@ -1843,7 +1843,7 @@
         "strength": "none",
         "message": "This recipe does not contain eggs, so nothing needs replacing.",
         "validation_errors": [],
-        "seconds": 0.3
+        "seconds": 0.1
       }
     ],
     "passed": 6,
@@ -1899,10 +1899,8 @@
           "restriction respected",
           "other conflicts reported"
         ],
-        "passed": false,
-        "problems": [
-          "turn 2: reply lacks 'Replacement quantity (supported)'"
-        ],
+        "passed": true,
+        "problems": [],
         "transcript": "transcripts/05_ollama.md"
       },
       {
@@ -1926,7 +1924,7 @@
         "transcript": "transcripts/07_ollama.md"
       }
     ],
-    "passed": 6,
+    "passed": 7,
     "total": 7
   },
   "baseline": {
