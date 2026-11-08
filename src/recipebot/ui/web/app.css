@@ -117,12 +117,8 @@ code { background: var(--panel-2); padding: 1px 6px; border-radius: 6px; font-si
   .features { gap: 8px; }
   .feature { font-size: 12px; padding: 6px 10px; gap: 6px; }
 }
-.hero-art svg { width: 100%; height: auto; display: block; filter: drop-shadow(0 18px 30px rgba(0,0,0,.45)); }
-.hero-art .steam path { animation: steam 3.2s ease-in-out infinite; }
-.hero-art .steam path:nth-child(2) { animation-delay: .6s; }
-.hero-art .steam path:nth-child(3) { animation-delay: 1.2s; }
-@keyframes steam { 0%, 100% { opacity: .15; transform: translateY(4px); } 50% { opacity: .5; transform: translateY(-4px); } }
-@media (prefers-reduced-motion: reduce) { .hero-art .steam path { animation: none; } }
+/* hero-pasta.svg carries its own steam animation */
+.hero-art img { width: 100%; height: auto; display: block; filter: drop-shadow(0 18px 30px rgba(0,0,0,.45)); }
 
 .features { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
 .feature { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 8px 14px;
