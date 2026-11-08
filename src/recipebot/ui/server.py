@@ -9,14 +9,15 @@ which runs instantly and updates the same conversation state.
 
 from __future__ import annotations
 
+import logging
 import statistics as pystats
 import threading
 from contextlib import asynccontextmanager
 from functools import lru_cache
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -75,6 +76,16 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(title="Recipe Intelligence", lifespan=lifespan)
 app.mount("/static", StaticFiles(directory=WEB_DIR), name="static")
+log = logging.getLogger("recipebot.web")
+
+
+@app.exception_handler(Exception)
+async def unexpected_error(request: Request, exc: Exception) -> JSONResponse:
+    """Log the full error in the terminal and tell the page what happened."""
+    log.exception("Error while handling %s", request.url.path)
+    return JSONResponse(status_code=500, content={
+        "detail": f"The server hit an error ({type(exc).__name__}: {str(exc)[:200]}). "
+                  "Details are in the terminal running `recipebot web`."})
 
 
 def _state(bot: Orchestrator) -> dict:

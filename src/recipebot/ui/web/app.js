@@ -48,9 +48,15 @@ let current = {};  // the session state from the last response
 
 // ---------- API ----------
 async function api(path, body) {
-  const res = await fetch(path, body === undefined ? {} : {
-    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
-  });
+  let res;
+  try {
+    res = await fetch(path, body === undefined ? {} : {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+    });
+  } catch {
+    throw new Error("The server is not reachable. Start it in a terminal with: uv run recipebot web " +
+      "(and keep that terminal open), then reload this page.");
+  }
   if (!res.ok) {
     const detail = await res.json().catch(() => ({}));
     throw new Error(typeof detail.detail === "string" ? detail.detail : `Request failed (${res.status})`);
@@ -104,7 +110,8 @@ async function send(kind, label, payload, target) {
     renderTurn(turn, target);
   } catch (err) {
     waiting.remove();
-    addBot(`<div class="bubble">Sorry, something went wrong: ${esc(err.message)}</div>`);
+    addBot(`<div class="bubble"><b>Could not get an answer.</b><br>${esc(err.message)}</div>`);
+    if (/not reachable/.test(err.message)) setStatus(false, "Server not running");
   } finally {
     setBusy(false);
   }

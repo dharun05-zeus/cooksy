@@ -107,8 +107,13 @@ def web(
     """Start the web UI (http://localhost:8000)."""
     import uvicorn
 
-    _say(f"Loading the dataset, then serving http://localhost:{port} ...", style="green")
-    uvicorn.run("recipebot.ui.server:app", host=host, port=port, log_level="warning")
+    import logging
+
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    _say("Loading the dataset (about 30-60 s)...", style="green")
+    _say(f"When 'Application startup complete' appears, open http://localhost:{port} . "
+         "Keep this terminal open while you use the app; press Ctrl+C to stop.", style="green")
+    uvicorn.run("recipebot.ui.server:app", host=host, port=port, log_level="info")
 
 
 if __name__ == "__main__":
