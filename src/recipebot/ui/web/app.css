@@ -55,7 +55,7 @@ code { background: var(--panel-2); padding: 1px 6px; border-radius: 6px; font-si
 .brand-icon { width: 46px; height: 46px; border-radius: 14px; background: var(--grad);
               display: grid; place-items: center; flex: none; }
 .brand-icon svg { width: 32px; height: 32px; }
-.brand-name { font-weight: 800; font-size: 17px; line-height: 1.1; }
+.brand-name { font-weight: 800; font-size: 26px; line-height: 1.1; letter-spacing: -.01em; }
 .brand-name span { color: var(--orange-2); }
 .brand-tag { color: var(--muted); font-size: 11.5px; margin-top: 3px; }
 .nav { display: flex; flex-direction: column; gap: 4px; }

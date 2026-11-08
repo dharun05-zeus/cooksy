@@ -74,7 +74,7 @@ async def lifespan(_: FastAPI):
     yield
 
 
-app = FastAPI(title="Recipe Intelligence", lifespan=lifespan)
+app = FastAPI(title="Cooksy", lifespan=lifespan)
 app.mount("/static", StaticFiles(directory=WEB_DIR), name="static")
 log = logging.getLogger("recipebot.web")
 

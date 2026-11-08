@@ -19,7 +19,7 @@ def client(monkeypatch, store, index):
 
 
 def test_page_and_status(client):
-    assert "Recipe Intelligence" in client.get("/").text
+    assert "Cooksy" in client.get("/").text
     assert client.get("/api/status").json()["llm"] is None
 
 

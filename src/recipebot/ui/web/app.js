@@ -1,4 +1,4 @@
-// Recipe Intelligence web UI. Everything shown comes from the API's engine results.
+// Cooksy web UI. Everything shown comes from the API's engine results.
 "use strict";
 
 const $ = (s, root = document) => root.querySelector(s);
