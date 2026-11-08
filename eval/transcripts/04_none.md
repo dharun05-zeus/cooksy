@@ -4,7 +4,7 @@ Parser: rules. Covers: multi-turn follow-up, explainable ranking
 
 **User:** I have eggs, onions, tomatoes, and rice. Suggest five recipes using as many of these as possible, with no peanuts and at most six instruction steps. Prefer recipes that need the fewest additional ingredients.
 
-*parser: rules, 1.1s*
+*parser: rules, 0.7s*
 
 ```text
 Your ingredients (as understood): egg, onion, tomato, rice
@@ -41,12 +41,13 @@ Your ingredients (as understood): egg, onion, tomato, rice
 Ranking rule: most of your ingredients used → fewest extra ingredients needed → fewest instruction steps → recipe ID.
 Hard constraints applied before ranking: exact duplicates removed (same title and ingredient set); excludes peanuts (peanut); at most 6 steps
 Note: No quantities were given, so this is a name-level match; whether you have enough of each ingredient was not verified.
+Note: No peanuts: removed 4,184 recipes that contain it and 560 where it is uncertain (e.g. margarine, chocolate); hard constraints remove uncertain cases too.
 Active constraints: no peanuts, at most 6 steps.
 ```
 
 **User:** Exclude eggs too.
 
-*parser: rules, 0.7s*
+*parser: rules, 0.4s*
 
 ```text
 Your ingredients (as understood): onion, tomato, rice
@@ -87,5 +88,7 @@ Ranking rule: most of your ingredients used → fewest extra ingredients needed 
 Hard constraints applied before ranking: exact duplicates removed (same title and ingredient set); excludes peanuts (peanut); excludes eggs (egg); at most 6 steps
 Note: 'eggs' is excluded by your constraints, so it is not counted as one of your ingredients.
 Note: No quantities were given, so this is a name-level match; whether you have enough of each ingredient was not verified.
+Note: No peanuts: removed 4,184 recipes that contain it and 560 where it is uncertain (e.g. margarine, chocolate); hard constraints remove uncertain cases too.
+Note: No eggs: removed 34,658 recipes that contain it and 295 where it is uncertain (e.g. margarine, chocolate); hard constraints remove uncertain cases too.
 Active constraints: no peanuts, no eggs, at most 6 steps.
 ```

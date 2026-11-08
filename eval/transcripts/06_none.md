@@ -30,7 +30,7 @@ Ask for 'the first one' (or any number) to see its full recipe.
 
 **User:** I cannot have dairy. Replace the butter in the first one.
 
-*parser: rules, 1.9s*
+*parser: rules, 1.0s*
 
 ```text
 Easy Chocolate Chip Cookies without butter: supported by the dataset, high confidence  [ar:RBAW5pewzXTtgX.2bKuw8wv5WUm0rJW]

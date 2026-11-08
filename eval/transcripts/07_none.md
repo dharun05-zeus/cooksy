@@ -4,7 +4,7 @@ Parser: rules. Covers: weak or conflicting evidence, quantity not invented, foll
 
 **User:** Take this banana bread recipe and remove eggs. Use only ingredients that appear in the dataset.
 
-*parser: rules, 3.8s*
+*parser: rules, 2.0s*
 
 ```text
 Using 'Banana Banana Bread' [ar:kq.naD.8G19M4UU9dVvJgHtpfo.l/eC], the top match for 'banana bread' that contains eggs.
@@ -79,7 +79,7 @@ This is not a guarantee that the dish is safe for an allergy.
 
 **User:** Use applesauce instead.
 
-*parser: rules, 3.8s*
+*parser: rules, 2.1s*
 
 ```text
 Banana Banana Bread without eggs: experimental, low confidence  [ar:kq.naD.8G19M4UU9dVvJgHtpfo.l/eC]

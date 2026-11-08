@@ -19,6 +19,7 @@ from pydantic import BaseModel
 
 from recipebot.engines.stats import RecipeFilter, apply_filter
 from recipebot.engines.store import RecipeStore
+from recipebot.nlp.allergens import DIETS
 from recipebot.nlp.text import fold
 
 SortKey = Literal["most_matched", "fewest_extra", "fewest_steps"]
@@ -173,10 +174,14 @@ def _violations(store: RecipeStore, recipe: MatchedRecipe, request: MatchRequest
         if categories:
             found = [c for c in categories if c in row["allergens"]]
             unsure = [c for c in categories if c in row["allergens_uncertain"]]
+            # "not vegetarian: contains meat", not "contains vegetarian"
+            diet = term.lower() in DIETS
             if found:
-                problems.append(f"contains {term} ({', '.join(found)})")
+                problems.append(f"not {term}: contains {', '.join(found)}" if diet
+                                else f"contains {term} ({', '.join(found)})")
             elif unsure:
-                problems.append(f"may contain {term} ({', '.join(unsure)}, uncertain)")
+                problems.append(f"may not be {term}: may contain {', '.join(unsure)} (uncertain)"
+                                if diet else f"may contain {term} ({', '.join(unsure)}, uncertain)")
         else:
             resolved = store.resolve(term, "broad")
             hit = [c for c in row["canonicals"] if c in resolved.matched_names]

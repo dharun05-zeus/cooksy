@@ -61,6 +61,7 @@ Ask for 'the first one' (or any number) to see its full recipe.
    Ingredients: 2 pounds sweet Italian sausage, roughly chopped; 3/4 cups olive oil, divided; 1 1/2 cups onion, diced and divided; 1 tablespoon dried oregano, crushed; 2 tablespoons garlic, chopped; 6 cups plus 6 whole tomatoes, chopped; 1/4 cup parsley, chopped; 1 cup basil, julienned and divided; 2 cups frozen peas; 2 pounds penne pasta; 3 ears corn, blanched; Salt and pepper
 
 Filters applied to the whole dataset: exact duplicates removed (same title and ingredient set); excludes dairy
+Note: No dairy: removed 71,142 recipes that contain it and 4,778 where it is uncertain (e.g. margarine, chocolate); hard constraints remove uncertain cases too.
 Note: Your constraints removed 2,690 of the 3,352 recipes matching the search words (uncertain cases are removed too).
 Ask for 'the first one' (or any number) to see its full recipe.
 Active constraints: no dairy.

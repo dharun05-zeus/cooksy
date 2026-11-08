@@ -339,10 +339,15 @@ async function openRecipe(id) {
 function closeModal() { $("#modal").classList.add("hidden"); }
 
 // ---------- state, status, overview ----------
+// Diets are shown as the diet ("vegetarian"); other restrictions as "no dairy".
+const DIET_NAMES = new Set(["vegetarian", "vegan", "pescatarian"]);
+const isDiet = (term) => DIET_NAMES.has(term.toLowerCase());
+const constraintLabel = (term) => (isDiet(term) ? term : `no ${term}`);
+
 function renderState(s) {
   current = s || {};
   const box = $("#constraints");
-  const items = (s.exclude || []).map((x) => `<span class="chip bad">no ${esc(x)}<button title="Remove" data-remove="${esc(x)}"><span class="i i-x"></span></button></span>`);
+  const items = (s.exclude || []).map((x) => `<span class="chip ${isDiet(x) ? "ok" : "bad"}">${esc(constraintLabel(x))}<button title="Remove" data-remove="${esc(x)}"><span class="i i-x"></span></button></span>`);
   if (s.max_steps) items.push(`<span class="chip need">at most ${s.max_steps} steps</span>`);
   box.innerHTML = items.join("") || `<span class="muted">None. Say "I can't have dairy" or pick a diet.</span>`;
   const bits = [];
@@ -477,7 +482,7 @@ function wire() {
     const pick = t.closest(".chip.pick");
     if (pick) { pick.classList.toggle("on"); return; }
     const remove = t.closest("[data-remove]");
-    if (remove) { const term = remove.dataset.remove; sendAction(`${term} is fine now`, { intent: "clarify", remove_exclude: [term], message: `Removed the restriction: no ${term}. It no longer applies to your searches.` }); return; }
+    if (remove) { const term = remove.dataset.remove; sendAction(`${term} is fine now`, { intent: "clarify", remove_exclude: [term], message: `Removed the restriction: ${constraintLabel(term)}. It no longer applies to your searches.` }); return; }
     const tab = t.closest(".tab");
     if (tab) {
       const card = tab.closest(".recipe");
@@ -501,7 +506,7 @@ function wire() {
     const restriction = f.elements.restriction.value;
     const title = $("[data-adapt]", card).dataset.title;
     closeModal();
-    sendAction(`Replace the ${target} in "${title}"${restriction ? ` (no ${restriction})` : ""}`, {
+    sendAction(`Replace the ${target} in "${title}"${restriction ? ` (${constraintLabel(restriction)})` : ""}`, {
       intent: "substitute", recipe_id: card.dataset.id, substitute: { target },
       add_exclude: restriction ? [restriction] : [],
     });

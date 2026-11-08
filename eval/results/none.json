@@ -1241,7 +1241,7 @@
         "strength": "weak",
         "message": "",
         "validation_errors": [],
-        "seconds": 3.1
+        "seconds": 2.1
       },
       {
         "name": "chocolate chip cookies, butter, no dairy (strong evidence)",
@@ -1253,7 +1253,7 @@
         "strength": "strong",
         "message": "",
         "validation_errors": [],
-        "seconds": 1.6
+        "seconds": 1.2
       },
       {
         "name": "pasta with heavy cream, cream, no dairy (PDF example)",
@@ -1265,7 +1265,7 @@
         "strength": "moderate",
         "message": "",
         "validation_errors": [],
-        "seconds": 1.8
+        "seconds": 1.4
       },
       {
         "name": "pancakes without milk",
@@ -1277,7 +1277,7 @@
         "strength": "strong",
         "message": "",
         "validation_errors": [],
-        "seconds": 1.1
+        "seconds": 0.8
       },
       {
         "name": "requested replacement that breaks the restriction",
@@ -1289,7 +1289,7 @@
         "strength": "excluded",
         "message": "Your requested replacement 'cream cheese' breaks your restrictions, so I did not use it.",
         "validation_errors": [],
-        "seconds": 1.2
+        "seconds": 1.1
       },
       {
         "name": "target not in the recipe",
@@ -1301,7 +1301,7 @@
         "strength": "none",
         "message": "This recipe does not contain eggs, so nothing needs replacing.",
         "validation_errors": [],
-        "seconds": 0.2
+        "seconds": 0.3
       }
     ],
     "passed": 6,

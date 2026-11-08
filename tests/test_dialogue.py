@@ -261,5 +261,14 @@ def test_guard_keeps_pantry_when_an_item_is_only_excluded():
     assert kept.remove_pantry == ["eggs"]
 
 
+def test_diets_are_labelled_as_diets(bot):
+    bot.handle("Find vegetarian pasta recipes without dairy.")
+    assert bot.state.constraints_text() == "no dairy, vegetarian"
+    turn = bot.handle("Find penne.")
+    assert "Active constraints: no dairy, vegetarian" in turn.reply
+    assert "no vegetarian" not in turn.reply
+    assert "vegetarian: no meat, fish, shellfish found" in turn.reply
+
+
 def test_schema_has_no_refs():
     assert "$ref" not in str(inline_schema(StatePatch))

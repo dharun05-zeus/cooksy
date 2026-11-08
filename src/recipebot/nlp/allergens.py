@@ -14,6 +14,14 @@ from recipebot.nlp.text import fold
 
 Status = Literal["contains", "uncertain"]
 
+# Restrictions named after a diet: shown as the diet ("vegetarian"), not as "no vegetarian".
+DIETS = {"vegetarian", "vegan", "pescatarian"}
+
+
+def constraint_label(term: str) -> str:
+    """ "dairy" -> "no dairy"; "vegetarian" -> "vegetarian"."""
+    return term if term.lower() in DIETS else f"no {term}"
+
 
 @dataclass(frozen=True)
 class AllergenHit:

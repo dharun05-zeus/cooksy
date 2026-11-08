@@ -13,6 +13,7 @@ from pydantic import BaseModel
 
 from recipebot.data.models import Source
 from recipebot.engines.store import MatchMode, RecipeStore
+from recipebot.nlp.allergens import DIETS, constraint_label
 
 
 class RecipeFilter(BaseModel):
@@ -99,12 +100,17 @@ def apply_filter(store: RecipeStore, f: RecipeFilter) -> FilterOutcome:
             contains, uncertain = store.category_masks(categories)
             removed, removed_unsure = int((mask & contains).sum()), int((mask & uncertain).sum())
             mask &= ~(contains | uncertain)
-            detail = "" if categories == [term] else f" ({', '.join(categories)})"
-            filters.append(f"excludes {term}{detail}")
+            if term.lower() in DIETS:  # "vegetarian (excludes meat, fish, shellfish)"
+                filters.append(f"{term} (excludes {', '.join(categories)})")
+                what = ", ".join(categories)
+            else:
+                detail = "" if categories == [term] else f" ({', '.join(categories)})"
+                filters.append(f"excludes {term}{detail}")
+                what = "it"
             notes.append(
-                f"Excluding {term}: removed {removed:,} recipes that contain it and "
-                f"{removed_unsure:,} where it is uncertain (e.g. margarine, chocolate); "
-                "hard constraints remove uncertain cases too."
+                f"{constraint_label(term).capitalize()}: removed {removed:,} recipes that "
+                f"contain {what} and {removed_unsure:,} where it is uncertain (e.g. margarine, "
+                "chocolate); hard constraints remove uncertain cases too."
             )
         else:
             # Exclusions are always broad: "no peanuts" also removes peanut oil and peanut butter.

@@ -15,6 +15,7 @@ import numpy as np
 
 from recipebot.engines.stats import RecipeFilter, apply_filter
 from recipebot.engines.store import RecipeStore
+from recipebot.nlp.allergens import DIETS
 from recipebot.nlp.lexicon import Lexicon
 from recipebot.nlp.text import fold
 
@@ -129,7 +130,10 @@ def _constraint_evidence(store: RecipeStore, row, f: RecipeFilter) -> list[str]:
     n = int(row["ingredient_count"])
     for term in f.exclude:
         categories = store.allergens.categories_for(term)
-        if categories:
+        if categories and term.lower() in DIETS:
+            evidence.append(f"{term}: no {', '.join(categories)} found in its {n} ingredient "
+                            "lines, including uncertain items")
+        elif categories:
             detail = "" if categories == [term] else f" ({', '.join(categories)})"
             evidence.append(f"no {term}{detail} found in its {n} ingredient lines, including "
                             "uncertain items")

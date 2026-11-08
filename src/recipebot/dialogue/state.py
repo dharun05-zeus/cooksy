@@ -15,6 +15,7 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 from recipebot.engines.matching import PantryItem, SortKey
+from recipebot.nlp.allergens import constraint_label
 
 Intent = Literal["search", "detail", "stats", "match", "substitute", "clarify", "reset", "help"]
 StatsOperation = Literal[
@@ -94,7 +95,7 @@ class SessionState(BaseModel):
     last_stats: StatsRequest | None = None
 
     def constraints_text(self) -> str:
-        parts = [f"no {term}" for term in self.exclude]
+        parts = [constraint_label(term) for term in self.exclude]
         if self.max_steps is not None:
             parts.append(f"at most {self.max_steps} steps")
         return ", ".join(parts)
