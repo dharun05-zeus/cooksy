@@ -4,7 +4,7 @@ Parser: ollama (qwen3:4b). Covers: no-match case, constraint never relaxed silen
 
 **User:** I have tempeh and kimchi. Suggest recipes with at most one instruction step.
 
-*parser: ollama (qwen3:4b), 10.9s; guard corrections: ['max_steps None -> 1']*
+*parser: ollama (qwen3:4b), 10.3s; guard corrections: ['max_steps None -> 1']*
 
 ```text
 Your ingredients (as understood): tempeh, kimchi

@@ -4,11 +4,11 @@ Parser: rules. Covers: multi-turn follow-up, explainable ranking
 
 **User:** I have eggs, onions, tomatoes, and rice. Suggest five recipes using as many of these as possible, with no peanuts and at most six instruction steps. Prefer recipes that need the fewest additional ingredients.
 
-*parser: rules, 2.3s*
+*parser: rules, 0.5s*
 
 ```text
 Your ingredients (as understood): egg, onion, tomato, rice
-47,529 of 61,422 recipes using your ingredients satisfy your constraints. Top 5:
+47,529 of 61,423 recipes using your ingredients satisfy your constraints. Top 5:
 
 1. Curried Rice With Smoked Trout  [fn:Akk/zqCo1n3wzwavH0..w6QIF5363M2]
    Why here: uses 4 of your 4 ingredients, needs 6 more, 3 steps
@@ -46,11 +46,11 @@ Active constraints: no peanuts, at most 6 steps.
 
 **User:** Exclude eggs too.
 
-*parser: rules, 1.9s*
+*parser: rules, 0.3s*
 
 ```text
 Your ingredients (as understood): onion, tomato, rice
-23,572 of 36,304 recipes using your ingredients satisfy your constraints. Top 5:
+23,572 of 36,305 recipes using your ingredients satisfy your constraints. Top 5:
 
 1. Zucchini Saute  [ar:J/illFyDAANk7X1GwnmkQ4iMZPDTBmO]
    Why here: uses 3 of your 3 ingredients, needs 3 more, 2 steps

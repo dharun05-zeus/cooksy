@@ -1782,14 +1782,14 @@
         "passed": true,
         "problems": [],
         "recipe": "Banana Banana Bread [ar:kq.naD.8G19M4UU9dVvJgHtpfo.l/eC]",
-        "method": "llm",
-        "substitute": "none",
-        "strength": "moderate",
+        "method": "fallback",
+        "substitute": "applesauce",
+        "strength": "weak",
         "message": "",
         "validation_errors": [
-          "new line still contains a restricted ingredient: 'egg substitute, 2'"
+          "replacement line '2 cups mashed overripe bananas' must contain only the substitute (applesauce), one ingredient per line"
         ],
-        "seconds": 34.7
+        "seconds": 52.2
       },
       {
         "name": "chocolate chip cookies, butter, no dairy (strong evidence)",
@@ -1801,7 +1801,7 @@
         "strength": "strong",
         "message": "",
         "validation_errors": [],
-        "seconds": 29.6
+        "seconds": 44.1
       },
       {
         "name": "pasta with heavy cream, cream, no dairy (PDF example)",
@@ -1809,11 +1809,11 @@
         "problems": [],
         "recipe": "Pasta with Peas, Cream, Parsley, and Mint [epi:v4TTgUj6zS6WK3mc4NIX4vRrvz4t4ju]",
         "method": "llm",
-        "substitute": "coconut milk",
+        "substitute": "olive oil",
         "strength": "moderate",
         "message": "",
         "validation_errors": [],
-        "seconds": 50.8
+        "seconds": 91.6
       },
       {
         "name": "pancakes without milk",
@@ -1825,7 +1825,7 @@
         "strength": "strong",
         "message": "",
         "validation_errors": [],
-        "seconds": 16.9
+        "seconds": 28.0
       },
       {
         "name": "requested replacement that breaks the restriction",
@@ -1837,7 +1837,7 @@
         "strength": "excluded",
         "message": "Your requested replacement 'cream cheese' breaks your restrictions, so I did not use it.",
         "validation_errors": [],
-        "seconds": 1.9
+        "seconds": 0.7
       },
       {
         "name": "target not in the recipe",
@@ -1849,12 +1849,12 @@
         "strength": "none",
         "message": "This recipe does not contain eggs, so nothing needs replacing.",
         "validation_errors": [],
-        "seconds": 1.5
+        "seconds": 0.2
       }
     ],
     "passed": 6,
     "total": 6,
-    "llm_rewrites": 4
+    "llm_rewrites": 3
   },
   "conversations": {
     "cases": [

@@ -73,6 +73,8 @@ provides:
   yogurt: [moisture, tang, richness, binding]
   greek yogurt: [moisture, tang, richness, binding]
   silken tofu: [binding, moisture, richness, thickening]
+  soy yogurt: [binding, moisture, tang]
+  egg replacer: [binding, leavening]
   tofu: [binding, structure]
   flaxseed: [binding]
   ground flaxseed: [binding]

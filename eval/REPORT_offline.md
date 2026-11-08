@@ -8,6 +8,7 @@ Re-run with `uv run python eval/run_eval.py` (add `--provider none` to run witho
 | Area | Passed | What is checked |
 |---|---|---|
 | parser | 27/40 | intent and slots of 40 labelled messages (many phrased unlike the prompt) |
+| substitution | 6/6 | restriction respected, unchanged lines verbatim, evidence IDs exist, weak evidence flagged |
 | conversations | 7/7 | scripted multi-turn conversations, incl. the PDF examples |
 
 Parser: LLM produced 0/40 patches; guards corrected 0; median 0.0 s per message.
@@ -29,6 +30,17 @@ Field accuracy: exclude 13/13, intent 34/39, intent_in 1/1, k 2/2, limit 1/2, ma
 - **parser** — lasagna for someone who is lactose intolerant: query_has: expected ['lasagna'], got None
 - **parser** — Find five easy cookie recipes: limit: expected 5, got None
 - **parser** — soups I can make in under 5 steps: query_has: expected ['soup'], got None
+
+## Substitution cases
+
+| Case | Recipe | Result | Evidence | By |
+|---|---|---|---|---|
+| banana bread without eggs (PDF example; weak evidence) | Banana Banana Bread [ar:kq.naD.8G19M4UU9dVvJgHtpfo.l/eC] | applesauce | weak | fallback |
+| chocolate chip cookies, butter, no dairy (strong evidence) | Easy Chocolate Chip Cookies [ar:RBAW5pewzXTtgX.2bKuw8wv5WUm0rJW] | shortening | strong | fallback |
+| pasta with heavy cream, cream, no dairy (PDF example) | Pasta with Peas, Cream, Parsley, and Mint [epi:v4TTgUj6zS6WK3mc4NIX4vRrvz4t4ju] | olive oil | moderate | fallback |
+| pancakes without milk | Pancakes [fn:W20tOEJAonkR.0irgPihRikRS4A2Sx6] | buttermilk | strong | fallback |
+| requested replacement that breaks the restriction | Easy Chocolate Chip Cookies [ar:RBAW5pewzXTtgX.2bKuw8wv5WUm0rJW] | Your requested replacement 'cream cheese' breaks your restri | excluded | none |
+| target not in the recipe | Green Salad Vinaigrette [fn:mpXss74G.YwwPqLF5xHmjOQKrlZAYsy] | This recipe does not contain eggs, so nothing needs replacin | none | none |
 
 ## Conversations
 

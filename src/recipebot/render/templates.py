@@ -119,6 +119,10 @@ def render_substitution(result: SubstitutionResult, chosen_by: str) -> str:
         lines.append(f"  Instruction note: \"{sentence[:160]}\"  [{rid}]")
     lines.append("  'Direct' = a recipe offers the swap itself; comparative evidence is indirect "
                  "(those recipes may differ in other ways too).")
+    if ev.expected_effects:
+        lines.append(f"\nExpected trade-offs of removing {ev.target} (predictions from its role, "
+                     "not dataset facts):")
+        lines += [f"  - {effect}" for effect in ev.expected_effects]
 
     if result.message:
         return "\n".join(lines + ["", result.message])
@@ -149,9 +153,8 @@ def render_substitution(result: SubstitutionResult, chosen_by: str) -> str:
         lines.append(f"\nCaution: the evidence for {adapted.substitute} is {best.strength}; "
                      "treat this adaptation as untested.")
     if result.validation_errors and result.method == "fallback":
-        lines.append("Note: the LLM's rewrite failed validation ("
-                     + "; ".join(result.validation_errors[:2])
-                     + "), so a simple rule-based rewrite is shown.")
+        lines.append("Note: a simple rule-based rewrite is shown because "
+                     + "; ".join(result.validation_errors[:2]) + ".")
     lines.append("This is not a guarantee that the dish is safe for an allergy.")
     return "\n".join(lines)
 

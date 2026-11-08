@@ -4,7 +4,7 @@ Parser: ollama (qwen3:4b). Covers: substitution, restriction respected, other co
 
 **User:** Find chocolate chip cookies.
 
-*parser: ollama (qwen3:4b), 4.1s*
+*parser: ollama (qwen3:4b), 3.8s*
 
 ```text
 12,819 recipes share at least one word with 'chocolate chip cookies'. The 5 most relevant:
@@ -30,7 +30,7 @@ Ask for 'the first one' (or any number) to see its full recipe.
 
 **User:** I cannot have dairy. Replace the butter in the first one.
 
-*parser: ollama (qwen3:4b), 40.2s; guard corrections: ["add_exclude += ['dairy']"]*
+*parser: ollama (qwen3:4b), 35.4s; guard corrections: ["add_exclude += ['dairy']"]*
 
 ```text
 Adapting: Easy Chocolate Chip Cookies  [ar:RBAW5pewzXTtgX.2bKuw8wv5WUm0rJW]
@@ -69,6 +69,11 @@ Local evidence from the dataset:
   Instruction note: "Squeeze roasted garlic from skins into potatoes along with butter and milk. • Add 2 cups crumbled goat cheese (8 oz) to potatoes along with butter and milk, and"  [epi:AXsAVcMc1UTpMW27zFmvku/dGi2Mgp2]
   'Direct' = a recipe offers the swap itself; comparative evidence is indirect (those recipes may differ in other ways too).
 
+Expected trade-offs of removing butter (predictions from its role, not dataset facts):
+  - without the butter's fat, the bake may be less rich and less tender
+  - without the butter's tenderness, the bake may be firmer or tougher
+  - without the butter's flavor, the bake the flavor will change
+
 Chosen substitute: shortening (strong evidence), chosen by the LLM (ollama (qwen3:4b)), from the evidenced candidates only, then checked by code.
 
 Adapted ingredients (* = changed):
@@ -84,12 +89,11 @@ Adapted instructions:
   3. Bake for 11 to 15 minutes in the preheated oven, until the edges are golden. Cool on baking sheets for a few minutes before removing to cool on wire racks.
 
 Changes:
-  - Substituted butter with shortening for a dairy-free alternative, as shortening is a common substitute in baked goods and fits the role of providing fat and tenderness without dairy.
+  - Substituted butter with shortening (evidence: strong role fit, used in 17 same dish recipes without butter)
 
 Predicted effects (not verified by the dataset):
-  - Mild reduction in richness but maintains tenderness and structure
-  - Slightly less sweet flavor profile due to shortening's neutral taste
-  - No dairy allergen risk
+  - Slightly less rich flavor but similar tenderness and texture
+  - May require a bit more mixing time due to different viscosity
 
 WARNING: other ingredients in this recipe still break your restrictions and were not replaced: 1 (18.25 ounce) package yellow cake mix; 2 cups semisweet chocolate chips. Ask me to replace them too.
 This is not a guarantee that the dish is safe for an allergy.

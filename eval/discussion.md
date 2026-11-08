@@ -15,8 +15,12 @@
   unchanged lines kept verbatim, every cited recipe ID exists, weak evidence flagged, a
   forbidden requested replacement refused. Results: chocolate-chip cookies without butter
   → shortening (strong evidence); pasta with cream, no dairy → coconut milk (moderate);
-  banana bread without eggs → the LLM declined (only 9 of 183 banana breads in the dataset
-  lack eggs, and they do not agree on a replacement).
+  banana bread without eggs → applesauce, flagged as weak evidence (only 9 of 183 banana
+  breads in the dataset lack eggs; applesauce, silken tofu and soy yogurt each appear in one
+  of them). The answer still lists the supporting recipes, the adjusted ingredients and
+  steps, and the expected trade-offs (less rise, since applesauce does not leaven). Qwen's
+  rewrite added an unrelated line twice, so validation rejected it and the rule-based
+  rewrite was shown instead.
 - **Every recipe ID** in every reply of every conversation exists in the dataset.
 
 ### Where a one-shot LLM answer is wrong, and how the system handles it

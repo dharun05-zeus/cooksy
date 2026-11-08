@@ -53,6 +53,12 @@ def test_rewrite_that_keeps_the_target_is_rejected(bot):
     assert any("still mentions the target" in e for e in errors)
 
 
+def test_replacement_line_must_hold_only_the_substitute(bot):
+    adapted = _adapted(["1 cup margarine", "2 cups all-purpose flour", "2 cups flour, 1/4 cup applesauce"])
+    errors = engine(bot).validate(adapted, ORIGINAL, STEPS, _evidence())
+    assert any("must contain only the substitute" in e for e in errors)
+
+
 def test_substitute_must_be_an_evidenced_candidate(bot):
     adapted = _adapted(ORIGINAL[:2] + ["1 banana"], substitute="banana")
     errors = engine(bot).validate(adapted, ORIGINAL, STEPS, _evidence())
@@ -106,7 +112,8 @@ def test_fallback_rewrite(bot):
     assert adapted.ingredients[2] == "applesauce (amount not given by the dataset)"
     assert adapted.ingredients[:2] == ORIGINAL[:2]
     assert adapted.instructions[0] == "Mix the dough with the applesauce."
-    assert any("prediction" in effect for effect in adapted.predicted_effects)
+    # roles.yaml: applesauce provides binding, so the egg's binding role is covered
+    assert adapted.predicted_effects == ["applesauce can take over the binding role(s)"]
 
 
 def test_fallback_keeps_measured_amounts(bot):

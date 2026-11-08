@@ -268,7 +268,8 @@ function substitutionCard(d) {
   const a = d.adapted;
   const adapted = a ? `
     <div class="note"><b>Chosen substitute: ${esc(a.substitute)}</b> <span class="badge ${esc(a.strength || "none")}">${esc(a.strength || "")}</span><br>
-      <span class="muted small">Chosen by ${esc(d.chosen_by)}</span></div>
+      <span class="muted small">Chosen by ${esc(d.chosen_by)}</span>
+      ${d.method === "fallback" && d.validation_errors.length ? `<br><span class="muted tiny">Rule-based rewrite shown because ${esc(d.validation_errors.slice(0, 2).join("; "))}.</span>` : ""}</div>
     <b>Adapted ingredients</b> <span class="muted tiny">(✱ changed)</span>
     <ul class="lines">${a.ingredients.map((x) => `<li class="${x.changed ? "changed" : ""}">${esc(x.text)}</li>`).join("")}</ul>
     <b>Adapted steps</b>
@@ -292,6 +293,8 @@ function substitutionCard(d) {
     ${d.message ? `<div class="note">${esc(d.message)}</div>` : ""}
     ${d.declined_by_llm ? `<div class="note">None of the evidenced candidates fits this ingredient's role well enough, so no adaptation is proposed.</div>` : ""}
     ${adapted}
+    ${d.expected_effects?.length ? `<b>Expected texture and trade-offs</b> <span class="muted tiny">(predictions from the ingredient's role, not dataset facts)</span>
+      <ul class="lines">${d.expected_effects.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
     ${d.remaining_conflicts.length ? `<div class="warn">Still in the recipe and not replaced: ${esc(d.remaining_conflicts.join("; "))}</div>` : ""}
     ${a ? `<div class="muted tiny">Not a guarantee that the dish is safe for an allergy.</div>` : ""}
   </div>`;

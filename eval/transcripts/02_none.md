@@ -20,9 +20,9 @@ Note: Dataset: 122,910 complete recipes (title, ingredients and instructions pre
 *parser: rules, 0.0s*
 
 ```text
-Answer: Fewest instruction steps among 11,710 matching recipes.
+Answer: Fewest instruction steps among 11,712 matching recipes.
 Filters: contains 'tomato' (same ingredient or its varieties: tomato, plum tomato, cherry tomato, roma tomato, grape tomato, beefsteak tomato and 2 more)
-Recipes analyzed: 11,710
+Recipes analyzed: 11,712
 Method: Step = one non-empty instruction line, excluding site boilerplate; a recipe stored as one paragraph is split into sentences. Sorted by steps, then ID.
   rank: 1 | recipe_id: ar:/0wx00RefE0VHzlff/GBszObKmj63Pi | title: Tomato Basil Smoothie | steps: 1 | counted_by: line
   rank: 2 | recipe_id: ar:3yxgq0iAqrlm2lHnLoxwJ8vQTHCd/Cm | title: Mediterranean Zucchini and Chickpea Salad | steps: 1 | counted_by: line

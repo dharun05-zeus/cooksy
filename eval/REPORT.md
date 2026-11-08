@@ -233,9 +233,9 @@ The dataset does not record nutrition (calories, fat, protein, carbohydrates), s
 
 | Case | Recipe | Result | Evidence | By |
 |---|---|---|---|---|
-| banana bread without eggs (PDF example; weak evidence) | Banana Banana Bread [ar:kq.naD.8G19M4UU9dVvJgHtpfo.l/eC] | none | moderate | llm |
+| banana bread without eggs (PDF example; weak evidence) | Banana Banana Bread [ar:kq.naD.8G19M4UU9dVvJgHtpfo.l/eC] | applesauce | weak | fallback |
 | chocolate chip cookies, butter, no dairy (strong evidence) | Easy Chocolate Chip Cookies [ar:RBAW5pewzXTtgX.2bKuw8wv5WUm0rJW] | shortening | strong | llm |
-| pasta with heavy cream, cream, no dairy (PDF example) | Pasta with Peas, Cream, Parsley, and Mint [epi:v4TTgUj6zS6WK3mc4NIX4vRrvz4t4ju] | coconut milk | moderate | llm |
+| pasta with heavy cream, cream, no dairy (PDF example) | Pasta with Peas, Cream, Parsley, and Mint [epi:v4TTgUj6zS6WK3mc4NIX4vRrvz4t4ju] | olive oil | moderate | llm |
 | pancakes without milk | Pancakes [fn:W20tOEJAonkR.0irgPihRikRS4A2Sx6] | buttermilk | strong | llm |
 | requested replacement that breaks the restriction | Easy Chocolate Chip Cookies [ar:RBAW5pewzXTtgX.2bKuw8wv5WUm0rJW] | Your requested replacement 'cream cheese' breaks your restri | excluded | none |
 | target not in the recipe | Green Salad Vinaigrette [fn:mpXss74G.YwwPqLF5xHmjOQKrlZAYsy] | This recipe does not contain eggs, so nothing needs replacin | none | none |
@@ -269,8 +269,12 @@ Full transcripts are in `eval/transcripts/`.
   unchanged lines kept verbatim, every cited recipe ID exists, weak evidence flagged, a
   forbidden requested replacement refused. Results: chocolate-chip cookies without butter
   → shortening (strong evidence); pasta with cream, no dairy → coconut milk (moderate);
-  banana bread without eggs → the LLM declined (only 9 of 183 banana breads in the dataset
-  lack eggs, and they do not agree on a replacement).
+  banana bread without eggs → applesauce, flagged as weak evidence (only 9 of 183 banana
+  breads in the dataset lack eggs; applesauce, silken tofu and soy yogurt each appear in one
+  of them). The answer still lists the supporting recipes, the adjusted ingredients and
+  steps, and the expected trade-offs (less rise, since applesauce does not leaven). Qwen's
+  rewrite added an unrelated line twice, so validation rejected it and the rule-based
+  rewrite was shown instead.
 - **Every recipe ID** in every reply of every conversation exists in the dataset.
 
 ### Where a one-shot LLM answer is wrong, and how the system handles it

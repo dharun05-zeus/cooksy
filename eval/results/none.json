@@ -1216,5 +1216,84 @@
     ],
     "passed": 7,
     "total": 7
+  },
+  "substitution": {
+    "cases": [
+      {
+        "name": "banana bread without eggs (PDF example; weak evidence)",
+        "passed": true,
+        "problems": [],
+        "recipe": "Banana Banana Bread [ar:kq.naD.8G19M4UU9dVvJgHtpfo.l/eC]",
+        "method": "fallback",
+        "substitute": "applesauce",
+        "strength": "weak",
+        "message": "",
+        "validation_errors": [],
+        "seconds": 0.6
+      },
+      {
+        "name": "chocolate chip cookies, butter, no dairy (strong evidence)",
+        "passed": true,
+        "problems": [],
+        "recipe": "Easy Chocolate Chip Cookies [ar:RBAW5pewzXTtgX.2bKuw8wv5WUm0rJW]",
+        "method": "fallback",
+        "substitute": "shortening",
+        "strength": "strong",
+        "message": "",
+        "validation_errors": [],
+        "seconds": 0.6
+      },
+      {
+        "name": "pasta with heavy cream, cream, no dairy (PDF example)",
+        "passed": true,
+        "problems": [],
+        "recipe": "Pasta with Peas, Cream, Parsley, and Mint [epi:v4TTgUj6zS6WK3mc4NIX4vRrvz4t4ju]",
+        "method": "fallback",
+        "substitute": "olive oil",
+        "strength": "moderate",
+        "message": "",
+        "validation_errors": [],
+        "seconds": 0.7
+      },
+      {
+        "name": "pancakes without milk",
+        "passed": true,
+        "problems": [],
+        "recipe": "Pancakes [fn:W20tOEJAonkR.0irgPihRikRS4A2Sx6]",
+        "method": "fallback",
+        "substitute": "buttermilk",
+        "strength": "strong",
+        "message": "",
+        "validation_errors": [],
+        "seconds": 0.5
+      },
+      {
+        "name": "requested replacement that breaks the restriction",
+        "passed": true,
+        "problems": [],
+        "recipe": "Easy Chocolate Chip Cookies [ar:RBAW5pewzXTtgX.2bKuw8wv5WUm0rJW]",
+        "method": "none",
+        "substitute": null,
+        "strength": "excluded",
+        "message": "Your requested replacement 'cream cheese' breaks your restrictions, so I did not use it.",
+        "validation_errors": [],
+        "seconds": 0.6
+      },
+      {
+        "name": "target not in the recipe",
+        "passed": true,
+        "problems": [],
+        "recipe": "Green Salad Vinaigrette [fn:mpXss74G.YwwPqLF5xHmjOQKrlZAYsy]",
+        "method": "none",
+        "substitute": null,
+        "strength": "none",
+        "message": "This recipe does not contain eggs, so nothing needs replacing.",
+        "validation_errors": [],
+        "seconds": 0.1
+      }
+    ],
+    "passed": 6,
+    "total": 6,
+    "llm_rewrites": 0
   }
 }

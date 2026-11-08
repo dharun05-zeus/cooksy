@@ -90,6 +90,7 @@ def substitution(result: SubstitutionResult, chosen_by: str) -> dict:
         "neighbours_without": ev.neighbours_without,
         "same_dish_without": [{"id": i, "title": t} for i, t in ev.same_dish_without],
         "notes": [{"id": i, "sentence": s} for i, s in ev.notes],
+        "expected_effects": ev.expected_effects,
         "candidates": [
             {"name": c.name, "strength": c.strength, "fit": c.fit, "summary": c.summary(),
              "direct_examples": [{"id": i, "line": t} for i, t in c.direct_examples],

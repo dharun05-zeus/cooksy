@@ -30,7 +30,7 @@ Ask for 'the first one' (or any number) to see its full recipe.
 
 **User:** I cannot have dairy. Replace the butter in the first one.
 
-*parser: rules, 2.6s*
+*parser: rules, 0.5s*
 
 ```text
 Adapting: Easy Chocolate Chip Cookies  [ar:RBAW5pewzXTtgX.2bKuw8wv5WUm0rJW]
@@ -69,6 +69,11 @@ Local evidence from the dataset:
   Instruction note: "Squeeze roasted garlic from skins into potatoes along with butter and milk. • Add 2 cups crumbled goat cheese (8 oz) to potatoes along with butter and milk, and"  [epi:AXsAVcMc1UTpMW27zFmvku/dGi2Mgp2]
   'Direct' = a recipe offers the swap itself; comparative evidence is indirect (those recipes may differ in other ways too).
 
+Expected trade-offs of removing butter (predictions from its role, not dataset facts):
+  - without the butter's fat, the bake may be less rich and less tender
+  - without the butter's tenderness, the bake may be firmer or tougher
+  - without the butter's flavor, the bake the flavor will change
+
 Chosen substitute: shortening (strong evidence), chosen by the strongest evidence (rule-based rewrite).
 
 Adapted ingredients (* = changed):
@@ -87,9 +92,8 @@ Changes:
   - replaced '1/2 cup butter, softened' with shortening (strong evidence: offered as an alternative to the target in 6 baked recipes; used by 17 same dish recipes without the target (25% of them vs 3% of those with it); good fit for the target's role)
 
 Predicted effects (not verified by the dataset):
-  - may be less rich and less tender (prediction based on the fat role)
-  - the flavor will change (prediction based on the flavor role)
-  - may be firmer or tougher (prediction based on the tenderness role)
+  - shortening can take over the fat and tenderness role(s)
+  - shortening does not provide flavor, so the result the flavor will change
 
 WARNING: other ingredients in this recipe still break your restrictions and were not replaced: 1 (18.25 ounce) package yellow cake mix; 2 cups semisweet chocolate chips. Ask me to replace them too.
 This is not a guarantee that the dish is safe for an allergy.

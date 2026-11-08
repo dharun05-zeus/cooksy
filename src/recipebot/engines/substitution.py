@@ -83,6 +83,9 @@ class Evidence:
     neighbours_without: int = 0
     comparison_scope: str = ""  # which recipes were compared, in words
     same_dish_without: list[tuple[str, str]] = field(default_factory=list)  # (ID, title)
+    # What removing the target is likely to change, from its roles (roles.yaml). Always
+    # given, so the trade-off question is answered even when no substitute is proposed.
+    expected_effects: list[str] = field(default_factory=list)
     candidates: list[Candidate] = field(default_factory=list)
     notes: list[tuple[str, str]] = field(default_factory=list)  # (recipe ID, sentence)
 
@@ -147,7 +150,8 @@ REWRITE_SYSTEM = """\
 You adapt a recipe by replacing one ingredient, using evidence from a recipe dataset.
 Return only the edits:
 - `substitute`: pick ONLY from the candidates list (exact name), preferring a good role fit
-  and stronger evidence. If none fits the role, use "none" and leave the edits empty.
+  and stronger evidence. Weak evidence is acceptable: the user is shown its strength and a
+  caution. Use "none" only if no candidate has a good or partial fit.
 - `ingredient_edits`: one per target line, with the new line for the substitute. If the
   amount is your own judgment rather than from the evidence, end the line with "(estimate)".
 - `step_edits`: one per step listed in steps_mentioning_target, rewritten for the
@@ -219,10 +223,14 @@ class SubstitutionEngine:
         if not ev.target_lines:
             return ev
 
+        ev.expected_effects = [
+            f"without the {name}'s {role}, the {'bake' if baked else 'dish'} "
+            f"{self.role_effects[role]}"
+            for name, roles in ev.roles.items() for role in roles if role in self.role_effects
+        ] or [f"the role table has no entry for {target}, so its effect cannot be predicted"]
         candidates: dict[str, Candidate] = {}
         self._direct(ev, candidates)
         self._comparative(ev, recipe_id, row, categories, candidates)
-        self._notes(ev)
         for cand in candidates.values():
             self._judge(ev, cand, set(row["bases"]))
         ranked = [c for c in candidates.values() if c.strength != "excluded"]
@@ -233,6 +241,7 @@ class SubstitutionEngine:
                                    STRENGTH_ORDER[c.strength],
                                    -(c.direct + 3 * c.comparative_support), c.name))
         ev.candidates = ranked[:6]
+        self._notes(ev, row["title"])  # after the candidates: notes that mention one are kept
         return ev
 
     def _target_roles(self, ev: Evidence) -> tuple[set[str], set[str]]:
@@ -310,6 +319,12 @@ class SubstitutionEngine:
         ev.comparison_scope = f"{len(top)} {kind} '{dish}' recipes"
         self._compare(ev, top, target_mask, candidates, min_support=2, scope="same dish")
         if without < MIN_NEIGHBOURS:
+            # Few versions of this dish lack the target (9 of 183 banana breads have no eggs),
+            # and each may use something different. Then a single same-dish recipe counts,
+            # but only for an ingredient that covers the target's main role (silken tofu or
+            # applesauce binding in place of egg), so one-off ingredients like carrot do not.
+            self._compare(ev, top, target_mask, candidates, min_support=1, scope="same dish",
+                          good_fit_only=True)
             wide, wide_dish = self._similar_recipes(recipe_id, row["title"], ev.baked, broad=True)
             if wide_dish != dish:
                 wide_without = int((~target_mask[wide]).sum())
@@ -319,7 +334,8 @@ class SubstitutionEngine:
                               min_support=MIN_COMPARATIVE_SUPPORT, scope=f"{wide_dish} recipes")
 
     def _compare(self, ev: Evidence, top: np.ndarray, target_mask: np.ndarray,
-                 candidates: dict[str, Candidate], min_support: int, scope: str) -> None:
+                 candidates: dict[str, Candidate], min_support: int, scope: str,
+                 good_fit_only: bool = False) -> None:
         store = self.store
         has_target = target_mask[top]
         with_rows, without_rows = top[has_target], top[~has_target]
@@ -343,8 +359,10 @@ class SubstitutionEngine:
             # Recipes without cream also use more tomato; that does not make tomato a cream
             # substitute. Comparative evidence alone only counts for ingredients known to
             # fill one of the target's roles.
-            fits = self._fit(Candidate(name), ev) in ("good", "partial")
-            if name not in candidates and not fits:
+            fit = self._fit(Candidate(name), ev)
+            if good_fit_only and fit != "good":
+                continue
+            if name not in candidates and fit not in ("good", "partial"):
                 continue
             cand = candidates.setdefault(name, Candidate(name))
             cand.comparative_support, cand.comparative_scope = n, scope
@@ -376,9 +394,10 @@ class SubstitutionEngine:
         rows = np.flatnonzero(mask)
         return rows[np.argsort(-scores[rows], kind="stable")][:NEIGHBOURS], label
 
-    def _notes(self, ev: Evidence) -> None:
+    def _notes(self, ev: Evidence, title: str) -> None:
         """Instruction sentences that talk about substituting the target itself, e.g.
-        "1 whole egg may be substituted for the 2 egg yolks", not "sugar substitute"."""
+        "1 whole egg may be substituted for the 2 egg yolks", not "sugar substitute".
+        Notes from the same dish type and kind (baked or not) come first."""
         words = {w for name in ev.target_names for w in name.split()} | {fold(ev.target)}
         t = "(?:" + "|".join(re.escape(w) for w in words) + r")s?"
         about = re.compile(
@@ -390,7 +409,28 @@ class SubstitutionEngine:
                              r"(?!\s+(?:for|with)\b)", re.I)
         found = self.notes[self.notes["sentence"].map(
             lambda s: bool(about.search(product.sub(" ", s))))].drop_duplicates("sentence")
-        ev.notes = list(found.head(3).itertuples(index=False, name=None))
+        words = tokenize(title, self.store.lexicon)
+        dish = words[-1] if words else ""
+
+        def closeness(recipe_id: str) -> tuple[int, int]:
+            pos = self.store.position.get(recipe_id)
+            if pos is None:
+                return (2, 2)
+            same_dish = bool(dish) and dish in tokenize(
+                self.store.recipes["title"].iat[pos], self.store.lexicon)
+            return (0 if same_dish else 1, 0 if self.is_baked[pos] == ev.baked else 1)
+
+        # Keep a note only if it comes from the same dish or names one of the evidenced
+        # candidates ("...applesauce for oil"); a royal-icing tip says little about bread.
+        names = [c.name for c in ev.candidates]
+
+        def relevant(note: tuple[str, str]) -> bool:
+            text = fold(note[1])
+            return closeness(note[0])[0] == 0 or any(
+                re.search(rf"\b{re.escape(n)}", text) for n in names)
+
+        ranked = sorted(found.itertuples(index=False, name=None), key=lambda n: closeness(n[0]))
+        ev.notes = [n for n in ranked if relevant(n)][:3]
 
     def _judge(self, ev: Evidence, cand: Candidate, recipe_bases: set[str]) -> None:
         """Drop candidates that break a restriction; flag uncertain ones; rate the evidence."""
@@ -467,6 +507,12 @@ class SubstitutionEngine:
                 except (LLMUnavailable, Exception) as exc:  # timeout, server down: give up
                     result.validation_errors = [f"LLM error: {type(exc).__name__}"]
                     break
+                if plan.substitute.lower() == "none" and self._has_good_fit(ev):
+                    # The evidence is labelled for the user; declining outright would leave
+                    # the question unanswered, so the rule-based adaptation is used instead.
+                    result.validation_errors = ["the LLM declined although a candidate fits "
+                                                "the ingredient's role"]
+                    break
                 adapted = self.apply_plan(plan, original, steps, ev)
                 self._patch_steps(adapted, ev)
                 errors = self.validate(adapted, original, steps, ev)
@@ -529,8 +575,8 @@ class SubstitutionEngine:
             "roles_of_target": ev.roles,
             "steps_mentioning_target": {i + 1: steps[i] for i in mentions},
             "restrictions": ev.restricted,
-            "candidates": [{"name": c.name, "evidence": c.strength, "detail": c.summary()}
-                           for c in ev.candidates],
+            "candidates": [{"name": c.name, "evidence": c.strength, "role_fit": c.fit,
+                            "detail": c.summary()} for c in ev.candidates],
         }
         return json.dumps(payload, ensure_ascii=False) + "\nJSON:"
 
@@ -586,6 +632,12 @@ class SubstitutionEngine:
             if parsed.canonical and parsed.canonical not in self.store.by_canonical \
                     and parsed.base not in self.store.by_base:
                 errors.append(f"'{parsed.canonical}' does not appear in the dataset")
+            # A replacement line holds the substitute only; it must not slip in more of
+            # something else ("2 cups mashed bananas, 1/4 cup applesauce").
+            substitute = self.store.resolve(adapted.substitute, "strict").base
+            if parsed.base != substitute and parsed.canonical != fold(adapted.substitute):
+                errors.append(f"replacement line '{line}' must contain only the substitute "
+                              f"({adapted.substitute}), one ingredient per line")
         for number, step in enumerate(adapted.instructions, 1):
             # "coconut cream" in a step is the substitute, not the target
             if self._mentions_target(step, ev, ignore=adapted.substitute):
@@ -609,6 +661,10 @@ class SubstitutionEngine:
                     adapted.instructions[i] = patched
                     adapted.changes.append(f"step {i + 1}: the target's name was replaced with "
                                            f"{adapted.substitute} automatically")
+
+    @staticmethod
+    def _has_good_fit(ev: Evidence) -> bool:
+        return any(c.fit == "good" and c.strength != "conflicting" for c in ev.candidates)
 
     def fallback_allowed(self, ev: Evidence) -> bool:
         """Without the LLM's judgment, only adapt when the choice is clear: a good role fit
@@ -635,9 +691,21 @@ class SubstitutionEngine:
                                if measured and swapped != line
                                else f"{sub} (amount not given by the dataset)")
         instructions = [pattern.sub(sub, s) for s in steps]
-        roles = sorted({r for rs in ev.roles.values() for r in rs})
-        effects = [f"{self.role_effects[r]} (prediction based on the {r} role)" for r in roles
-                   if r in self.role_effects]
+        # Which of the target's roles the substitute covers (roles.yaml), and what is likely
+        # to change for the roles it does not: specific to the substitute, unlike the general
+        # "expected trade-offs of removing the target".
+        roles = list(dict.fromkeys(r for rs in ev.roles.values() for r in rs))
+        provided = set(self.provides.get(sub, []))
+        covered = [r for r in roles if r in provided]
+        effects = []
+        if provided:
+            if covered:
+                effects.append(f"{sub} can take over the {' and '.join(covered)} role(s)")
+            effects += [f"{sub} does not provide {r}, so the result {self.role_effects[r]}"
+                        for r in roles if r not in provided and r in self.role_effects]
+        else:
+            effects.append(f"the roles {sub} plays are not in the role table, so its effect "
+                           "cannot be predicted beyond the trade-offs above")
         changes = [f"replaced '{t}' with {sub} ({ev.candidates[0].strength} evidence: "
                    f"{ev.candidates[0].summary()})" for t in targets.values()]
         return AdaptedRecipe(substitute=sub, ingredients=ingredients, instructions=instructions,
