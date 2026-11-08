@@ -117,7 +117,7 @@ code { background: var(--panel-2); padding: 1px 6px; border-radius: 6px; font-si
   .features { gap: 8px; }
   .feature { font-size: 12px; padding: 6px 10px; gap: 6px; }
 }
-/* hero-pasta.svg carries its own steam animation */
+/* hero-chef.svg carries its own animations (steam, spoon, sparkles) */
 .hero-art img { width: 100%; height: auto; display: block; filter: drop-shadow(0 18px 30px rgba(0,0,0,.45)); }
 
 .features { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
