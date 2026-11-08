@@ -140,29 +140,7 @@ eval/              evaluation cases, runner, report, transcripts
 tests/             unit tests on a 9-record fixture dataset
 ```
 
-## Where to change things
 
-| To change… | Edit |
-|---|---|
-| ingredient names, synonyms, varieties | `config/synonyms.yaml`, `config/normalization.yaml` |
-| allergen and diet words (what "no dairy" removes) | `config/allergens.yaml` |
-| pantry staples assumed in "What can I cook?" | `config/staples.yaml` |
-| what an ingredient does in a dish, what a substitute provides | `config/roles.yaml` |
-| substitution ranking order | `_rank_key` and `_why` in `src/recipebot/engines/substitution.py` |
-| substitution thresholds (similar recipes compared, evidence strength) | constants at the top of `engines/substitution.py`; strength in `_judge` |
-| matching ranking order | `DEFAULT_ORDER` in `src/recipebot/engines/matching.py` |
-| wording of any answer | `src/recipebot/render/templates.py` (one `render_…` function per answer type) |
-| the short substitution summary | `substitution_summary` in `render/templates.py` |
-| how results look in the web page | `src/recipebot/ui/web/app.js` (`searchCard`, `recipeCard`, `matchCard`, `statsCard`, `substitutionCard`) and `app.css` |
-| home page text, example prompts, diet cards | `ui/web/index.html`; `DIETS`, `CHAT_EXAMPLES`, `STAT_PRESETS` in `app.js` |
-| how messages are understood (LLM prompt and examples) | `SYSTEM_PROMPT` in `src/recipebot/llm/parser.py`; corrections in `apply_guards` |
-| phrasings the offline parser knows | `src/recipebot/llm/rules.py` |
-| which model is used, or no LLM | `.env` (`OLLAMA_MODEL`, `LLM_PROVIDER=none`) |
-
-After changing a `config/` file that affects parsing (`units`, `normalization`, `synonyms`,
-`allergens`), rebuild the data with `uv run python scripts/build_index.py`; other changes
-only need the app restarted (`recipebot web`) and the page refreshed. Run `uv run pytest` to
-check nothing broke.
 
 ## Limitations
 
