@@ -79,6 +79,16 @@ app.mount("/static", StaticFiles(directory=WEB_DIR), name="static")
 log = logging.getLogger("recipebot.web")
 
 
+@app.middleware("http")
+async def revalidate_page(request: Request, call_next):
+    """The page and its files are revalidated on every load (a cheap 304 when unchanged),
+    so a browser never keeps showing an old version of the UI after an update."""
+    response = await call_next(request)
+    if request.url.path == "/" or request.url.path.startswith("/static/"):
+        response.headers["Cache-Control"] = "no-cache"
+    return response
+
+
 @app.exception_handler(Exception)
 async def unexpected_error(request: Request, exc: Exception) -> JSONResponse:
     """Log the full error in the terminal and tell the page what happened."""

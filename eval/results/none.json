@@ -1277,7 +1277,7 @@
         "strength": "strong",
         "message": "",
         "validation_errors": [],
-        "seconds": 0.8
+        "seconds": 0.9
       },
       {
         "name": "requested replacement that breaks the restriction",
@@ -1289,7 +1289,7 @@
         "strength": "excluded",
         "message": "Your requested replacement 'cream cheese' breaks your restrictions, so I did not use it.",
         "validation_errors": [],
-        "seconds": 1.1
+        "seconds": 1.0
       },
       {
         "name": "target not in the recipe",

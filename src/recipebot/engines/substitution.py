@@ -956,6 +956,7 @@ class SubstitutionEngine:
         if temp:
             parts.append(f"{temp.group(1)} degrees F" + (f" ({temp.group(2)} degrees C)"
                                                          if temp.group(2) else ""))
+        times = list(dict.fromkeys(times))  # "35 minutes" twice in the recipe is one time
         if times:
             parts.append(times[-1] if len(times) == 1 else ", then ".join(times))
         return "; ".join(parts)

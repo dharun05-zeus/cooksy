@@ -47,7 +47,7 @@ Active constraints: no peanuts, at most 6 steps.
 
 **User:** Exclude eggs too.
 
-*parser: rules, 0.4s*
+*parser: rules, 0.5s*
 
 ```text
 Your ingredients (as understood): onion, tomato, rice

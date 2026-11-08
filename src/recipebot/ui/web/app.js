@@ -15,13 +15,14 @@ const SESSION = (() => {
   } catch { return Math.random().toString(36).slice(2); }
 })();
 
+// `no`: the tile shows a "not allowed" badge on the emoji (dairy-free, nut-free, egg-free).
 const DIETS = [
-  { key: "vegetarian", label: "Vegetarian", sub: "no meat or fish", emoji: "🥦", bg: "linear-gradient(160deg,#166534,#14532d)" },
-  { key: "vegan", label: "Vegan", sub: "no animal products", emoji: "🌱", bg: "linear-gradient(160deg,#15803d,#3f6212)" },
-  { key: "dairy", label: "Dairy-free", sub: "no milk, butter, cheese", emoji: "🥛", bg: "linear-gradient(160deg,#1d4ed8,#312e81)" },
-  { key: "gluten", label: "Gluten-free", sub: "no wheat, pasta, bread", emoji: "🌾", bg: "linear-gradient(160deg,#a16207,#713f12)" },
-  { key: "nuts", label: "Nut-free", sub: "no peanuts or tree nuts", emoji: "🥜", bg: "linear-gradient(160deg,#9a3412,#7c2d12)" },
-  { key: "egg", label: "Egg-free", sub: "no eggs or mayonnaise", emoji: "🥚", bg: "linear-gradient(160deg,#a21caf,#701a75)" },
+  { key: "vegetarian", label: "Vegetarian", sub: "no meat or fish", emoji: "🥗", bg: "linear-gradient(160deg,#3f8a2a,#1f4d17)" },
+  { key: "vegan", label: "Vegan", sub: "no animal products", emoji: "🌱", bg: "linear-gradient(160deg,#16704a,#0f3f2c)" },
+  { key: "dairy", label: "Dairy-free", sub: "no milk, butter, cheese", emoji: "🥛", no: true, bg: "linear-gradient(160deg,#2f4fb5,#1a2560)" },
+  { key: "gluten", label: "Gluten-free", sub: "no wheat, pasta, bread", emoji: "🌾", bg: "linear-gradient(160deg,#9a5a17,#5a300c)" },
+  { key: "nuts", label: "Nut-free", sub: "no peanuts or tree nuts", emoji: "🥜", no: true, bg: "linear-gradient(160deg,#9b2335,#55121d)" },
+  { key: "egg", label: "Egg-free", sub: "no eggs or mayonnaise", emoji: "🥚", no: true, bg: "linear-gradient(160deg,#7b3fc4,#3f1b70)" },
 ];
 
 const CHAT_EXAMPLES = [
@@ -392,8 +393,8 @@ async function loadOverview() {
 // ---------- builders ----------
 function buildStatic() {
   $("#diet-tiles").innerHTML = DIETS.map((d) => `
-    <button class="tile" data-diet="${d.key}" style="background:${d.bg}">
-      <span class="emoji">${d.emoji}</span>${esc(d.label)}<small>${esc(d.sub)}</small></button>`).join("");
+    <button class="tile" data-diet="${d.key}" style="background:${d.bg}" title="${esc(d.label)}: ${esc(d.sub)}">
+      <span class="emoji">${d.emoji}${d.no ? `<span class="no">🚫</span>` : ""}</span>${esc(d.label)}</button>`).join("");
   $("#cook-diets").innerHTML = DIETS.map((d) => `<span class="chip pick" data-key="${d.key}">${d.emoji} ${esc(d.label)}</span>`).join("");
   $("#chat-examples").innerHTML = CHAT_EXAMPLES.map(([t, q]) => `<button class="example" data-ask="${esc(q)}"><b>${esc(t)}</b><span class="muted">${esc(q)}</span></button>`).join("");
   $("#stat-presets").innerHTML = STAT_PRESETS.map(([label], i) => `<button class="pill" data-preset="${i}">${esc(label)}</button>`).join("");
@@ -406,12 +407,33 @@ function dietPatch(d) {
 
 const splitList = (s) => s.split(",").map((x) => x.trim()).filter(Boolean);
 
+// Voice input with the browser's own speech recognition (Chrome, Edge, Safari). The words
+// go into the box for the user to check and send; the button stays hidden elsewhere.
+function wireVoice(button, input) {
+  const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!Recognition) return;
+  button.classList.remove("hidden");
+  let rec = null;
+  button.addEventListener("click", () => {
+    if (rec) { rec.stop(); return; }
+    rec = new Recognition();
+    rec.lang = navigator.language || "en-US";
+    rec.interimResults = true;
+    rec.onresult = (e) => { input.value = [...e.results].map((r) => r[0].transcript).join(" "); };
+    rec.onend = () => { rec = null; button.classList.remove("listening"); input.focus(); };
+    rec.onerror = () => rec?.stop();
+    button.classList.add("listening");
+    rec.start();
+  });
+}
+
 // ---------- events ----------
 function wire() {
   $$(".nav-item").forEach((b) => b.addEventListener("click", () => show(b.dataset.view)));
   $("#expand").addEventListener("click", () => show("chat"));
 
   $("#hero-form").addEventListener("submit", (e) => { e.preventDefault(); sendChat($("#hero-input").value); $("#hero-input").value = ""; });
+  wireVoice($("#hero-mic"), $("#hero-input"));
   $("#chat-form").addEventListener("submit", (e) => { e.preventDefault(); sendChat($("#chat-input").value); $("#chat-input").value = ""; });
 
   $("#reset").addEventListener("click", async () => {
@@ -475,6 +497,8 @@ function wire() {
     const t = e.target;
     const ask = t.closest("[data-ask]");
     if (ask) { sendChat(ask.dataset.ask); return; }
+    const link = t.closest("[data-view-link]");
+    if (link) { show(link.dataset.viewLink); return; }
     const tile = t.closest(".tile");
     if (tile) { const d = DIETS.find((x) => x.key === tile.dataset.diet); sendAction(`Show ${d.label.toLowerCase()} recipes`, dietPatch(d)); return; }
     const preset = t.closest("[data-preset]");

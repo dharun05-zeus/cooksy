@@ -44,27 +44,71 @@
     <!-- HOME -->
     <section class="view" id="view-home">
       <div class="hero">
-        <div class="hero-deco" aria-hidden="true"><span>🍅</span><span>🌿</span></div>
-        <div class="hero-text">
-          <h1>Meet <span class="grad">Cooksy</span></h1>
-          <h2>Search, analyse, match and adapt real recipes</h2>
-          <p>Every answer is computed from the Recipe Box dataset, with recipe IDs and evidence. Nothing is made up.</p>
+        <div class="hero-art" aria-hidden="true">
+          <svg viewBox="0 0 360 260" class="bowl" overflow="visible">
+            <defs>
+              <radialGradient id="glow" cx="50%" cy="55%" r="55%"><stop offset="0" stop-color="#f97316" stop-opacity=".35"/><stop offset="1" stop-color="#f97316" stop-opacity="0"/></radialGradient>
+              <linearGradient id="bowl-out" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffaf3"/><stop offset="1" stop-color="#d9cfc4"/></linearGradient>
+              <linearGradient id="bowl-in" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a1f0e"/><stop offset="1" stop-color="#b8331a"/></linearGradient>
+              <linearGradient id="penne" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb347"/><stop offset=".55" stop-color="#f0782a"/><stop offset="1" stop-color="#c2410c"/></linearGradient>
+              <radialGradient id="tom" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#ff8a7a"/><stop offset=".45" stop-color="#e5321f"/><stop offset="1" stop-color="#8f1a0e"/></radialGradient>
+              <g id="p"><rect x="-17" y="-6.5" width="34" height="13" rx="4" fill="url(#penne)"/><path d="M-11 -6v12M-4 -6.5v13M3 -6.5v13M10 -6v12" stroke="#b45309" stroke-opacity=".45" stroke-width="1.3"/><ellipse cx="17" cy="0" rx="2.6" ry="6.2" fill="#7c2d12"/></g>
+              <g id="leaf"><path d="M0 0C8-10 26-10 34 0C26 10 8 10 0 0Z" fill="#22a447"/><path d="M2 0H32" stroke="#0f6b2c" stroke-width="1.4"/></g>
+            </defs>
+            <ellipse cx="180" cy="150" rx="175" ry="110" fill="url(#glow)"/>
+            <g class="steam" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".28">
+              <path d="M146 52c-14-14 14-24 0-40"/><path d="M184 44c-14-14 14-24 0-40"/><path d="M222 52c-14-14 14-24 0-40"/>
+            </g>
+            <ellipse cx="180" cy="228" rx="132" ry="16" fill="#000" opacity=".35"/>
+            <!-- back of the bowl, the sauce, then the heap of penne, then the bowl's front -->
+            <ellipse cx="180" cy="140" rx="128" ry="38" fill="#e9e0d4"/>
+            <ellipse cx="180" cy="142" rx="116" ry="30" fill="url(#bowl-in)"/>
+            <use href="#p" transform="translate(98 132) rotate(-18)"/><use href="#p" transform="translate(128 136) rotate(24)"/>
+            <use href="#p" transform="translate(160 134) rotate(-36)"/><use href="#p" transform="translate(194 136) rotate(14)"/>
+            <use href="#p" transform="translate(226 134) rotate(-26)"/><use href="#p" transform="translate(258 130) rotate(32)"/>
+            <use href="#p" transform="translate(114 114) rotate(40)"/><use href="#p" transform="translate(146 116) rotate(-12)"/>
+            <use href="#p" transform="translate(178 112) rotate(30)"/><use href="#p" transform="translate(210 116) rotate(-44)"/>
+            <use href="#p" transform="translate(242 112) rotate(10)"/><use href="#p" transform="translate(132 96) rotate(-30)"/>
+            <use href="#p" transform="translate(162 92) rotate(52)"/><use href="#p" transform="translate(196 94) rotate(-6)"/>
+            <use href="#p" transform="translate(226 96) rotate(38)"/><use href="#p" transform="translate(150 76) rotate(16)"/>
+            <use href="#p" transform="translate(182 74) rotate(-40)"/><use href="#p" transform="translate(212 78) rotate(24)"/>
+            <use href="#p" transform="translate(172 60) rotate(-14)"/><use href="#p" transform="translate(198 62) rotate(60)"/>
+            <circle cx="122" cy="102" r="11" fill="url(#tom)"/><circle cx="238" cy="120" r="10" fill="url(#tom)"/>
+            <circle cx="200" cy="108" r="9" fill="url(#tom)"/>
+            <use href="#leaf" transform="translate(176 56) rotate(-38)"/><use href="#leaf" transform="translate(194 58) rotate(-142)"/>
+            <use href="#leaf" transform="translate(186 60) rotate(-92) scale(.8)"/>
+            <path d="M52 140c0 6 56 38 128 38s128-32 128-38c0 60-56 96-128 96S52 200 52 140Z" fill="url(#bowl-out)"/>
+            <path d="M58 146c18 20 66 34 122 34s104-14 122-34" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="3"/>
+            <circle cx="28" cy="218" r="15" fill="url(#tom)"/><circle cx="334" cy="206" r="13" fill="url(#tom)"/>
+            <use href="#leaf" transform="translate(296 30) rotate(-20) scale(1.1)"/><use href="#leaf" transform="translate(16 96) rotate(30) scale(.8)"/>
+          </svg>
         </div>
-        <div class="hero-chef" aria-hidden="true">👩‍🍳</div>
-        <form class="ask" id="hero-form">
-          <span class="i i-spark"></span>
-          <input id="hero-input" placeholder="What would you like to cook or know?" autocomplete="off">
+        <div class="hero-text">
+          <h1 class="hero-brand">Cook<span>sy</span></h1>
+          <h2>Your Smart Recipe Assistant</h2>
+          <p>Find recipes, match them to what you have, and get smart, evidence-based substitutions.</p>
+        </div>
+        <div class="features">
+            <button class="feature" data-view-link="chat"><span class="i i-cutlery"></span>120K+ Recipes</button>
+            <button class="feature" data-view-link="cook"><span class="i i-star"></span>Ingredient Matching</button>
+            <button class="feature" data-ask="Take this banana bread recipe and remove eggs."><span class="i i-swap"></span>Smart Substitutions</button>
+            <button class="feature" data-view-link="stats"><span class="i i-chart"></span>Recipe Insights</button>
+        </div>
+        <form class="ask hero-ask" id="hero-form">
+          <span class="i i-search"></span>
+          <input id="hero-input" placeholder="Search for recipes, ingredients, or ask a cooking question..." autocomplete="off" aria-label="Ask Cooksy">
+          <button type="button" class="mic hidden" id="hero-mic" aria-label="Speak your question" title="Speak your question (your browser's speech recognition)"><span class="i i-mic"></span></button>
           <button class="send" aria-label="Send"><span class="i i-send"></span></button>
         </form>
         <div class="try">
           <span>Try:</span>
-          <button class="pill" data-ask="Find a penne pasta recipe.">"Find a penne pasta recipe"</button>
-          <button class="pill" data-ask="How many recipes contain both garlic and onion? What percentage of the dataset is that?">"Garlic and onion: how many?"</button>
-          <button class="pill" data-ask="Take this banana bread recipe and remove eggs.">"Banana bread without eggs"</button>
+          <button class="pill" data-ask="Find penne pasta without dairy."><span class="pill-emoji">🍝</span>"Penne pasta without dairy"</button>
+          <button class="pill" data-ask="I have eggs and rice. What can I cook?"><span class="pill-emoji">🥗</span>"Recipes with eggs and rice"</button>
+          <button class="pill" data-ask="Replace the butter in a chocolate cake recipe."><span class="i i-swap"></span>"Replace butter in a cake"</button>
         </div>
       </div>
 
-      <div class="section-head"><h3><span class="i i-grid"></span>Explore by diet</h3><span class="muted small">Sets a constraint that stays on for your whole conversation</span></div>
+      <div class="section-head"><h3><span class="sprout">🌱</span>Explore by diet</h3><span class="muted small">Quickly filter recipes to match your needs (stays on until you remove it)</span></div>
       <div class="tiles" id="diet-tiles"></div>
 
       <div class="section-head"><h3><span class="i i-flame"></span>The dataset at a glance</h3><span class="muted small">Computed live from the data</span></div>

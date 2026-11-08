@@ -4,7 +4,7 @@ Parser: rules. Covers: multi-turn follow-up, restriction removed, restriction ad
 
 **User:** Find vegetarian pasta recipes without mushrooms.
 
-*parser: rules, 0.0s*
+*parser: rules, 0.1s*
 
 ```text
 1,028 recipes share at least one word with 'pasta' and satisfy your constraints. The 5 most relevant:

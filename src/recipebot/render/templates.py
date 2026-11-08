@@ -162,7 +162,13 @@ def _expect(result: SubstitutionResult) -> str:
     elif m and m.risk == "none" and "moisture" in ev.all_roles:
         parts.append("it may be drier")
     if not parts:
-        parts = [f"{p.lower()}: {t}" for p, t in result.texture[:2]] or ["no change predicted"]
+        missing = [r for r in ev.all_roles if c.coverage.get(r) != "full"]
+        if c.coverage and not missing:
+            roles = ", ".join(ev.all_roles)
+            parts = [f"little change: {c.name} does what {ev.noun} does here ({roles})"]
+        else:
+            parts = [f"{p.lower()}: {t}" for p, t in result.texture
+                     if not t.startswith(f"{c.name} provides")][:2] or ["no change predicted"]
     text = "; ".join(parts)
     return text[0].upper() + text[1:] + "."
 

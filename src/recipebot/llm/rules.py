@@ -141,6 +141,9 @@ class RuleParser:
                          r"([a-z ]+?)(?:\s+(?:in|from|with|for)\b|[.,?!]|$)", t)
         if swap and swap.group(1).strip() not in ("it", "this", "that"):
             dish = re.search(r"(?:this|the|a)\s+([a-z ]+?)\s+recipe", t)
+            if dish:  # "the butter in a chocolate cake recipe" -> "chocolate cake"
+                last = re.split(r"\b(?:in|from|of)\s+(?:the|a|an|this|my)\s+", dish.group(1))[-1]
+                dish = re.search(r"([a-z ]+)$", last)
             number = re.search(r"\bthe\s+" + _NUM + r"\s+one\b", t)
             position = _number(number.group(1)) if number else 0
             if position == -1:
