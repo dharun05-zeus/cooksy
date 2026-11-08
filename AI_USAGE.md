@@ -15,9 +15,10 @@ decisions.
 **Architecture and technology decisions**
 - Compared the options (rules only, Gemini's free tier, a local model) and chose an
   LLM-first design in which the LLM interprets requests and code produces every fact.
-- When my Gemini key turned out to be on a billed project, switched the default to a free
-  local model (Qwen3 4B via Ollama), so the interviewer needs no API key or quota; later
-  added Groq as the free hosted option because Gemini's free quota runs out quickly.
+- When my Gemini key turned out to be on a billed project, switched to a free local model
+  (Qwen3 4B via Ollama). I later tried Groq as a hosted option too, then decided to keep
+  only the local model: free quotas run out, and the interviewer should not need any
+  account or API key.
 - Had the plan critically evaluated against the assignment before any code was written,
   required every weakness to be fixed, and had the revised plan checked again. This shaped
   the evidence-based substitution design, the separate ingredient-normalization module and
@@ -37,7 +38,7 @@ decisions.
 - Required full bug reviews of the first two stages before continuing and again before the
   final stage; these found real problems, such as substitutions replacing the wrong line in
   recipes with section headings.
-- Set up and ran the system myself (Ollama, API key, web UI), tested conversations by hand
+- Set up and ran the system myself (Ollama, web UI), tested conversations by hand
   and reported the failures I found, each then fixed with a test: a restriction that stayed
   active after I allowed the ingredient again, a diet shown as "no vegetarian", and answers
   that were too long and technical.
@@ -64,8 +65,7 @@ in my reviews and testing were fixed the same way.
 
 The assistant itself uses an LLM at run time (see DESIGN.md §11):
 
-- **Qwen3 4B via Ollama** (default, local), or **Groq** or **Gemini** if an API key is
-  configured.
+- **Qwen3 4B via Ollama**, running locally; no API key or account.
 - The LLM turns messages into structured requests, rewords the recipe steps a substitution
   changes, and (optionally) writes a short summary. Code chooses the substitute and its
   quantity.

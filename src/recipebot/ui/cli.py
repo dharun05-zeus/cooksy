@@ -1,7 +1,7 @@
 """Command-line chat.
 
     uv run recipebot chat                      # interactive
-    uv run recipebot chat --provider rules     # offline, no API key
+    uv run recipebot chat --provider none      # offline: no LLM, rule parser only
     uv run recipebot chat --script demo.txt    # run a scripted conversation (one message per line)
 """
 
@@ -55,7 +55,7 @@ def _run_turn(bot: Orchestrator, text: str, debug: bool) -> None:
 @app.command()
 def chat(
     provider: Annotated[str | None, typer.Option(
-        help="auto | ollama | groq | gemini | none (default: LLM_PROVIDER)")] = None,
+        help="ollama | none (default: LLM_PROVIDER)")] = None,
     script: Annotated[Path | None, typer.Option(
         help="file with one user message per line")] = None,
     debug: Annotated[bool, typer.Option(

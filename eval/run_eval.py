@@ -597,7 +597,7 @@ def write_report(results: dict, provider: str) -> Path:
 def main() -> int:
     use_utf8_console()
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
-    ap.add_argument("--provider", help="auto | ollama | groq | gemini | none")
+    ap.add_argument("--provider", help="ollama | none")
     ap.add_argument("--only", help="comma-separated: parser,stats,matching,substitution,"
                                    "conversations,baseline")
     ap.add_argument("--refresh-baseline", action="store_true")

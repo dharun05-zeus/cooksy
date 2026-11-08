@@ -157,7 +157,7 @@ class _NoCreditsClient:
 
     def generate_json(self, system, prompt, schema):
         self.calls += 1
-        raise LLMUnavailable("Gemini error 402: credits depleted")
+        raise LLMUnavailable("the Ollama server is not running")
 
 
 def test_permanent_llm_error_disables_llm_for_the_session():
