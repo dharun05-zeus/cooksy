@@ -1,34 +1,79 @@
-# Aggregate statistics (PDF Task 1)
+# Removing one restriction and adding another in one message
 
-Parser: ollama (qwen3:4b). Covers: aggregate statistics, stated filters and denominator
+Parser: ollama (qwen3:4b). Covers: multi-turn follow-up, restriction removed, restriction added
 
-**User:** How many recipes contain both garlic and onion? What percentage of the dataset is that?
+**User:** Find vegetarian pasta recipes without mushrooms.
 
-*parser: ollama (qwen3:4b), 5.8s*
+*parser: ollama (qwen3:4b), 5.3s; guard corrections: ["add_exclude += ['vegetarian']"]*
 
 ```text
-Answer: 15,657 of 122,910 recipes (12.74%).
-Filters: contains 'garlic' (same ingredient or its varieties: garlic, garlic clove, cloves garlic, bulb garlic, unpeeled garlic clove, pureed garlic and 6 more); contains 'onion' (same ingredient or its varieties: onion, red onion, yellow onion, white onion, sweet onion, spanish onion and 15 more)
-Recipes analyzed: 122,910
-Method: numerator / denominator × 100, where the denominator is all complete recipes.
-Example recipe IDs: ar:..6gl/0GIzSugrbvy6kHyxEHMMP4h9K, ar:..G2iuRLT7oseNmkKbjqAgbdB1G5IBC, ar:..M776r8BHroHcCXw3vInfs25LDkWw2, ar:..VDFobAHiAa0127h.N784Y2pnZyBZK, ar:./EObbt769KyfBTxJ.hIRe5275W4a9C
-Note: Dataset: 122,910 complete recipes (title, ingredients and instructions present) out of 125,164 records; 2,254 incomplete records excluded (517 empty).
+1,168 recipes share at least one word with 'vegetarian pasta' and satisfy your constraints. The 5 most relevant:
+
+1. Southwestern Vegetarian Pasta  [ar:1JismUWkQscNRlus8EuS2twFcreBd3u]
+   11 ingredients, 3 steps; matched: vegetarian, pasta
+   Evidence: none of its 11 ingredients contains 'mushrooms'; no vegetarian (meat, fish, shellfish) found in its 11 ingredient lines, including uncertain items
+   Ingredients: 1 tablespoon vegetable oil; 1 onion, chopped; 1/2 green bell pepper, diced; 2 cloves garlic, chopped; 2 tablespoons chili powder; 1 teaspoon ground cumin; 1 (28 ounce) can diced tomatoes with juice; 1 (15 ounce) can chickpeas; 1 (10 ounce) package frozen corn kernels, thawed; 1 (12 ounce) package uncooked elbow macaroni; 1/2 cup shredded Monterey Jack cheese
+
+2. Vegetarian White Bean 'Alfredo' with Linguine  [ar:MlZPouFciGWMdaDto8x4umEEaPeOMUe]
+   7 ingredients, 2 steps; matched: vegetarian, pasta
+   Evidence: none of its 7 ingredients contains 'mushrooms'; no vegetarian (meat, fish, shellfish) found in its 7 ingredient lines, including uncertain items
+   Ingredients: 1 (16 ounce) package linguine pasta; 1/4 cup butter; 3 cloves garlic, minced; 2 cups cooked navy beans, rinsed and drained; 1 1/2 cups soy milk; 1 cup asparagus, cut into 1/2-inch pieces; salt and black pepper to taste
+
+3. Easy Vegetarian Spinach Lasagna  [ar:ZlpIBwe2yjq8THm7S0OY7b/BP1Y3zAm]
+   12 ingredients, 6 steps; matched: vegetarian, pasta
+   Evidence: none of its 12 ingredients contains 'mushrooms'; no vegetarian (meat, fish, shellfish) found in its 12 ingredient lines, including uncertain items
+   Ingredients: cooking spray; 9 lasagna noodles; 1 bunch fresh spinach; 1 (8 ounce) container ricotta cheese; 1/2 cup shredded mozzarella cheese; 1 egg, lightly beaten; 1 pinch ground nutmeg; 1 pinch dried basil; salt and ground black pepper to taste; 1 cup pasta sauce; 1/2 cup shredded mozzarella cheese; 1/4 cup grated Parmesan cheese
+
+4. Vegetarian Four Cheese Lasagna  [ar:dZUU4MHgUSMVxBORhLFh0QDZl16UY8G]
+   12 ingredients, 5 steps; matched: vegetarian, pasta
+   Evidence: none of its 12 ingredients contains 'mushrooms'; no vegetarian (meat, fish, shellfish) found in its 12 ingredient lines, including uncertain items
+   Ingredients: 2 cups peeled and diced pumpkin; 1 eggplant, sliced into 1/2 inch rounds; 5 tomatoes; 1 pint ricotta cheese; 9 ounces crumbled feta cheese; 2/3 cup pesto; 2 eggs, beaten; salt and pepper to taste; 1 (15 ounce) can tomato sauce; fresh pasta sheets; 1 1/3 cups shredded mozzarella cheese; 1 cup grated Parmesan cheese
+
+5. Vegetarian, Tofu-Less Stir-Fry  [ar:uunA.qMKwI388W8D7Lbd3.nNm7kmohe]
+   11 ingredients, 2 steps; matched: vegetarian, pasta
+   Evidence: none of its 11 ingredients contains 'mushrooms'; no vegetarian (meat, fish, shellfish) found in its 11 ingredient lines, including uncertain items
+   Ingredients: 1/4 cup frozen shelled edamame (green soybeans); 1/8 teaspoon salt; 1 tablespoon olive oil; 1 clove garlic, minced; 1 cup sliced yellow bell pepper; 1/2 cup sliced yellow onion; 1/2 cup bean sprouts; 1 tablespoon tamari soy sauce; 2 cups cooked pasta; 1 tablespoon sesame oil; 1 teaspoon toasted sesame seeds
+
+Filters applied to the whole dataset: exact duplicates removed (same title and ingredient set); excludes 'mushroom' (any name containing it: mushroom, shiitake mushroom, condensed cream of mushroom soup, button mushroom, cremini mushroom, portobello mushroom and 470 more); excludes vegetarian (meat, fish, shellfish)
+Note: Your constraints removed 2,325 of the 3,493 recipes matching the search words (uncertain cases are removed too).
+Ask for 'the first one' (or any number) to see its full recipe.
+Active constraints: no mushrooms, no vegetarian.
 ```
 
-**User:** Among recipes containing tomato, which five have the fewest instruction steps?
+**User:** Actually, mushrooms are okay. But exclude dairy.
 
-*parser: ollama (qwen3:4b), 10.5s*
+*parser: ollama (qwen3:4b), 11.4s*
 
 ```text
-Answer: Fewest instruction steps among 11,712 matching recipes.
-Filters: contains 'tomato' (same ingredient or its varieties: tomato, plum tomato, cherry tomato, roma tomato, grape tomato, beefsteak tomato and 2 more)
-Recipes analyzed: 11,712
-Method: Step = one non-empty instruction line, excluding site boilerplate; a recipe stored as one paragraph is split into sentences. Sorted by steps, then ID.
-  rank: 1 | recipe_id: ar:/0wx00RefE0VHzlff/GBszObKmj63Pi | title: Tomato Basil Smoothie | steps: 1 | counted_by: line
-  rank: 2 | recipe_id: ar:3yxgq0iAqrlm2lHnLoxwJ8vQTHCd/Cm | title: Mediterranean Zucchini and Chickpea Salad | steps: 1 | counted_by: line
-  rank: 3 | recipe_id: ar:5s.4S6mTsQWRNXHDFGWe6ea03Oac48C | title: Momma's Marinara Sauce | steps: 1 | counted_by: line
-  rank: 4 | recipe_id: ar:9T2HkniyS.3VZB9NmFvzrfA39fMSt.. | title: Black Bean and White Corn Salad | steps: 1 | counted_by: line
-  rank: 5 | recipe_id: ar:BqfGsVgk7WHPebuzDH3IIRDAo0Vy8Hy | title: Refreshing Mango Chutney | steps: 1 | counted_by: line
-Note: Dataset: 122,910 complete recipes (title, ingredients and instructions present) out of 125,164 records; 2,254 incomplete records excluded (517 empty).
-Note: 47 recipes have 1 step(s); the 5 shown are the first by recipe ID (deterministic tie-break).
+315 recipes share at least one word with 'vegetarian pasta' and satisfy your constraints. The 5 most relevant:
+
+1. Vegetarian, Tofu-Less Stir-Fry  [ar:uunA.qMKwI388W8D7Lbd3.nNm7kmohe]
+   11 ingredients, 2 steps; matched: vegetarian, pasta
+   Evidence: no vegetarian (meat, fish, shellfish) found in its 11 ingredient lines, including uncertain items; no dairy found in its 11 ingredient lines, including uncertain items
+   Ingredients: 1/4 cup frozen shelled edamame (green soybeans); 1/8 teaspoon salt; 1 tablespoon olive oil; 1 clove garlic, minced; 1 cup sliced yellow bell pepper; 1/2 cup sliced yellow onion; 1/2 cup bean sprouts; 1 tablespoon tamari soy sauce; 2 cups cooked pasta; 1 tablespoon sesame oil; 1 teaspoon toasted sesame seeds
+
+2. Vegetarian Dashi  [fn:/PExjBcOe2zIQx6cmsln.2zQWdL5agG]
+   3 ingredients, 4 steps; matched: vegetarian
+   Evidence: no vegetarian (meat, fish, shellfish) found in its 3 ingredient lines, including uncertain items; no dairy found in its 3 ingredient lines, including uncertain items
+   Ingredients: 1 small piece (4 to 5 square inch) kombu (dried, cultivated kelp or seaweed); 2 cups water; 1 cup vegetable stock
+
+3. Al's Quick Vegetarian Spaghetti  [ar:9B8BIcDQ11ZH0D.at3b.2E3QfecQCfe]
+   6 ingredients, 2 steps; matched: vegetarian
+   Evidence: no vegetarian (meat, fish, shellfish) found in its 6 ingredient lines, including uncertain items; no dairy found in its 6 ingredient lines, including uncertain items
+   Ingredients: 1 pound uncooked spaghetti; 1 cup broccoli florets; 1 (15 ounce) can whole kernel corn, drained; 1 cup fresh sliced mushrooms; 1 cup sliced carrots; 2 (8 ounce) cans tomato sauce
+
+4. Vegetarian Dipping Sauce  [epi:aXLWEF8ptI0beFOoSaU.qglNhAbRyiC]
+   4 ingredients, 2 steps; matched: vegetarian
+   Evidence: no vegetarian (meat, fish, shellfish) found in its 4 ingredient lines, including uncertain items; no dairy found in its 4 ingredient lines, including uncertain items
+   Ingredients: 1/4 cup superfine sugar; 3/4 cup boiling water; 3 tablespoons freshly squeezed lemon juice; 3 tablespoons light soy sauce
+
+5. Vegetarian Ribs  [ar:2A3VpW2Kxo0RIA42hMemG6mku/sdRJu]
+   9 ingredients, 7 steps; matched: vegetarian
+   Evidence: no vegetarian (meat, fish, shellfish) found in its 9 ingredient lines, including uncertain items; no dairy found in its 9 ingredient lines, including uncertain items
+   Ingredients: 2 cups gluten; 1/3 cup nutritional yeast; 2 tablespoons paprika; 1 tablespoon salt; 2 cups water; 1/2 cup smooth peanut butter; 1 large onion, minced; 1/2 cup olive oil; 2 cups barbeque sauce
+
+Filters applied to the whole dataset: exact duplicates removed (same title and ingredient set); excludes vegetarian (meat, fish, shellfish); excludes dairy
+Note: Your constraints removed 3,178 of the 3,493 recipes matching the search words (uncertain cases are removed too).
+Ask for 'the first one' (or any number) to see its full recipe.
+Active constraints: no vegetarian, no dairy.
 ```

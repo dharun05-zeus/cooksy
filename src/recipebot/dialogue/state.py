@@ -100,17 +100,22 @@ class SessionState(BaseModel):
         return ", ".join(parts)
 
 
+def same_term(a: str, b: str) -> bool:
+    """ "mushroom" / "Mushrooms", "tomato" / "tomatoes": the same restriction."""
+    a, b = a.lower().strip(), b.lower().strip()
+    return a == b or a.rstrip("s") == b.rstrip("s") or a == b + "es" or b == a + "es"
+
+
 def _add(items: list[str], new: list[str]) -> list[str]:
     result = list(items)
     for item in new:
-        if item.lower() not in {r.lower() for r in result}:
+        if not any(same_term(item, r) for r in result):
             result.append(item)
     return result
 
 
 def _remove(items: list[str], gone: list[str]) -> list[str]:
-    gone_lower = {g.lower() for g in gone}
-    return [i for i in items if i.lower() not in gone_lower]
+    return [i for i in items if not any(same_term(i, g) for g in gone)]
 
 
 def resolve_intent(state: SessionState, patch: StatePatch) -> StatePatch:

@@ -8,7 +8,13 @@ from __future__ import annotations
 
 import re
 
-from recipebot.dialogue.state import SessionState, StatePatch, StatsRequest, SubstituteRequest
+from recipebot.dialogue.state import (
+    SessionState,
+    StatePatch,
+    StatsRequest,
+    SubstituteRequest,
+    same_term,
+)
 from recipebot.engines.matching import PantryItem
 
 NUMBERS = {
@@ -26,9 +32,21 @@ _EXCLUDE = re.compile(
 _FREE = re.compile(r"\b([a-z]+)[- ]free\b")  # "gluten-free", "gluten free"
 _DIETS = re.compile(r"\b(vegan|vegetarian|pescatarian)\b")
 _INTOLERANT = re.compile(r"\b(lactose|gluten)[- ]intolerant\b")
+# "mushrooms are okay", "dairy is fine now", "I can have nuts again", "allow eggs again"
 _ALLOWED_AGAIN = re.compile(
-    r"\b([a-z]+) is (?:fine|ok|okay|allowed)(?: now| again)?\b"
-    r"|\bi can (?:have|eat) ([a-z]+) (?:now|again)\b")
+    r"\b([a-z]+(?: [a-z]+){0,2}) (?:is|are) (?:fine|ok|okay|allowed|alright|good)"
+    r"(?: now| again| after all)?\b"
+    r"|\bi can (?:have|eat) ([a-z]+(?: [a-z]+)?) (?:now|again|after all)\b"
+    r"|\b(?:allow|include|bring back) ([a-z]+(?: [a-z]+)?) (?:again|back|after all)\b")
+# Leading words that belong to the sentence, not the ingredient: "but red onions are fine".
+_LEAD = re.compile(r"^(?:(?:actually|but|and|so|now|ok|okay|well|oh|the|also|then)\s+)+")
+
+
+def allowed_again(t: str) -> list[str]:
+    """Ingredients the user allows again in a (lower-cased) message."""
+    found = [_LEAD.sub("", next(g for g in groups if g)) for groups in _ALLOWED_AGAIN.findall(t)]
+    return [f for f in dict.fromkeys(found)
+            if f and f not in {"it", "that", "this", "everything", "all", "that all"}]
 _SPLIT = re.compile(r",\s*(?:and\s+)?|\s+and\s+|\s+or\s+")
 
 
@@ -89,10 +107,12 @@ class RuleParser:
         if re.match(r"^(reset|start over|new session|clear)\b", t):
             return StatePatch(intent="reset")
 
-        excludes = restrictions_in(t)
-        allowed = [a or b for a, b in _ALLOWED_AGAIN.findall(t)]
+        allowed = allowed_again(t)
+        excludes = [e for e in restrictions_in(t) if not any(same_term(e, a) for a in allowed)]
         if allowed:
-            return StatePatch(intent=state.task or "search", remove_exclude=allowed)
+            # "Mushrooms are okay. But exclude dairy.": both changes in one message.
+            return StatePatch(intent=state.task or "search", remove_exclude=allowed,
+                              add_exclude=excludes)
         steps = (re.search(r"(?:at most|max(?:imum)?|no more than|up to|under|fewer than|"
                            r"less than)\s+"
                            + _NUM + r"\s+(?:instruction\s+)?steps?", t)

@@ -4,7 +4,7 @@ Parser: ollama (qwen3:4b). Covers: multi-turn follow-up, restriction applies to 
 
 **User:** Find a penne pasta recipe.
 
-*parser: ollama (qwen3:4b), 4.4s*
+*parser: ollama (qwen3:4b), 3.9s*
 
 ```text
 3,352 recipes share at least one word with 'penne pasta'. The 5 most relevant:
@@ -68,7 +68,7 @@ Active constraints: no dairy.
 
 **User:** Show me the ingredients for the first one.
 
-*parser: ollama (qwen3:4b), 9.9s*
+*parser: ollama (qwen3:4b), 9.3s*
 
 ```text
 Penne Pasta with Spinach and Bacon  [ar:23to8XzUux0FF.g5ZFsqnxvhByMzfJ.]  (source: Allrecipes)

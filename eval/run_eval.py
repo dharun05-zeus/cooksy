@@ -409,6 +409,9 @@ def eval_conversations(store, index, llm, provider: str) -> dict:
             if "exclude_has" in st and not _terms(store, [st["exclude_has"]]) <= _terms(
                     store, bot.state.exclude):
                 problems.append(f"turn {turn_no}: '{st['exclude_has']}' not in active exclusions")
+            if "exclude_lacks" in st and _terms(store, [st["exclude_lacks"]]) & _terms(
+                    store, bot.state.exclude):
+                problems.append(f"turn {turn_no}: '{st['exclude_lacks']}' is still excluded")
             if "query_has" in st and st["query_has"] not in fold(bot.state.query):
                 problems.append(f"turn {turn_no}: active query lost '{st['query_has']}'")
             if "max_steps" in st and bot.state.max_steps != st["max_steps"]:

@@ -1,5 +1,7 @@
 """Multi-turn conversations on the 9-record fixture dataset (see test_pipeline_and_stats.py)."""
 
+import pytest
+
 from recipebot.dialogue.state import SessionState, StatePatch, apply_patch
 from recipebot.engines.matching import MatchRequest, PantryItem, match
 from recipebot.llm.base import LLMUnavailable, inline_schema
@@ -193,6 +195,70 @@ def test_guard_drops_exclusion_with_no_restriction_in_message():
     assert fixed.add_exclude == [] and notes
     kept, _ = apply_guards(llm, StatePatch(intent="search"), "pasta, my son is lactose intolerant")
     assert kept.add_exclude == ["dairy"]
+
+
+def test_allowing_one_ingredient_and_excluding_another_in_one_message(bot):
+    bot.handle("Find vegetarian pasta recipes without mushrooms.")
+    assert set(bot.state.exclude) == {"mushrooms", "vegetarian"}
+    bot.handle("Actually, mushrooms are okay. But exclude dairy.")
+    assert set(bot.state.exclude) == {"vegetarian", "dairy"}
+
+
+@pytest.mark.parametrize("message, allowed", [
+    ("mushrooms are okay", ["mushrooms"]),
+    ("actually, dairy is fine now", ["dairy"]),
+    ("but red onions are fine after all", ["red onions"]),
+    ("i can have nuts again", ["nuts"]),
+    ("allow eggs again", ["eggs"]),
+    ("that is fine", []),
+])
+def test_allowed_again_phrasings(message, allowed):
+    from recipebot.llm.rules import allowed_again
+
+    assert allowed_again(message) == allowed
+
+
+def test_removing_an_exclusion_ignores_plural():
+    state = apply_patch(SessionState(), StatePatch(intent="search", add_exclude=["mushrooms"]))
+    state = apply_patch(state, StatePatch(intent="search", remove_exclude=["Mushroom"]))
+    assert state.exclude == []
+
+
+def test_guard_stops_the_llm_re_adding_an_allowed_ingredient():
+    from recipebot.llm.parser import apply_guards
+
+    # What Qwen returned for "Actually, mushrooms are okay. But exclude dairy."
+    llm = StatePatch(intent="search", query="vegetarian pasta", add_exclude=["mushrooms", "dairy"])
+    rules = StatePatch(intent="search", remove_exclude=["mushrooms"], add_exclude=["dairy"])
+    fixed, _ = apply_guards(llm, rules, "Actually, mushrooms are okay. But exclude dairy.")
+    assert fixed.remove_exclude == ["mushrooms"] and fixed.add_exclude == ["dairy"]
+
+
+def test_guard_drops_an_invented_replacement():
+    from recipebot.dialogue.state import SubstituteRequest
+    from recipebot.llm.parser import apply_guards
+
+    text = "I cannot have dairy. Replace the butter in the first one."
+    llm = StatePatch(intent="substitute", result_number=1, add_exclude=["dairy"],
+                     substitute=SubstituteRequest(target="butter", replacement="dairy-free butter"))
+    fixed, _ = apply_guards(llm, StatePatch(intent="substitute"), text)
+    assert fixed.substitute.replacement is None
+    named = llm.model_copy(update={"substitute": SubstituteRequest(target="butter",
+                                                                   replacement="shortening")})
+    kept, _ = apply_guards(named, StatePatch(intent="substitute"),
+                           "Replace the butter with shortening.")
+    assert kept.substitute.replacement == "shortening"
+
+
+def test_guard_keeps_pantry_when_an_item_is_only_excluded():
+    from recipebot.llm.parser import apply_guards
+
+    llm = StatePatch(intent="match", add_exclude=["eggs"], remove_pantry=["eggs"])
+    fixed, _ = apply_guards(llm, StatePatch(intent="match", add_exclude=["eggs"]),
+                            "Exclude eggs too.")
+    assert fixed.remove_pantry == [] and fixed.add_exclude == ["eggs"]
+    kept, _ = apply_guards(llm, StatePatch(intent="match"), "I don't have eggs after all.")
+    assert kept.remove_pantry == ["eggs"]
 
 
 def test_schema_has_no_refs():

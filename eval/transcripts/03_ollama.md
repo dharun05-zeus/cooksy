@@ -1,91 +1,34 @@
-# Ingredient matching with a follow-up (PDF Task 2)
+# Aggregate statistics (PDF Task 1)
 
-Parser: ollama (qwen3:4b). Covers: multi-turn follow-up, explainable ranking
+Parser: ollama (qwen3:4b). Covers: aggregate statistics, stated filters and denominator
 
-**User:** I have eggs, onions, tomatoes, and rice. Suggest five recipes using as many of these as possible, with no peanuts and at most six instruction steps. Prefer recipes that need the fewest additional ingredients.
+**User:** How many recipes contain both garlic and onion? What percentage of the dataset is that?
 
-*parser: ollama (qwen3:4b), 20.2s; guard corrections: ["add_exclude += ['peanuts']", 'max_steps None -> 6']*
+*parser: ollama (qwen3:4b), 6.5s*
 
 ```text
-Your ingredients (as understood): egg, onion, tomato, rice
-47,529 of 61,423 recipes using your ingredients satisfy your constraints. Top 5:
-
-1. Curried Rice With Smoked Trout  [fn:Akk/zqCo1n3wzwavH0..w6QIF5363M2]
-   Why here: uses 4 of your 4 ingredients, needs 6 more, 3 steps
-   Matched: egg, onion, tomato, rice
-   Extra required: olive oil, curry powder, cilantro, mixed green, lemon juice, smoked trout
-   Staples assumed available: salt, black pepper
-
-2. Omelet for Leftovers (Omurice)  [ar:ylwbZEdf8zK8ZA6pqy15Wll6YtZyG2G]
-   Why here: uses 4 of your 4 ingredients, needs 7 more, 2 steps
-   Matched: egg, onion, tomato, rice
-   Extra required: butter, bell pepper, zucchini, mushroom, ketchup, bacon, paprika
-   Staples assumed available: salt, black pepper
-
-3. Imitation Meatloaf  [ar:q3kO3yCalJEVIp74kLkkcxHp6izs7zi]
-   Why here: uses 4 of your 4 ingredients, needs 8 more, 3 steps
-   Matched: egg, onion, tomato, rice
-   Extra required: dry brown lentil, wheat germ, dry bread crumb, thyme, hot sauce, ketchup, soy sauce, mozzarella cheese
-
-4. Sopa de Albondigas  [ar:EluceK82BeHBZiEFBnlazdnX3tReKky]
-   Why here: uses 4 of your 4 ingredients, needs 8 more, 4 steps
-   Matched: egg, onion, tomato, rice
-   Extra required: chicken broth, ground chuck, hot pepper, garlic, cumin, pepper jack cheese, potato, cilantro
-   Staples assumed available: salt, black pepper
-
-5. Flank Steak with Black Beans and Rice  [fn:Yp5x0qV/NdaF8jYDOm3N1sE7i6Ps802]
-   Why here: uses 4 of your 4 ingredients, needs 9 more, 2 steps
-   Matched: egg, onion, tomato, rice
-   Extra required: flank steak, vegetable oil, bay leaf, beef stock, olive oil, garlic, oregano, cumin, black bean
-
-Ranking rule: most of your ingredients used → fewest extra ingredients needed → fewest instruction steps → recipe ID.
-Hard constraints applied before ranking: exact duplicates removed (same title and ingredient set); excludes peanuts (peanut); at most 6 steps
-Note: No quantities were given, so this is a name-level match; whether you have enough of each ingredient was not verified.
-Active constraints: no peanuts, at most 6 steps.
+Answer: 15,657 of 122,910 recipes (12.74%).
+Filters: contains 'garlic' (same ingredient or its varieties: garlic, garlic clove, cloves garlic, bulb garlic, unpeeled garlic clove, pureed garlic and 6 more); contains 'onion' (same ingredient or its varieties: onion, red onion, yellow onion, white onion, sweet onion, spanish onion and 15 more)
+Recipes analyzed: 122,910
+Method: numerator / denominator × 100, where the denominator is all complete recipes.
+Example recipe IDs: ar:..6gl/0GIzSugrbvy6kHyxEHMMP4h9K, ar:..G2iuRLT7oseNmkKbjqAgbdB1G5IBC, ar:..M776r8BHroHcCXw3vInfs25LDkWw2, ar:..VDFobAHiAa0127h.N784Y2pnZyBZK, ar:./EObbt769KyfBTxJ.hIRe5275W4a9C
+Note: Dataset: 122,910 complete recipes (title, ingredients and instructions present) out of 125,164 records; 2,254 incomplete records excluded (517 empty).
 ```
 
-**User:** Exclude eggs too.
+**User:** Among recipes containing tomato, which five have the fewest instruction steps?
 
-*parser: ollama (qwen3:4b), 20.6s; guard corrections: ["add_exclude += ['eggs']"]*
+*parser: ollama (qwen3:4b), 10.2s*
 
 ```text
-Your ingredients (as understood): onion, tomato, rice
-23,572 of 36,305 recipes using your ingredients satisfy your constraints. Top 5:
-
-1. Zucchini Saute  [ar:J/illFyDAANk7X1GwnmkQ4iMZPDTBmO]
-   Why here: uses 3 of your 3 ingredients, needs 3 more, 2 steps
-   Matched: onion, tomato, rice
-   Extra required: vegetable oil, zucchini, bell pepper
-   Staples assumed available: salt, black pepper, water
-
-2. Mexican Rice I  [ar:tlxZ5TF3/OeA94/bLSh51tLF//pNk3.]
-   Why here: uses 3 of your 3 ingredients, needs 3 more, 2 steps
-   Matched: onion, tomato, rice
-   Extra required: vegetable oil, cumin, chili powder
-   Staples assumed available: salt, water
-   Form: uses canned tomato
-
-3. Black Beans and Rice  [fn:RwGqUrp5Mxzf/f5nCKmr0MofUtRB0Oy]
-   Why here: uses 3 of your 3 ingredients, needs 3 more, 2 steps
-   Matched: onion, tomato, rice
-   Extra required: black bean, vegetable oil, okra
-   Staples assumed available: salt
-
-4. Vary Aminanana (Collard Greens and Rice)  [ar:wA.9BnVROfR6gjMSi2k5C7WoEoLYWOK]
-   Why here: uses 3 of your 3 ingredients, needs 3 more, 3 steps
-   Matched: onion, tomato, rice
-   Extra required: olive oil, ginger root, collard green
-   Staples assumed available: water, salt, black pepper
-
-5. Mexican Rice  [fn:Pj3bu2i8t2GEOJE3h3991Rvnf.ud0CK]
-   Why here: uses 3 of your 3 ingredients, needs 3 more, 3 steps
-   Matched: onion, tomato, rice
-   Extra required: vegetable oil, garlic, jalapeno pepper
-   Staples assumed available: salt
-
-Ranking rule: most of your ingredients used → fewest extra ingredients needed → fewest instruction steps → recipe ID.
-Hard constraints applied before ranking: exact duplicates removed (same title and ingredient set); excludes peanuts (peanut); excludes eggs (egg); at most 6 steps
-Note: 'eggs' is excluded by your constraints, so it is not counted as one of your ingredients.
-Note: No quantities were given, so this is a name-level match; whether you have enough of each ingredient was not verified.
-Active constraints: no peanuts, no eggs, at most 6 steps.
+Answer: Fewest instruction steps among 11,712 matching recipes.
+Filters: contains 'tomato' (same ingredient or its varieties: tomato, plum tomato, cherry tomato, roma tomato, grape tomato, beefsteak tomato and 2 more)
+Recipes analyzed: 11,712
+Method: Step = one non-empty instruction line, excluding site boilerplate; a recipe stored as one paragraph is split into sentences. Sorted by steps, then ID.
+  rank: 1 | recipe_id: ar:/0wx00RefE0VHzlff/GBszObKmj63Pi | title: Tomato Basil Smoothie | steps: 1 | counted_by: line
+  rank: 2 | recipe_id: ar:3yxgq0iAqrlm2lHnLoxwJ8vQTHCd/Cm | title: Mediterranean Zucchini and Chickpea Salad | steps: 1 | counted_by: line
+  rank: 3 | recipe_id: ar:5s.4S6mTsQWRNXHDFGWe6ea03Oac48C | title: Momma's Marinara Sauce | steps: 1 | counted_by: line
+  rank: 4 | recipe_id: ar:9T2HkniyS.3VZB9NmFvzrfA39fMSt.. | title: Black Bean and White Corn Salad | steps: 1 | counted_by: line
+  rank: 5 | recipe_id: ar:BqfGsVgk7WHPebuzDH3IIRDAo0Vy8Hy | title: Refreshing Mango Chutney | steps: 1 | counted_by: line
+Note: Dataset: 122,910 complete recipes (title, ingredients and instructions present) out of 125,164 records; 2,254 incomplete records excluded (517 empty).
+Note: 47 recipes have 1 step(s); the 5 shown are the first by recipe ID (deterministic tie-break).
 ```

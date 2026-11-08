@@ -14,6 +14,14 @@
     - user: Show me the ingredients for the first one.
       expect: {reply_has: ["Ingredients (as listed in the dataset)"]}
 
+- name: Removing one restriction and adding another in one message
+  covers: [multi-turn follow-up, restriction removed, restriction added]
+  turns:
+    - user: Find vegetarian pasta recipes without mushrooms.
+      expect: {state: {exclude_has: mushrooms}}
+    - user: Actually, mushrooms are okay. But exclude dairy.
+      expect: {reply_lacks: ["no mushrooms"], state: {exclude_has: dairy, exclude_lacks: mushrooms}}
+
 - name: Aggregate statistics (PDF Task 1)
   covers: [aggregate statistics, stated filters and denominator]
   turns:

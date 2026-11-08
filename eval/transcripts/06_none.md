@@ -1,143 +1,85 @@
-# Substitution with weak or conflicting evidence (PDF Task 3)
+# Substitution with strong evidence (PDF Task 3)
 
-Parser: rules. Covers: weak or conflicting evidence, quantity not invented, follow-up with a requested replacement
+Parser: rules. Covers: substitution, restriction respected, other conflicts reported
 
-**User:** Take this banana bread recipe and remove eggs. Use only ingredients that appear in the dataset.
+**User:** Find chocolate chip cookies.
 
-*parser: rules, 2.6s*
+*parser: rules, 0.0s*
 
 ```text
-Using 'Banana Banana Bread' [ar:kq.naD.8G19M4UU9dVvJgHtpfo.l/eC], the top match for 'banana bread' that contains eggs.
-Banana Banana Bread without eggs: experimental, amount unknown, low confidence  [ar:kq.naD.8G19M4UU9dVvJgHtpfo.l/eC]
-- Swap: replace 2 eggs, beaten with silken tofu; the dataset doesn't say how much to use
-- Why: only 1 banana bread recipe without eggs uses it, and it holds the batter together like egg does.
-- Other options: applesauce (about 2/3 cup, estimated), soy yogurt (about 3/4 cup, estimated)
-- Expect: Less rise and a denser result; it may turn gummy: this recipe is already wetter than most banana bread recipes.
-- Bake: as the original, 350 degrees F (175 degrees C); 60 to 65 minutes. Check with a toothpick.
+12,819 recipes share at least one word with 'chocolate chip cookies'. The 5 most relevant:
 
-Incomplete recipe: the silken tofu amount is not established by the dataset, so test a small batch first.
+1. Easy Chocolate Chip Cookies  [ar:RBAW5pewzXTtgX.2bKuw8wv5WUm0rJW]
+   5 ingredients, 3 steps; matched: chocolate, chip, cookie
 
-Adapted recipe (* = changed):
-    2 cups all-purpose flour
-    1 teaspoon baking soda
-    1/4 teaspoon salt
-    1/2 cup butter
-    3/4 cup brown sugar
-  * silken tofu (quantity not established by the dataset)
-    2 1/3 cups mashed overripe bananas
-Steps:
-  1. Preheat oven to 350 degrees F (175 degrees C). Lightly grease a 9x5 inch loaf pan.
-  2. In a large bowl, combine flour, baking soda and salt. In a separate bowl, cream together butter and brown sugar. Stir in silken tofu and mashed bananas until well blended. Stir banana mixture into flour mixture; stir just to moisten. Pour batter into prepared loaf pan.
-  3. Bake in preheated oven for 60 to 65 minutes, until a toothpick inserted into center of the loaf comes out clean. Let bread cool in pan for 10 minutes, then turn out onto a wire rack.
+2. Chocolate Chip Cookie Pie Crust  [fn:oQxof/DMNnvFoXWjv9idYb9V15P4jyG]
+   4 ingredients, 2 steps; matched: chocolate, chip, cookie
 
-DETAILS
-Selected replacement: silken tofu (weak evidence, good role fit), selected by the ranking rules in code; steps rewritten by replacing the name.
-Amount (unknown): Quantity not established by the dataset. Microwave Tofu Banana Bread [ar:5S4TJwjeeH.L/gDoUxUR0jfxC/8Vd4u] uses "1/2 (12 ounce) package silken tofu", but its size cannot be compared with this recipe's, so the amount is not scaled.
-What egg does here (cooking knowledge): binding (main), leavening, moisture, structure, emulsification.
-Why this choice (ranking rules: 1) candidates that may break a restriction rank last; 2) a candidate must provide the ingredient's main role to be selected; 3) evidence strength; 4) evidence type: direct, then same dish, then related recipes; 5) how many of the ingredient's roles it covers; 6) number of supporting recipes; 7) quantity: from the dataset, estimated, unknown):
-  - silken tofu ranks above applesauce: both have weak same dish evidence, but silken tofu covers more of the egg's roles (binding fully, moisture fully, structure partly, emulsification partly; not leavening) than applesauce (binding partly, moisture fully; not leavening, structure, emulsification).
-  - silken tofu ranks above soy yogurt: both have weak same dish evidence, but silken tofu covers more of the egg's roles (binding fully, moisture fully, structure partly, emulsification partly; not leavening) than soy yogurt (binding partly, moisture fully; not leavening, structure, emulsification).
-  - silken tofu ranks above olive oil: olive oil does not provide the egg's main role (binding).
-  - silken tofu ranks above evaporated milk: evaporated milk does not provide the egg's main role (binding).
-  - silken tofu, applesauce, soy yogurt all have equally weak evidence; the order between them rests on role coverage and quantity, not on stronger data.
-  - Conflicting evidence: egg substitute is supported by the dataset but may contain a restricted ingredient, so it ranks last and is never chosen automatically.
-Evidence from the dataset, ranked (strength and role fit rated separately):
-  1. silken tofu: weak evidence, good fit, amount unknown (indirect: used by 1 same-dish recipe(s) without it; e.g. Microwave Tofu Banana Bread [ar:5S4TJwjeeH.L/gDoUxUR0jfxC/8Vd4u])
-  2. applesauce: weak evidence, partial fit, about 2/3 cup, estimated (indirect: used by 1 same-dish recipe(s) without it; e.g. Vegan Zucchini Banana Bread Muffins [ar:.GLWQH0bkiU3fRzwc68PqTCqGHJj2fy])
-  3. soy yogurt: weak evidence, partial fit, about 3/4 cup, estimated (indirect: used by 1 same-dish recipe(s) without it; e.g. Vegan Banana Bread [fn:p174TykunvO./PLjDpl03RBTaXiOEdu])
-  4. olive oil: moderate evidence, partial fit, amount unknown (indirect: used by 12 bread recipe(s) without it; e.g. Appetizing Bread [ar:06n7WTw6RQSDCfROjZZs5Zee/ciX.Hm])
-  5. evaporated milk: weak evidence, partial fit, amount unknown (direct: 1 recipe(s) offer it as an alternative; e.g. Pumpkin Turnovers [epi:DiKM3xoQccTZ7paC.XGMVpHMD8gchRm])
-  6. egg substitute: conflicting evidence, good fit, 1/2 cup (direct: 4 recipe(s) offer it as an alternative; e.g. Quick-and-Easy Cheese Blintz Casserole [epi:cTG4e2s8RON5swgZSMmn6Omhx7Q9MGi])
-  Compared 183 baked 'banana bread' recipes; only 9 lack eggs, so also 300 baked 'bread' recipes (83 without it); 9 of them have no eggs.
-  Versions of this dish in the dataset made without eggs: Microwave Tofu Banana Bread [ar:5S4TJwjeeH.L/gDoUxUR0jfxC/8Vd4u]; Banana Oat Bread Pudding [ar:/tgLkKTWsLuZ95S0LSm4WrrYcwKFuMi]; Rich and Delicious Banana Bread [ar:TJFqS5qmSUVcBw7c2Da99BzhmvnbgCm]
-  Instruction note: "Prepare cake mix as directed, except substitute egg whites for eggs and applesauce for oil."  [ar:d8ca8qxARHeOTiYcQFQlp229RTttkw.]
-  Direct evidence: a recipe explicitly offers the ingredient as an alternative. Indirect evidence: a related recipe uses it without the removed ingredient but does not call it a replacement. The two are not equivalent.
-Predicted texture changes (predictions, not verified by the dataset):
-  - Binding: silken tofu provides binding, so this may stay close to the original
-  - Rise: silken tofu does not provide leavening, so the result may rise less and be denser
-  - Moisture: may stay moist or become wetter than the original, depending on the amount of silken tofu
-  - Structure: potentially weaker than the original: silken tofu provides only some structure
-  - Batter consistency: potentially weaker than the original: silken tofu provides only some emulsification
-  - Density: may become denser, since the egg's leavening is not fully replaced
-  - Crumb: may become softer or gummy, more so with more silken tofu
-Moisture check (risk: high):
-  - Wet ingredients already in this recipe: 2 1/3 cups mashed overripe bananas.
-  - By volume they are 117% of the flour; the median across 56 'banana bread' recipes in the dataset is 80% (eggs are not counted: the dataset gives no volume for them).
-  - The amount of silken tofu is not established, and it decides how wet the batter gets.
-  - Excess-moisture risk: a wetter batter can bake up gummy, dense or underbaked in the centre. Check doneness with a toothpick; the original baking time was not tested with this change.
-Limitations:
-  - No recipe in the dataset explicitly recommends silken tofu for eggs. The evidence is indirect: recipes that use silken tofu and no eggs may differ in other ways too.
-  - The evidence rests on a single recipe.
-  - Quantity not established by the dataset. The ingredient list is incomplete: test a small batch before relying on it.
-  - Baking temperature and time are those of the original recipe; they were not re-tested with the substitute.
-  - Texture predictions come from the ingredient's roles (general cooking knowledge), not from results recorded in the dataset.
-  - silken tofu, applesauce, soy yogurt all have equally weak evidence; the order between them rests on role coverage and quantity, not on stronger data.
-  - Conflicting evidence: egg substitute is supported by the dataset but may contain a restricted ingredient, so it ranks last and is never chosen automatically.
-Caution: the evidence for silken tofu is weak; treat this adaptation as untested.
-This is not a guarantee that the dish is safe for an allergy.
+3. Quick Chocolate Chip Cookie Cake  [ar:d6OkEkfpeougQEphCnBqf1cFPyIUVVu]
+   4 ingredients, 3 steps; matched: chocolate, chip, cookie
+
+4. Super Easy Chocolate Chip Cookies  [ar:RK7Vzzv28tg2cfgBqtEWzisPPmCFDeq]
+   4 ingredients, 3 steps; matched: chocolate, chip, cookie
+
+5. Quick Chocolate Chip Cookies  [fn:rdAmVvsjNefAmDh3favT2HJRuCF/eBi]
+   8 ingredients, 5 steps; matched: chocolate, chip, cookie
+
+Filters applied to the whole dataset: exact duplicates removed (same title and ingredient set)
+Ask for 'the first one' (or any number) to see its full recipe.
 ```
 
-**User:** Use applesauce instead.
+**User:** I cannot have dairy. Replace the butter in the first one.
 
-*parser: rules, 2.5s*
+*parser: rules, 1.9s*
 
 ```text
-Banana Banana Bread without eggs: experimental, low confidence  [ar:kq.naD.8G19M4UU9dVvJgHtpfo.l/eC]
-- Swap: replace 2 eggs, beaten with applesauce; about 2/3 cup (estimated) (your choice)
-- Why: only 1 banana bread recipe without eggs uses it; it only partly holds the batter together.
-- Other options: silken tofu (amount unknown), soy yogurt (about 3/4 cup, estimated)
-- Expect: Less rise and a denser result; it may crumble more; it may turn gummy: this recipe is already wetter than most banana bread recipes.
-- Bake: as the original, 350 degrees F (175 degrees C); 60 to 65 minutes. Check with a toothpick.
+Easy Chocolate Chip Cookies without butter: supported by the dataset, high confidence  [ar:RBAW5pewzXTtgX.2bKuw8wv5WUm0rJW]
+- Swap: replace 1/2 cup butter, softened with shortening; same amount as the original (the dataset offers this)
+- Why: 4 recipes in the dataset offer it as an alternative to butter, and it adds fat and tenderness like butter does.
+- Other options: olive oil (2/3 cup), vegetable shortening (same amount)
+- Expect: Richness and tenderness: shortening provides fat, so this may stay close to the original; tenderness: shortening provides tenderness, so this may stay close to the original.
+- Bake: as the original, 350 degrees F (175 degrees C); 11 to 15 minutes. Check with a toothpick.
+- Still to replace: 1 (18.25 ounce) package yellow cake mix; 2 cups semisweet chocolate chips
 
 Adapted recipe (* = changed):
-    2 cups all-purpose flour
-    1 teaspoon baking soda
-    1/4 teaspoon salt
-    1/2 cup butter
-    3/4 cup brown sugar
-  * 2/3 cup applesauce (estimated quantity)
-    2 1/3 cups mashed overripe bananas
+    1 (18.25 ounce) package yellow cake mix
+  * 1/2 cup shortening, softened (quantity from the dataset)
+    2 eggs
+    1 teaspoon vanilla extract
+    2 cups semisweet chocolate chips
 Steps:
-  1. Preheat oven to 350 degrees F (175 degrees C). Lightly grease a 9x5 inch loaf pan.
-  2. In a large bowl, combine flour, baking soda and salt. In a separate bowl, cream together butter and brown sugar. Stir in applesauce and mashed bananas until well blended. Stir banana mixture into flour mixture; stir just to moisten. Pour batter into prepared loaf pan.
-  3. Bake in preheated oven for 60 to 65 minutes, until a toothpick inserted into center of the loaf comes out clean. Let bread cool in pan for 10 minutes, then turn out onto a wire rack.
+  1. Preheat oven to 350 degrees F (175 degrees C).
+  2. Pour the cake mix into a large bowl. Stir in the shortening, eggs and vanilla with an electric mixer until well blended. Stir in the chocolate chips. Drop by rounded spoonfuls onto cookie sheets.
+  3. Bake for 11 to 15 minutes in the preheated oven, until the edges are golden. Cool on baking sheets for a few minutes before removing to cool on wire racks.
 
 DETAILS
-Selected replacement: applesauce (weak evidence, partial role fit), selected by you (requested); steps rewritten by replacing the name.
-Amount (estimated): estimated from Vegan Zucchini Banana Bread Muffins [ar:.GLWQH0bkiU3fRzwc68PqTCqGHJj2fy], which uses "1 cup applesauce" with 3 cups flour; scaled to this recipe's 2 cups flour
-What egg does here (cooking knowledge): binding (main), leavening, moisture, structure, emulsification.
+Selected replacement: shortening (strong evidence, good role fit), selected by the ranking rules in code; steps rewritten by replacing the name.
+Amount (supported): 3 dataset line(s) offer shortening at the same amount, e.g. "2 tablespoons shortening or butter, softened" [ar:6/NPCgFnySkuJAntnjd5N6dC3GD5xR6]
+What butter does here (cooking knowledge): fat (main), tenderness, flavor.
 Why this choice (ranking rules: 1) candidates that may break a restriction rank last; 2) a candidate must provide the ingredient's main role to be selected; 3) evidence strength; 4) evidence type: direct, then same dish, then related recipes; 5) how many of the ingredient's roles it covers; 6) number of supporting recipes; 7) quantity: from the dataset, estimated, unknown):
-  - You asked for applesauce, so the ranking rules were not used to choose it; its evidence and role coverage are shown as for any other candidate.
+  - shortening ranks above olive oil: shortening has more supporting recipes (21 vs 15).
+  - shortening ranks above vegetable shortening: shortening has more supporting recipes (21 vs 7).
+  - shortening ranks above vegetable oil: both have strong direct evidence, but shortening covers more of the butter's roles (fat fully, tenderness fully; not flavor) than vegetable oil (fat fully; not tenderness, flavor).
+  - shortening ranks above oil: both have strong direct evidence, but shortening covers more of the butter's roles (fat fully, tenderness fully; not flavor) than oil (fat fully; not tenderness, flavor).
 Evidence from the dataset, ranked (strength and role fit rated separately):
-  1. applesauce: weak evidence, partial fit, about 2/3 cup, estimated (indirect: used by 1 same-dish recipe(s) without it; e.g. Vegan Zucchini Banana Bread Muffins [ar:.GLWQH0bkiU3fRzwc68PqTCqGHJj2fy])
-  2. silken tofu: weak evidence, good fit, amount unknown (indirect: used by 1 same-dish recipe(s) without it; e.g. Microwave Tofu Banana Bread [ar:5S4TJwjeeH.L/gDoUxUR0jfxC/8Vd4u])
-  3. soy yogurt: weak evidence, partial fit, about 3/4 cup, estimated (indirect: used by 1 same-dish recipe(s) without it; e.g. Vegan Banana Bread [fn:p174TykunvO./PLjDpl03RBTaXiOEdu])
-  4. olive oil: moderate evidence, partial fit, amount unknown (indirect: used by 12 bread recipe(s) without it; e.g. Appetizing Bread [ar:06n7WTw6RQSDCfROjZZs5Zee/ciX.Hm])
-  5. evaporated milk: weak evidence, partial fit, amount unknown (direct: 1 recipe(s) offer it as an alternative; e.g. Pumpkin Turnovers [epi:DiKM3xoQccTZ7paC.XGMVpHMD8gchRm])
-  6. egg substitute: conflicting evidence, good fit, 1/2 cup (direct: 4 recipe(s) offer it as an alternative; e.g. Quick-and-Easy Cheese Blintz Casserole [epi:cTG4e2s8RON5swgZSMmn6Omhx7Q9MGi])
-  Compared 183 baked 'banana bread' recipes; only 9 lack eggs, so also 300 baked 'bread' recipes (83 without it); 9 of them have no eggs.
-  Versions of this dish in the dataset made without eggs: Microwave Tofu Banana Bread [ar:5S4TJwjeeH.L/gDoUxUR0jfxC/8Vd4u]; Banana Oat Bread Pudding [ar:/tgLkKTWsLuZ95S0LSm4WrrYcwKFuMi]; Rich and Delicious Banana Bread [ar:TJFqS5qmSUVcBw7c2Da99BzhmvnbgCm]
-  Instruction note: "Prepare cake mix as directed, except substitute egg whites for eggs and applesauce for oil."  [ar:d8ca8qxARHeOTiYcQFQlp229RTttkw.]
+  1. shortening: strong evidence, good fit, same amount (direct: 4 recipe(s) offer it as an alternative; e.g. Plum Dumplings [ar:6/NPCgFnySkuJAntnjd5N6dC3GD5xR6])
+  2. olive oil: strong evidence, good fit, 2/3 cup (direct: 15 recipe(s) offer it as an alternative; e.g. Brazilian Cheese Bread (Pao de Queijo) [ar:fX2MRtBMuIRMpCyFDkT5ihRMaPEQlQq])
+  3. vegetable shortening: strong evidence, good fit, same amount (direct: 5 recipe(s) offer it as an alternative; e.g. Coconut Tamales [epi:Kfl8WWJjgBAr.5CNTIO/z09aPECRufu])
+  4. vegetable oil: strong evidence, good fit, 1/2 cup (direct: 8 recipe(s) offer it as an alternative; e.g. Vanilla Coconut Flour Cupcakes [ar:AQoeOlshZt4qsaMX.nfK.586MdemyOy])
+  5. oil: strong evidence, good fit, same amount (direct: 8 recipe(s) offer it as an alternative; e.g. Lemongrass-Panko Crusted Sea Bass [fn:2svFyH7VnjFvhN66OP5NjNvruPert6m])
+  6. coconut oil: moderate evidence, good fit, same amount (direct: 2 recipe(s) offer it as an alternative; e.g. Buckwheat Crepes with Honeyed Ricotta and Sautéed Plums [epi:3zWG5z7wvpHiYRH6hj0OhbAuGdIo6HC])
+  Compared 300 baked 'chocolate chip cookie' recipes; 68 of them have no butter.
+  Versions of this dish in the dataset made without butter: Super Easy Chocolate Chip Cookies [ar:RK7Vzzv28tg2cfgBqtEWzisPPmCFDeq]; Easy Chocolate Chip Cookie Dough Cheesecake [ar:iqk5XOpQOGCD.nbIzlczFga5PfoAyBO]; Chocolate Chip and Peppermint Cookie Bark [fn:0kI5vfNx7n0UbUz1tYmsW5BcVTHbqBW]
+  Instruction note: "Cream sugar, shortening (may substitute 1/2 cup butter or margarine), eggs and vanilla thoroughly."  [ar:FMNsUfdxGnrJ59c/m6axYRV0.Z3UCOK]
+  Instruction note: "Variations: • Add 2 cups crumbled goat cheese (8 oz) to potatoes along with butter and milk, and reduce salt to 3/4 teaspoon. • In place of butter, use 1/2 cup "  [epi:AXsAVcMc1UTpMW27zFmvku/dGi2Mgp2]
+  Instruction note: "Squeeze roasted garlic from skins into potatoes along with butter and milk. • Add 2 cups crumbled goat cheese (8 oz) to potatoes along with butter and milk, and"  [epi:AXsAVcMc1UTpMW27zFmvku/dGi2Mgp2]
   Direct evidence: a recipe explicitly offers the ingredient as an alternative. Indirect evidence: a related recipe uses it without the removed ingredient but does not call it a replacement. The two are not equivalent.
 Predicted texture changes (predictions, not verified by the dataset):
-  - Binding: potentially weaker than the original: applesauce provides only some binding
-  - Rise: applesauce does not provide leavening, so the result may rise less and be denser
-  - Moisture: may stay moist or become wetter than the original, depending on the amount of applesauce
-  - Structure: applesauce does not provide structure, so the result may be more fragile and softer
-  - Batter consistency: applesauce does not provide emulsification, so the result may be less smooth, as the batter can separate
-  - Density: may become denser, since the egg's leavening is not fully replaced
-  - Crumb: may become softer or gummy, more so with more applesauce
-Moisture check (risk: high):
-  - Wet ingredients already in this recipe: 2 1/3 cups mashed overripe bananas.
-  - By volume they are 117% of the flour; the median across 56 'banana bread' recipes in the dataset is 80% (eggs are not counted: the dataset gives no volume for them).
-  - With 2/3 cup applesauce (estimated) it would be about 150%.
-  - Excess-moisture risk: a wetter batter can bake up gummy, dense or underbaked in the centre. Check doneness with a toothpick; the original baking time was not tested with this change.
+  - Richness and tenderness: shortening provides fat, so this may stay close to the original
+  - Tenderness: shortening provides tenderness, so this may stay close to the original
+  - Flavor: shortening does not provide flavor, so the result may taste different
 Limitations:
-  - No recipe in the dataset explicitly recommends applesauce for eggs. The evidence is indirect: recipes that use applesauce and no eggs may differ in other ways too.
-  - The evidence rests on a single recipe.
-  - The quantity is an estimate scaled from another recipe, not an amount the dataset gives for this substitution.
   - Baking temperature and time are those of the original recipe; they were not re-tested with the substitute.
   - Texture predictions come from the ingredient's roles (general cooking knowledge), not from results recorded in the dataset.
-Caution: the evidence for applesauce is weak; treat this adaptation as untested.
 This is not a guarantee that the dish is safe for an allergy.
 ```

@@ -16,7 +16,7 @@ import re
 
 from pydantic import ValidationError
 
-from recipebot.dialogue.state import SessionState, StatePatch
+from recipebot.dialogue.state import SessionState, StatePatch, same_term
 from recipebot.llm.base import LLMClient, LLMUnavailable
 from recipebot.llm.rules import RuleParser
 
@@ -57,6 +57,7 @@ Examples (state is shown only when it matters):
 "Average number of ingredients in cookie recipes?" -> {"intent":"stats","stats":{"operation":"ingredient_count_stats","title_contains":["cookie"]}}
 "I have eggs, onions and rice. Suggest 3 recipes with no peanuts and at most six steps." -> {"intent":"match","pantry":[{"name":"eggs"},{"name":"onions"},{"name":"rice"}],"replace_pantry":true,"add_exclude":["peanut"],"max_steps":6,"limit":3}
 [active task: match] "Exclude eggs too." -> {"intent":"match","add_exclude":["egg"]}
+[excluded: mushrooms] "Actually, mushrooms are okay. But exclude dairy." -> {"intent":"search","remove_exclude":["mushrooms"],"add_exclude":["dairy"]}
 "show me the second one" -> {"intent":"detail","result_number":2}
 "Take this banana bread recipe and remove eggs." -> {"intent":"substitute","substitute":{"target":"eggs","recipe_query":"banana bread"}}
 [last results shown] "Replace the cream in the first one without dairy" -> {"intent":"substitute","result_number":1,"substitute":{"target":"cream"},"add_exclude":["dairy"]}
@@ -96,6 +97,10 @@ _NEGATION = re.compile(
     r"\b(no|not|without|free|cannot|can't|cant|allergic|allergy|avoid|exclude|excluding|"
     r"intolerant|hate|don't|dont|never|except|skip|remove|replace|vegan|vegetarian|"
     r"pescatarian|nothing|none|hold)\b|-free\b", re.I)
+_NO_LONGER_HAVE = re.compile(
+    r"\b(?:don'?t|do not|no longer|didn'?t|don't actually) have\b|\bran out\b|\bout of\b"
+    r"|\bused (?:it |them |all )?up\b|\b(?:remove|take|drop|delete)\b.*\b(?:from|off) my\b"
+    r"|\bforget (?:the|about)\b", re.I)
 _SEARCH_STOP = {
     "i", "can", "make", "in", "under", "steps", "step", "find", "me", "some", "recipes",
     "recipe", "with", "a", "an", "the", "that", "which", "what", "for", "to", "less", "than",
@@ -125,9 +130,17 @@ def apply_guards(llm: StatePatch, rules: StatePatch, text: str = "",
             and not rules.query and not rules.pantry):
         notes.append("intent search -> match (refines the active ingredient match)")
         fixed.intent, fixed.new_topic, fixed.query = "match", False, None
-    if rules.remove_exclude and not fixed.remove_exclude:
-        notes.append(f"remove_exclude <- {rules.remove_exclude}")
-        fixed.remove_exclude = rules.remove_exclude
+    missing_removals = [r for r in rules.remove_exclude
+                        if not any(same_term(r, x) for x in fixed.remove_exclude)]
+    if missing_removals:
+        notes.append(f"remove_exclude += {missing_removals}")
+        fixed.remove_exclude += missing_removals
+    # "Mushrooms are okay": an ingredient the user allows is never also added as excluded.
+    readded = [e for e in fixed.add_exclude
+               if any(same_term(e, r) for r in fixed.remove_exclude)]
+    if readded:
+        notes.append(f"add_exclude -= {readded} (allowed in this message)")
+        fixed.add_exclude = [e for e in fixed.add_exclude if e not in readded]
     if rules.intent == "stats" and rules.stats and llm.intent != "stats":
         notes.append(f"intent {llm.intent} -> stats")
         fixed.intent, fixed.stats = "stats", rules.stats
@@ -146,8 +159,10 @@ def apply_guards(llm: StatePatch, rules: StatePatch, text: str = "",
     # A replacement the user never named is invented ("replace the butter" is not "use
     # apricot mignonette"); the substitute must then come from the evidence.
     sub = fixed.substitute
-    if sub and sub.replacement and text and not any(
-            w in text.lower() for w in sub.replacement.lower().split() if len(w) > 2):
+    words = set(re.findall(r"[a-z][a-z'-]*", text.lower()))
+    if sub and sub.replacement and text and not all(
+            w in words or w.rstrip("s") in words or f"{w}s" in words
+            for w in re.findall(r"[a-z][a-z'-]*", sub.replacement.lower())):
         notes.append(f"replacement '{sub.replacement}' removed (not in the message)")
         fixed.substitute = sub.model_copy(update={"replacement": None})
     # "Use applesauce instead" right after a substitution: keep its target, with the
@@ -158,6 +173,11 @@ def apply_guards(llm: StatePatch, rules: StatePatch, text: str = "",
             or not fixed.substitute.replacement):
         notes.append(f"intent {fixed.intent} -> substitute with {follow_up.replacement}")
         fixed.intent, fixed.substitute = "substitute", follow_up
+    # "Exclude eggs too" restricts recipes; it does not mean the user no longer has eggs.
+    if fixed.remove_pantry and text and not _NO_LONGER_HAVE.search(text):
+        notes.append(f"remove_pantry {fixed.remove_pantry} dropped (the message does not say "
+                     "the user lacks them)")
+        fixed.remove_pantry = []
     if rules.intent == "match" and fixed.intent != "match" and rules.pantry:
         notes.append(f"intent {fixed.intent} -> match")
         fixed.intent, fixed.pantry, fixed.replace_pantry = "match", rules.pantry, True

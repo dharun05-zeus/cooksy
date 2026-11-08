@@ -1,34 +1,79 @@
-# Aggregate statistics (PDF Task 1)
+# Removing one restriction and adding another in one message
 
-Parser: rules. Covers: aggregate statistics, stated filters and denominator
+Parser: rules. Covers: multi-turn follow-up, restriction removed, restriction added
 
-**User:** How many recipes contain both garlic and onion? What percentage of the dataset is that?
+**User:** Find vegetarian pasta recipes without mushrooms.
 
-*parser: rules, 0.0s*
+*parser: rules, 0.1s*
 
 ```text
-Answer: 15,657 of 122,910 recipes (12.74%).
-Filters: contains 'garlic' (same ingredient or its varieties: garlic, garlic clove, cloves garlic, bulb garlic, unpeeled garlic clove, pureed garlic and 6 more); contains 'onion' (same ingredient or its varieties: onion, red onion, yellow onion, white onion, sweet onion, spanish onion and 15 more)
-Recipes analyzed: 122,910
-Method: numerator / denominator × 100, where the denominator is all complete recipes.
-Example recipe IDs: ar:..6gl/0GIzSugrbvy6kHyxEHMMP4h9K, ar:..G2iuRLT7oseNmkKbjqAgbdB1G5IBC, ar:..M776r8BHroHcCXw3vInfs25LDkWw2, ar:..VDFobAHiAa0127h.N784Y2pnZyBZK, ar:./EObbt769KyfBTxJ.hIRe5275W4a9C
-Note: Dataset: 122,910 complete recipes (title, ingredients and instructions present) out of 125,164 records; 2,254 incomplete records excluded (517 empty).
+1,028 recipes share at least one word with 'pasta' and satisfy your constraints. The 5 most relevant:
+
+1. Reheating Pasta  [ar:VXH7q0f.zvkOk/Ouf/UNcTajeWgIQrC]
+   2 ingredients, 6 steps; matched: pasta
+   Evidence: none of its 2 ingredients contains 'mushrooms'; no vegetarian (meat, fish, shellfish) found in its 2 ingredient lines, including uncertain items
+   Ingredients: 8 ounces dry pasta; 3 tablespoons olive oil
+
+2. How to Cook Pasta  [fn:kjkJhrV0MyFtnOGvmej5ktGxJ/wWd7i]
+   1 ingredients, 2 steps; matched: pasta
+   Evidence: none of its 1 ingredients contains 'mushrooms'; no vegetarian (meat, fish, shellfish) found in its 1 ingredient lines, including uncertain items
+   Ingredients: 1 pound pasta (your choice)
+
+3. Homemade Pasta without a Pasta Machine  [ar:zwLWQ0v2wXlZd1RmfmuRGUnS4hINuwO]
+   4 ingredients, 6 steps; matched: pasta
+   Evidence: none of its 4 ingredients contains 'mushrooms'; no vegetarian (meat, fish, shellfish) found in its 4 ingredient lines, including uncertain items
+   Ingredients: 3 cups Italian-style tipo 00 flour; 3 eggs; 1 pinch salt; water, or as needed (optional)
+
+4. Simple Pesto Pasta  [ar:TES5iV01pTIvz12YPfvJd3uPxw54GoO]
+   4 ingredients, 2 steps; matched: pasta
+   Evidence: none of its 4 ingredients contains 'mushrooms'; no vegetarian (meat, fish, shellfish) found in its 4 ingredient lines, including uncertain items
+   Ingredients: 1/2 (16 ounce) box dry fettuccine pasta; 1/4 cup butter, or to taste; 3 tablespoons minced garlic; 1/4 cup pesto
+
+5. Pesto and Pasta  [fn:mNKBHMiOPqKMmmrnb/BdT50dcjL39xO]
+   4 ingredients, 8 steps; matched: pasta
+   Evidence: none of its 4 ingredients contains 'mushrooms'; no vegetarian (meat, fish, shellfish) found in its 4 ingredient lines, including uncertain items
+   Ingredients: 1/4 pound Rotelle pasta; 6 tablespoons pesto; 2 cups tomato sauce; 1/4 cup cream
+
+Filters applied to the whole dataset: exact duplicates removed (same title and ingredient set); excludes 'mushroom' (any name containing it: mushroom, shiitake mushroom, condensed cream of mushroom soup, button mushroom, cremini mushroom, portobello mushroom and 470 more); excludes vegetarian (meat, fish, shellfish)
+Note: Your constraints removed 2,190 of the 3,218 recipes matching the search words (uncertain cases are removed too).
+Ask for 'the first one' (or any number) to see its full recipe.
+Active constraints: no mushrooms, no vegetarian.
 ```
 
-**User:** Among recipes containing tomato, which five have the fewest instruction steps?
+**User:** Actually, mushrooms are okay. But exclude dairy.
 
 *parser: rules, 0.0s*
 
 ```text
-Answer: Fewest instruction steps among 11,712 matching recipes.
-Filters: contains 'tomato' (same ingredient or its varieties: tomato, plum tomato, cherry tomato, roma tomato, grape tomato, beefsteak tomato and 2 more)
-Recipes analyzed: 11,712
-Method: Step = one non-empty instruction line, excluding site boilerplate; a recipe stored as one paragraph is split into sentences. Sorted by steps, then ID.
-  rank: 1 | recipe_id: ar:/0wx00RefE0VHzlff/GBszObKmj63Pi | title: Tomato Basil Smoothie | steps: 1 | counted_by: line
-  rank: 2 | recipe_id: ar:3yxgq0iAqrlm2lHnLoxwJ8vQTHCd/Cm | title: Mediterranean Zucchini and Chickpea Salad | steps: 1 | counted_by: line
-  rank: 3 | recipe_id: ar:5s.4S6mTsQWRNXHDFGWe6ea03Oac48C | title: Momma's Marinara Sauce | steps: 1 | counted_by: line
-  rank: 4 | recipe_id: ar:9T2HkniyS.3VZB9NmFvzrfA39fMSt.. | title: Black Bean and White Corn Salad | steps: 1 | counted_by: line
-  rank: 5 | recipe_id: ar:BqfGsVgk7WHPebuzDH3IIRDAo0Vy8Hy | title: Refreshing Mango Chutney | steps: 1 | counted_by: line
-Note: Dataset: 122,910 complete recipes (title, ingredients and instructions present) out of 125,164 records; 2,254 incomplete records excluded (517 empty).
-Note: 47 recipes have 1 step(s); the 5 shown are the first by recipe ID (deterministic tie-break).
+228 recipes share at least one word with 'pasta' and satisfy your constraints. The 5 most relevant:
+
+1. Reheating Pasta  [ar:VXH7q0f.zvkOk/Ouf/UNcTajeWgIQrC]
+   2 ingredients, 6 steps; matched: pasta
+   Evidence: no vegetarian (meat, fish, shellfish) found in its 2 ingredient lines, including uncertain items; no dairy found in its 2 ingredient lines, including uncertain items
+   Ingredients: 8 ounces dry pasta; 3 tablespoons olive oil
+
+2. How to Cook Pasta  [fn:kjkJhrV0MyFtnOGvmej5ktGxJ/wWd7i]
+   1 ingredients, 2 steps; matched: pasta
+   Evidence: no vegetarian (meat, fish, shellfish) found in its 1 ingredient lines, including uncertain items; no dairy found in its 1 ingredient lines, including uncertain items
+   Ingredients: 1 pound pasta (your choice)
+
+3. Homemade Pasta without a Pasta Machine  [ar:zwLWQ0v2wXlZd1RmfmuRGUnS4hINuwO]
+   4 ingredients, 6 steps; matched: pasta
+   Evidence: no vegetarian (meat, fish, shellfish) found in its 4 ingredient lines, including uncertain items; no dairy found in its 4 ingredient lines, including uncertain items
+   Ingredients: 3 cups Italian-style tipo 00 flour; 3 eggs; 1 pinch salt; water, or as needed (optional)
+
+4. Pasta and Beans (Pasta e Fagioli)  [fn:0rIkIsCBG2Njb3Y042H2uIpBDIqCHFe]
+   7 ingredients, 9 steps; matched: pasta
+   Evidence: no vegetarian (meat, fish, shellfish) found in its 7 ingredient lines, including uncertain items; no dairy found in its 7 ingredient lines, including uncertain items
+   Ingredients: 1/4 cup olive oil; 2 large cloves garlic, minced; 1/8 teaspoon hot red pepper flakes; 3 peeled plum tomatoes, crushed, from a can; 1/2 teaspoon salt; 2 1/2 to 3 cups cooked cannelloni beans, cooking water reserved; 1 pound cooked ditalini pasta, cooking water reserved
+
+5. Pasta and Beans  [ar:HKOP45CaBPW0XwN77bZjJtVFtXVDV..]
+   6 ingredients, 3 steps; matched: pasta
+   Evidence: no vegetarian (meat, fish, shellfish) found in its 6 ingredient lines, including uncertain items; no dairy found in its 6 ingredient lines, including uncertain items
+   Ingredients: 1 1/2 tablespoons extra virgin olive oil; 1 onion, chopped; 2 tomatoes, chopped; 1 (15 ounce) can cannellini beans; 2 cups penne pasta; salt to taste
+
+Filters applied to the whole dataset: exact duplicates removed (same title and ingredient set); excludes vegetarian (meat, fish, shellfish); excludes dairy
+Note: Your constraints removed 2,990 of the 3,218 recipes matching the search words (uncertain cases are removed too).
+Ask for 'the first one' (or any number) to see its full recipe.
+Active constraints: no vegetarian, no dairy.
 ```
