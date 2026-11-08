@@ -4,7 +4,7 @@ Parser: ollama (qwen3:4b). Covers: refusing to fabricate
 
 **User:** Find banana bread.
 
-*parser: ollama (qwen3:4b), 3.5s*
+*parser: ollama (qwen3:4b), 3.4s*
 
 ```text
 12,305 recipes share at least one word with 'banana bread'. The 5 most relevant:
@@ -30,7 +30,7 @@ Ask for 'the first one' (or any number) to see its full recipe.
 
 **User:** How many calories are in the first one?
 
-*parser: ollama (qwen3:4b), 8.9s; guard corrections: ['intent clarify -> stats']*
+*parser: ollama (qwen3:4b), 8.7s; guard corrections: ['stats operation ingredient_count_stats -> count']*
 
 ```text
 The dataset does not record nutrition (calories, fat, protein, carbohydrates), so I cannot answer that without guessing. Each recipe has only a title, an ingredient list and instructions; I can show those, or answer questions about them.

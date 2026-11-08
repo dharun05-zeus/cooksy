@@ -143,6 +143,13 @@ def apply_guards(llm: StatePatch, rules: StatePatch, text: str = "",
         if rules.stats.include_all and not fixed.stats.include_all:
             notes.append(f"stats include_all <- {rules.stats.include_all}")
             fixed.stats.include_all = rules.stats.include_all
+    # A replacement the user never named is invented ("replace the butter" is not "use
+    # apricot mignonette"); the substitute must then come from the evidence.
+    sub = fixed.substitute
+    if sub and sub.replacement and text and not any(
+            w in text.lower() for w in sub.replacement.lower().split() if len(w) > 2):
+        notes.append(f"replacement '{sub.replacement}' removed (not in the message)")
+        fixed.substitute = sub.model_copy(update={"replacement": None})
     # "Use applesauce instead" right after a substitution: keep its target, with the
     # user's replacement, even if the LLM read it as a search.
     follow_up = rules.substitute if rules.intent == "substitute" else None

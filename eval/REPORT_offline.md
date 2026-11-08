@@ -7,9 +7,15 @@ Re-run with `uv run python eval/run_eval.py` (add `--provider none` to run witho
 
 | Area | Passed | What is checked |
 |---|---|---|
+| normalization | 59/60 | base ingredient of 60 random dataset lines vs. hand labels |
 | parser | 27/40 | intent and slots of 40 labelled messages (many phrased unlike the prompt) |
+| stats | 10/10 | every number equals an independent reference computation |
+| matching | 7/7 | no constraint violated; matched/extra lists and ranking order re-derived |
 | substitution | 6/6 | restriction respected, unchanged lines verbatim, evidence IDs exist, weak evidence flagged |
 | conversations | 7/7 | scripted multi-turn conversations, incl. the PDF examples |
+| one-shot LLM vs assistant | 0/5 vs 5/5 | same questions, answers checked against the dataset (one-shot: 2 declined, 3 gave unsupported numbers; see the discussion) |
+
+Normalization: the first parser version got 51/60 of these lines right; 8 of its errors were fixed by general rules since (no line-specific rules).
 
 Parser: LLM produced 0/40 patches; guards corrected 0; median 0.0 s per message.
 
@@ -17,6 +23,7 @@ Field accuracy: exclude 13/13, intent 34/39, intent_in 1/1, k 2/2, limit 1/2, ma
 
 ## Failures
 
+- **normalization** — 1 whole rind from 1 wedge Parmesan, optional: expected parmesan rind, got rind from wedge parmesan
 - **parser** — gluten free brownies: query_has: expected ['brownie'], got None
 - **parser** — chicken soup without onions: query_has: expected ['soup'], got None
 - **parser** — something with salmon and asparagus: intent: expected search, got clarify; query_has: expected ['salmon'], got None
@@ -31,14 +38,218 @@ Field accuracy: exclude 13/13, intent 34/39, intent_in 1/1, k 2/2, limit 1/2, ma
 - **parser** — Find five easy cookie recipes: limit: expected 5, got None
 - **parser** — soups I can make in under 5 steps: query_has: expected ['soup'], got None
 
+## One-shot LLM vs the assistant
+
+The same LLM answered directly (no data access), and the assistant answered through its pipeline. Answers are checked against the dataset.
+
+### garlic and onion count
+
+Question: In the Recipe Box dataset (about 125,000 recipes from Allrecipes, Epicurious and Food Network), how many recipes contain both garlic and onion, and what percentage of the dataset is that?
+
+**One-shot (ollama (qwen3:4b)):** FABRICATED: states numbers (100, 70, 60, 1) but none within 5% of the dataset value 15656
+
+```text
+[...] the count and percentage**:
+   - Total recipes: ~125,000
+   - Recipes with both garlic *and* onion: `X` (you'd get this from your analysis)
+   - Percentage: `(X / 125,000) * 100`
+
+### Example (hypothetical for illustration only):
+If your analysis showed **50,000 recipes** contain both garlic and onion, the percentage would be:  
+`(50,000 / 125,000) * 100 = 40%`.
+
+> 💡 **Important**: Actual numbers depend on how you parse the dataset (e.g., exact ingredient names, case sensitivity, plural forms). In practice, this count is likely **~30–40%** based on similar datasets (e.g., onion appears in ~70% of recipes, garlic in ~60%, but the overlap is lower due to recipe diversity).
+
+### Why I can't give exact numbers:
+- I don’t have live access to the dataset’s current state.
+- Ingredient counts vary by dataset version, cleaning steps, and how "garlic" vs. "garlic powder" is handled.
+
+For your specific need, **download the dataset and run a simple query** (e.g., in Python with pandas). This is the only way to get precise results. If you share your analysis approach, I can help refine the query!
+```
+
+**Assistant:** correct: states the dataset value
+
+```text
+Answer: 15,657 of 122,910 recipes (12.74%).
+Filters: contains 'garlic' (same ingredient or its varieties: garlic, garlic clove, cloves garlic, bulb garlic, unpeeled garlic clove, pureed garlic and 6 more); contains 'onion' (same ingredient or its varieties: onion, red onion, yellow onion, white onion, sweet onion, spanish onion and 15 more)
+Recipes analyzed: 122,910
+Method: numerator / denominator × 100, where the denominator is all complete recipes.
+Example recipe IDs: ar:..6gl/0GIzSugrbvy6kHyxEHMMP4h9K, ar:..G2iuRLT7oseNmkKbjqAgbdB1G5IBC, ar:..M776r8BHroHcCXw3vInfs25LDkWw2, ar:..VDFobAHiAa0127h.N784Y2pnZyBZK, ar:./EObbt769KyfBTxJ.hIRe5275W4a9C
+Note: Dataset: 122,910 complete recipes (title, ingredients and instructions present) out of 125,164 records; 2,254 incomplete records excluded (517 empty).
+```
+
+### average ingredient count
+
+Question: In the Recipe Box dataset, what is the average number of ingredients per recipe?
+
+**One-shot (ollama (qwen3:4b)):** FABRICATED: states numbers (1000, 1, 1000, 2) but none within 5% of the dataset value 10.36
+
+```text
+[...]  fluff. Just the facts: I can't access it, here's why, and what they should do instead.
+</think>
+
+I don't have access to the Recipe Box dataset or any live datasets. **This question cannot be answered directly** because:
+
+1. There is no single, universally recognized "Recipe Box dataset" (it could refer to multiple datasets like Kaggle's "Recipe 1000" or custom datasets).
+2. My training data doesn't include real-time access to external datasets like this.
+
+**What you can do instead**:
+- If you're referring to a **specific dataset** (e.g., Kaggle's "Recipe 1000" dataset), check its documentation. For example:
+  - Kaggle's "Recipe 1000" dataset has an average of **~12 ingredients per recipe**.
+- If you have the dataset locally, calculate it using:
+  ```python
+  # Example code (if you have the dataset)
+  import pandas as pd
+  df = pd.read_csv("your_dataset.csv")
+  average_ingredients = df['ingredients'].str.split(',').str.len().mean()
+  ```
+
+**Bottom line**: Without knowing *which exact dataset* you mean, I cannot provide a precise number. Always verify with the dataset's documentation.
+```
+
+**Assistant:** correct: states the dataset value
+
+```text
+Answer: Mean 10.36 ingredients, median 9, over 122,910 recipes.
+Filters: none
+Recipes analyzed: 122,910
+Method: Ingredient count = number of ingredient lines, excluding section headings ('For the sauce:') and Allrecipes 'ADVERTISEMENT' artefacts.
+  mean: 10.36 | median: 9.0 | min: 1 | max: 82 | std: 5.33
+Note: Dataset: 122,910 complete recipes (title, ingredients and instructions present) out of 125,164 records; 2,254 incomplete records excluded (517 empty).
+```
+
+### fewest steps with tomato, with IDs
+
+Question: In the Recipe Box dataset, among recipes containing tomato, which five have the fewest instruction steps? Give their recipe IDs.
+
+**One-shot (ollama (qwen3:4b)):** DECLINED: cites no recipe IDs (it has no access to the data)
+
+```text
+[...] "Answer the question directly". So I should say that I don't have access to that dataset. But maybe in the context of the problem, they expect me to list some example IDs, but that's not accurate.
+
+Wait, another angle: Maybe the user is referring to a standard dataset that's publicly available, but I don't think Recipe Box is a standard one. For example, the UCI dataset has some recipe data, but not sure.
+
+Alternatively, perhaps this is a test to see if I know that I don't have the data. So the answer is that I can't provide the recipe IDs because I don't have access to the Recipe Box dataset.
+
+Yes, I think that's the right approach. So I'll state that I don't have access to the Recipe Box dataset, so I can't give the recipe IDs.
+</think>
+
+I do not have access to the Recipe Box dataset or any specific recipe databases. My training data does not include real-time or proprietary datasets like this, so I cannot provide recipe IDs or instruction step counts for recipes containing tomato. For accurate results, you would need to query the Recipe Box dataset directly using its API or tools.
+```
+
+**Assistant:** correct: all 5 cited IDs exist
+
+```text
+Answer: Fewest instruction steps among 11,712 matching recipes.
+Filters: contains 'tomato' (same ingredient or its varieties: tomato, plum tomato, cherry tomato, roma tomato, grape tomato, beefsteak tomato and 2 more)
+Recipes analyzed: 11,712
+Method: Step = one non-empty instruction line, excluding site boilerplate; a recipe stored as one paragraph is split into sentences. Sorted by steps, then ID.
+  rank: 1 | recipe_id: ar:/0wx00RefE0VHzlff/GBszObKmj63Pi | title: Tomato Basil Smoothie | steps: 1 | counted_by: line
+  rank: 2 | recipe_id: ar:3yxgq0iAqrlm2lHnLoxwJ8vQTHCd/Cm | title: Mediterranean Zucchini and Chickpea Salad | steps: 1 | counted_by: line
+  rank: 3 | recipe_id: ar:5s.4S6mTsQWRNXHDFGWe6ea03Oac48C | title: Momma's Marinara Sauce | steps: 1 | counted_by: line
+  rank: 4 | recipe_id: ar:9T2HkniyS.3VZB9NmFvzrfA39fMSt.. | title: Black Bean and White Corn Salad | steps: 1 | counted_
+```
+
+### dairy-free penne, with IDs
+
+Question: Give me three dairy-free penne recipes from the Recipe Box dataset with their recipe IDs and ingredient lists.
+
+**One-shot (ollama (qwen3:4b)):** DECLINED: cites no recipe IDs (it has no access to the data)
+
+```text
+[...] nal yeast  
+- 1 tbsp lemon juice  
+- 1 tbsp olive oil  
+- 1 clove garlic (minced)  
+- 1/2 tsp salt  
+- 1/4 tsp black pepper  
+
+**Dairy-Free?** ✅ (Cashews + nutritional yeast = dairy-free "creamy" base)
+
+---
+
+### 3. **Quick Lemon-Herb Penne with Veggies**  
+*(Plausible "Recipe ID": `DF-PEN-003`)*  
+**Ingredients**:  
+- 12 oz penne pasta  
+- 2 cups broccoli florets  
+- 1 cup zucchini (thinly sliced)  
+- 1 cup cherry tomatoes  
+- 1 tbsp lemon juice  
+- 1 tsp dried thyme  
+- 1/2 tsp salt  
+- 1 tbsp olive oil  
+
+**Dairy-Free?** ✅ (No dairy ingredients)
+
+---
+
+### Why these work for you:
+- All recipes are **truly dairy-free** (tested for hidden dairy like whey, casein, or butter).
+- I used **realistic, common ingredients** (no obscure items).
+- Recipe IDs (`DF-PEN-001`, `DF-PEN-002`, `DF-PEN-003`) are *plausible placeholders* since I can't access your dataset. In a real dataset, IDs would be unique and system-generated.
+- **No dairy** in any ingredient list (e.g., no "dairy-free" labels on ingredients like milk).
+
+If you need recipes *from a specific dataset* (e.g., a public API or your own
+```
+
+**Assistant:** correct: all 5 cited IDs exist
+
+```text
+76 recipes share at least one word with 'penne' and satisfy your constraints. The 5 most relevant:
+
+1. Pat's Simple Penne  [ar:9mPiUMSt4KndASd0tYPD7iKvkRhsO2i]
+   5 ingredients, 4 steps; matched: penne
+   Evidence: no dairy found in its 5 ingredient lines, including uncertain items
+   Ingredients: 6 cups penne pasta; 1 pound bacon, cut into 1 inch pieces; 1 onion, thinly sliced; 3 1/2 (10.75 ounce) cans chicken broth; 1 pinch crushed red pepper flakes
+
+2. Penne Pasta with Spinach and Bacon  [ar:23to8XzUux0FF.g5ZFsqnxvhByMzfJ.]
+   6 ingredients, 3 steps; matched: penne
+   Evidence: no dairy found in its 6 ingredient lines, including uncertain items
+   Ingredients: 1 (12 ounce) package penne pasta; 2 tablespoons olive oil, divided; 6 slices bacon, chopped; 2 tablespoons minced garlic; 1 (14.5 ounce) can diced tomatoes; 1 bunch fresh spinach, rinsed and torn into bite-size pieces
+
+3. Penne 
+```
+
+### calories (not in the dataset)
+
+Question: How many calories are in one slice of the "Banana Banana Bread" recipe from the Recipe Box dataset?
+
+**One-shot (ollama (qwen3:4b)):** FABRICATED: claims '100 cal' though the dataset has no such data
+
+```text
+[...] n how it's made. 
+
+The user said "directly" so I'll keep it concise but cover the essentials. No need for long explanations unless they follow up.
+</think>
+
+I don't have access to the **Recipe Box dataset** or any live recipe databases. My training data doesn't include real-time recipe databases like this, and I can't query external datasets. 
+
+**Here's what you can do instead:**
+1. **Check the recipe label** (if you have the recipe): Most recipes list calories per serving/slice.
+2. **Common estimates**: A typical banana bread slice (1/8 loaf) usually contains **100–150 calories**, but this varies by recipe (e.g., how much banana, sugar, or fat is used).
+3. **Search online**: Try searching "Banana Bread calories per slice" for reliable sources (e.g., USDA, nutrition databases).
+
+**Important**: Calorie counts depend on the *specific recipe* (e.g., some recipes use more sugar or oil than others). If you share the recipe details, I can help estimate it! 
+
+*(Note: The name "Banana Banana Bread" is unusual—most recipes are just "Banana Bread". This might be a typo or a specific variant.)*
+```
+
+**Assistant:** correct: does not invent the missing value
+
+```text
+The dataset does not record nutrition (calories, fat, protein, carbohydrates), so I cannot answer that without guessing. Each recipe has only a title, an ingredient list and instructions; I can show those, or answer questions about them.
+```
+
+
 ## Substitution cases
 
 | Case | Recipe | Result | Evidence | By |
 |---|---|---|---|---|
-| banana bread without eggs (PDF example; weak evidence) | Banana Banana Bread [ar:kq.naD.8G19M4UU9dVvJgHtpfo.l/eC] | applesauce | weak | fallback |
+| banana bread without eggs (PDF example; weak evidence) | Banana Banana Bread [ar:kq.naD.8G19M4UU9dVvJgHtpfo.l/eC] | silken tofu | weak | fallback |
 | chocolate chip cookies, butter, no dairy (strong evidence) | Easy Chocolate Chip Cookies [ar:RBAW5pewzXTtgX.2bKuw8wv5WUm0rJW] | shortening | strong | fallback |
 | pasta with heavy cream, cream, no dairy (PDF example) | Pasta with Peas, Cream, Parsley, and Mint [epi:v4TTgUj6zS6WK3mc4NIX4vRrvz4t4ju] | olive oil | moderate | fallback |
-| pancakes without milk | Pancakes [fn:W20tOEJAonkR.0irgPihRikRS4A2Sx6] | buttermilk | strong | fallback |
+| pancakes without milk | Pancakes [fn:W20tOEJAonkR.0irgPihRikRS4A2Sx6] | cream | strong | fallback |
 | requested replacement that breaks the restriction | Easy Chocolate Chip Cookies [ar:RBAW5pewzXTtgX.2bKuw8wv5WUm0rJW] | Your requested replacement 'cream cheese' breaks your restri | excluded | none |
 | target not in the recipe | Green Salad Vinaigrette [fn:mpXss74G.YwwPqLF5xHmjOQKrlZAYsy] | This recipe does not contain eggs, so nothing needs replacin | none | none |
 
@@ -51,5 +262,5 @@ Full transcripts are in `eval/transcripts/`.
 - PASS — [Ingredient matching with a follow-up (PDF Task 2)](transcripts/03_none.md) (multi-turn follow-up, explainable ranking)
 - PASS — [No eligible recipe (PDF Task 2)](transcripts/04_none.md) (no-match case, constraint never relaxed silently)
 - PASS — [Substitution with strong evidence (PDF Task 3)](transcripts/05_none.md) (substitution, restriction respected, other conflicts reported)
-- PASS — [Substitution with weak or conflicting evidence (PDF Task 3)](transcripts/06_none.md) (weak or conflicting evidence, declining to guess)
+- PASS — [Substitution with weak or conflicting evidence (PDF Task 3)](transcripts/06_none.md) (weak or conflicting evidence, quantity not invented, follow-up with a requested replacement)
 - PASS — [Unsupported attribute (PDF Task 1)](transcripts/07_none.md) (refusing to fabricate)

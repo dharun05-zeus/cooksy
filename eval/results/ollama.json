@@ -624,7 +624,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 3.8
+        "seconds": 6.0
       },
       {
         "message": "I cannot have dairy.",
@@ -649,7 +649,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 5.7
+        "seconds": 5.0
       },
       {
         "message": "no nuts please",
@@ -674,7 +674,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 3.3
+        "seconds": 3.0
       },
       {
         "message": "show me some vegan curry recipes",
@@ -709,7 +709,7 @@
         "corrections": [
           "add_exclude += ['vegan']"
         ],
-        "seconds": 4.3
+        "seconds": 3.8
       },
       {
         "message": "I'm allergic to shellfish, find me a paella",
@@ -742,7 +742,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 5.1
+        "seconds": 4.9
       },
       {
         "message": "gluten free brownies",
@@ -777,7 +777,7 @@
         "corrections": [
           "add_exclude += ['gluten']"
         ],
-        "seconds": 4.2
+        "seconds": 3.8
       },
       {
         "message": "chicken soup without onions",
@@ -810,7 +810,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 4.8
+        "seconds": 4.5
       },
       {
         "message": "something with salmon and asparagus",
@@ -854,7 +854,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 4.4
+        "seconds": 4.6
       },
       {
         "message": "what are the instructions for the first recipe?",
@@ -875,7 +875,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 3.5
+        "seconds": 2.9
       },
       {
         "message": "How many recipes use cilantro?",
@@ -905,10 +905,8 @@
           }
         ],
         "source": "ollama (qwen3:4b)",
-        "corrections": [
-          "stats operation ingredient_count_stats -> count"
-        ],
-        "seconds": 5.9
+        "corrections": [],
+        "seconds": 4.8
       },
       {
         "message": "What percentage of recipes contain butter?",
@@ -939,7 +937,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 5.2
+        "seconds": 5.3
       },
       {
         "message": "How many recipes contain both garlic and onion? What percentage of the dataset is that?",
@@ -972,7 +970,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 7.1
+        "seconds": 5.4
       },
       {
         "message": "Among recipes containing tomato, which five have the fewest instruction steps?",
@@ -1015,7 +1013,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 8.4
+        "seconds": 7.8
       },
       {
         "message": "Which 3 chicken recipes have the most steps?",
@@ -1048,7 +1046,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 7.6
+        "seconds": 7.1
       },
       {
         "message": "What are the most common ingredients in cookie recipes?",
@@ -1069,7 +1067,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 5.7
+        "seconds": 5.0
       },
       {
         "message": "What is the average number of ingredients in soup recipes?",
@@ -1090,7 +1088,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 5.5
+        "seconds": 5.4
       },
       {
         "message": "median ingredient count across the whole dataset",
@@ -1111,7 +1109,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 5.4
+        "seconds": 5.2
       },
       {
         "message": "How many vegetarian recipes are there?",
@@ -1132,7 +1130,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 5.2
+        "seconds": 5.4
       },
       {
         "message": "how many recipes are in the dataset?",
@@ -1153,7 +1151,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 5.0
+        "seconds": 4.9
       },
       {
         "message": "which ingredient appears most often?",
@@ -1174,7 +1172,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 7.9
+        "seconds": 5.6
       },
       {
         "message": "I have eggs, onions, tomatoes, and rice. Suggest five recipes using as many of these as possible, with no peanuts and at most six instruction steps. Prefer recipes that need the fewest additional ingredients.",
@@ -1236,7 +1234,7 @@
           "add_exclude += ['peanuts']",
           "max_steps None -> 6"
         ],
-        "seconds": 15.2
+        "seconds": 19.2
       },
       {
         "message": "Exclude eggs too.",
@@ -1264,7 +1262,7 @@
           "intent match -> search 'exclude eggs too' (no ingredients given)",
           "intent search -> match (refines the active ingredient match)"
         ],
-        "seconds": 6.1
+        "seconds": 6.0
       },
       {
         "message": "I've got chicken, broccoli and soy sauce, what can I make?",
@@ -1293,7 +1291,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 10.1
+        "seconds": 9.8
       },
       {
         "message": "I have 2 cups of rice and 4 eggs",
@@ -1320,7 +1318,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 7.8
+        "seconds": 7.4
       },
       {
         "message": "only show recipes with at most 4 steps",
@@ -1343,7 +1341,7 @@
         "corrections": [
           "max_steps None -> 4"
         ],
-        "seconds": 14.7
+        "seconds": 12.9
       },
       {
         "message": "Take this banana bread recipe and remove eggs.",
@@ -1372,7 +1370,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 5.9
+        "seconds": 10.4
       },
       {
         "message": "Replace the cream in the first one without dairy.",
@@ -1411,7 +1409,7 @@
         "corrections": [
           "add_exclude += ['dairy']"
         ],
-        "seconds": 10.7
+        "seconds": 11.0
       },
       {
         "message": "can I make the second one without butter?",
@@ -1440,7 +1438,7 @@
         "corrections": [
           "add_exclude += ['butter']"
         ],
-        "seconds": 8.8
+        "seconds": 7.0
       },
       {
         "message": "swap the sour cream for yogurt in the first recipe",
@@ -1467,7 +1465,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 7.1
+        "seconds": 6.3
       },
       {
         "message": "what's the weather today?",
@@ -1482,7 +1480,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 5.5
+        "seconds": 5.6
       },
       {
         "message": "start over",
@@ -1497,7 +1495,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 3.0
+        "seconds": 3.5
       },
       {
         "message": "dairy is fine now",
@@ -1524,11 +1522,11 @@
         "corrections": [
           "remove_exclude <- ['dairy']"
         ],
-        "seconds": 5.6
+        "seconds": 5.8
       },
       {
         "message": "quick vegetarian dinner with chickpeas",
-        "passed": true,
+        "passed": false,
         "checks": [
           {
             "field": "intent",
@@ -1541,8 +1539,8 @@
             "expected": [
               "chickpea"
             ],
-            "got": "vegetarian dinner chickpeas",
-            "ok": true
+            "got": "vegetarian dinner",
+            "ok": false
           },
           {
             "field": "exclude",
@@ -1562,10 +1560,8 @@
           }
         ],
         "source": "ollama (qwen3:4b)",
-        "corrections": [
-          "add_exclude += ['vegetarian']"
-        ],
-        "seconds": 5.2
+        "corrections": [],
+        "seconds": 6.8
       },
       {
         "message": "lasagna for someone who is lactose intolerant",
@@ -1598,7 +1594,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 6.1
+        "seconds": 6.5
       },
       {
         "message": "Find five easy cookie recipes",
@@ -1615,7 +1611,7 @@
             "expected": [
               "cookie"
             ],
-            "got": "easy cookie",
+            "got": "cookie",
             "ok": true
           },
           {
@@ -1633,7 +1629,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 5.3
+        "seconds": 5.9
       },
       {
         "message": "Find a pasta recipe with heavy cream.",
@@ -1662,7 +1658,7 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 6.5
+        "seconds": 6.4
       },
       {
         "message": "soups I can make in under 5 steps",
@@ -1694,7 +1690,7 @@
           "intent match -> search 'soups' (no ingredients given)",
           "max_steps None -> 4"
         ],
-        "seconds": 8.3
+        "seconds": 7.4
       },
       {
         "message": "How many calories are in the first recipe?",
@@ -1715,7 +1711,7 @@
         "corrections": [
           "intent clarify -> stats"
         ],
-        "seconds": 8.4
+        "seconds": 8.0
       },
       {
         "message": "find tacos, but nothing with pork",
@@ -1748,10 +1744,10 @@
         ],
         "source": "ollama (qwen3:4b)",
         "corrections": [],
-        "seconds": 5.7
+        "seconds": 5.6
       }
     ],
-    "passed": 40,
+    "passed": 39,
     "total": 40,
     "field_accuracy": {
       "exclude": "13/13",
@@ -1763,7 +1759,7 @@
       "order": "2/2",
       "pantry": "3/3",
       "preferences": "1/1",
-      "query_has": "12/12",
+      "query_has": "11/12",
       "recipe_query_has": "1/1",
       "remove_exclude": "1/1",
       "result_number": "5/5",
@@ -1772,8 +1768,8 @@
       "substitute_target": "4/4"
     },
     "llm_used": 40,
-    "guard_corrections": 12,
-    "median_seconds": 5.7
+    "guard_corrections": 10,
+    "median_seconds": 5.6
   },
   "substitution": {
     "cases": [
@@ -1782,14 +1778,12 @@
         "passed": true,
         "problems": [],
         "recipe": "Banana Banana Bread [ar:kq.naD.8G19M4UU9dVvJgHtpfo.l/eC]",
-        "method": "fallback",
-        "substitute": "applesauce",
+        "method": "llm",
+        "substitute": "silken tofu",
         "strength": "weak",
         "message": "",
-        "validation_errors": [
-          "replacement line '2 cups mashed overripe bananas' must contain only the substitute (applesauce), one ingredient per line"
-        ],
-        "seconds": 52.2
+        "validation_errors": [],
+        "seconds": 19.3
       },
       {
         "name": "chocolate chip cookies, butter, no dairy (strong evidence)",
@@ -1801,7 +1795,7 @@
         "strength": "strong",
         "message": "",
         "validation_errors": [],
-        "seconds": 44.1
+        "seconds": 12.1
       },
       {
         "name": "pasta with heavy cream, cream, no dairy (PDF example)",
@@ -1813,19 +1807,19 @@
         "strength": "moderate",
         "message": "",
         "validation_errors": [],
-        "seconds": 91.6
+        "seconds": 46.8
       },
       {
         "name": "pancakes without milk",
         "passed": true,
         "problems": [],
         "recipe": "Pancakes [fn:W20tOEJAonkR.0irgPihRikRS4A2Sx6]",
-        "method": "llm",
-        "substitute": "buttermilk",
+        "method": "fallback",
+        "substitute": "cream",
         "strength": "strong",
         "message": "",
         "validation_errors": [],
-        "seconds": 28.0
+        "seconds": 1.0
       },
       {
         "name": "requested replacement that breaks the restriction",
@@ -1837,7 +1831,7 @@
         "strength": "excluded",
         "message": "Your requested replacement 'cream cheese' breaks your restrictions, so I did not use it.",
         "validation_errors": [],
-        "seconds": 0.7
+        "seconds": 1.1
       },
       {
         "name": "target not in the recipe",
@@ -1849,7 +1843,7 @@
         "strength": "none",
         "message": "This recipe does not contain eggs, so nothing needs replacing.",
         "validation_errors": [],
-        "seconds": 0.2
+        "seconds": 0.3
       }
     ],
     "passed": 6,
@@ -1905,15 +1899,18 @@
           "restriction respected",
           "other conflicts reported"
         ],
-        "passed": true,
-        "problems": [],
+        "passed": false,
+        "problems": [
+          "turn 2: reply lacks 'Replacement quantity (supported)'"
+        ],
         "transcript": "transcripts/05_ollama.md"
       },
       {
         "name": "Substitution with weak or conflicting evidence (PDF Task 3)",
         "covers": [
           "weak or conflicting evidence",
-          "declining to guess"
+          "quantity not invented",
+          "follow-up with a requested replacement"
         ],
         "passed": true,
         "problems": [],
@@ -1929,7 +1926,7 @@
         "transcript": "transcripts/07_ollama.md"
       }
     ],
-    "passed": 7,
+    "passed": 6,
     "total": 7
   },
   "baseline": {

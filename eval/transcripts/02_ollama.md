@@ -4,7 +4,7 @@ Parser: ollama (qwen3:4b). Covers: aggregate statistics, stated filters and deno
 
 **User:** How many recipes contain both garlic and onion? What percentage of the dataset is that?
 
-*parser: ollama (qwen3:4b), 6.3s*
+*parser: ollama (qwen3:4b), 5.3s*
 
 ```text
 Answer: 15,657 of 122,910 recipes (12.74%).
@@ -17,7 +17,7 @@ Note: Dataset: 122,910 complete recipes (title, ingredients and instructions pre
 
 **User:** Among recipes containing tomato, which five have the fewest instruction steps?
 
-*parser: ollama (qwen3:4b), 10.4s*
+*parser: ollama (qwen3:4b), 10.1s*
 
 ```text
 Answer: Fewest instruction steps among 11,712 matching recipes.

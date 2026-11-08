@@ -4,7 +4,7 @@ Parser: ollama (qwen3:4b). Covers: multi-turn follow-up, restriction applies to 
 
 **User:** Find a penne pasta recipe.
 
-*parser: ollama (qwen3:4b), 3.7s*
+*parser: ollama (qwen3:4b), 3.4s*
 
 ```text
 3,352 recipes share at least one word with 'penne pasta'. The 5 most relevant:
@@ -30,7 +30,7 @@ Ask for 'the first one' (or any number) to see its full recipe.
 
 **User:** I cannot have dairy.
 
-*parser: ollama (qwen3:4b), 8.1s*
+*parser: ollama (qwen3:4b), 7.6s*
 
 ```text
 662 recipes share at least one word with 'penne pasta' and satisfy your constraints. The 5 most relevant:
@@ -68,7 +68,7 @@ Active constraints: no dairy.
 
 **User:** Show me the ingredients for the first one.
 
-*parser: ollama (qwen3:4b), 8.8s*
+*parser: ollama (qwen3:4b), 8.9s*
 
 ```text
 Penne Pasta with Spinach and Bacon  [ar:23to8XzUux0FF.g5ZFsqnxvhByMzfJ.]  (source: Allrecipes)
