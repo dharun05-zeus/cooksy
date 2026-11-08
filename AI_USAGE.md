@@ -27,6 +27,9 @@ the AI wrote the code and drafted the documentation under my direction.
   headings.
 - **Testing.** I set up the LLM (Ollama and an API key), ran the assistant, and checked its
   answers, its speed on my laptop, and the evaluation report.
+- **User interface design.** I chose the visual design of the web UI and specified that it
+  must show only features the system really has (no cooking times, ratings or nutrition,
+  which the dataset does not contain).
 
 ## The AI assistant's role
 

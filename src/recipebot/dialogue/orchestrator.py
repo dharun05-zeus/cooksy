@@ -23,7 +23,7 @@ from recipebot.engines.substitution import SubstitutionEngine
 from recipebot.llm.base import LLMClient, LLMUnavailable
 from recipebot.llm.parser import MessageParser
 from recipebot.llm.writer import write_summary
-from recipebot.render import templates
+from recipebot.render import payloads, templates
 from recipebot.render.grounding import Grounder, GroundingReport
 
 HELP = """I answer questions from the Recipe Box dataset (about 123,000 recipes). Try:
@@ -58,6 +58,8 @@ class Turn:
     corrections: list[str] = field(default_factory=list)  # guard fixes to the LLM's patch
     grounding: GroundingReport | None = None  # sentences removed from the LLM summary
     seconds: float = 0.0
+    data: dict | None = None  # the engine result as JSON, for the web UI's cards
+    summary: str = ""  # the grounded LLM summary on its own (also inside `reply`)
 
 
 class Orchestrator:
@@ -71,6 +73,7 @@ class Orchestrator:
         self.state = SessionState()
         self.history: list[tuple[str, str]] = []
         self.substitution = SubstitutionEngine(store, index, store.lexicon.config_dir)
+        self._data: dict | None = None  # structured result of the current turn
         common = {name for name, rows in store.by_base.items() if len(rows) >= 50}
         self.grounder = Grounder(common)
 
@@ -83,8 +86,20 @@ class Orchestrator:
         return None if self.parser.disabled_reason else self.llm
 
     def handle(self, text: str) -> Turn:
+        """A chat message: the parser (LLM) turns it into a StatePatch, then it runs."""
         started = time.perf_counter()
-        patch = resolve_intent(self.state, self.parser.parse(text, self.state, self.history))
+        patch = self.parser.parse(text, self.state, self.history)
+        return self.run(text, patch, self.parser.last_source, self.parser.last_corrections,
+                        started)
+
+    def run(self, text: str, patch: StatePatch, source: str = "form",
+            corrections: list[str] | None = None, started: float | None = None) -> Turn:
+        """Run an already-structured request. The web UI's forms (diet filters, the
+        ingredient form, "adapt this recipe") call this directly: no parsing needed, and
+        the conversation state is updated exactly as for a chat message."""
+        started = started or time.perf_counter()
+        self._data = None
+        patch = resolve_intent(self.state, patch)
         unknown_id = None
         if patch.recipe_id and self.store.get(patch.recipe_id) is None:
             unknown_id = patch.recipe_id
@@ -98,14 +113,14 @@ class Orchestrator:
         else:
             self.state = apply_patch(self.state, patch)
             facts, allowed_ids = self._route(patch)
-        reply, grounding = facts, None
+        reply, grounding, summary = facts, None, ""
         if self.summaries and self.active_llm and patch.intent in SUMMARIZED:
             summary, grounding = self._summary(text, facts, allowed_ids)
             if summary:
                 reply = f"{summary}\n\n{facts}"
         self.history += [("user", text), ("assistant", reply.split("\n", 1)[0])]
-        return Turn(text, reply, patch, self.parser.last_source, self.parser.last_corrections,
-                    grounding, round(time.perf_counter() - started, 1))
+        return Turn(text, reply, patch, source, corrections or [], grounding,
+                    round(time.perf_counter() - started, 1), self._data, summary)
 
     def _unsupported(self, text: str, patch: StatePatch) -> str | None:
         """A question about something the dataset does not record (calories, cooking time)."""
@@ -154,6 +169,7 @@ class Orchestrator:
         f = RecipeFilter(include_all=s.include, exclude=s.exclude, max_steps=s.max_steps)
         result = search(self.store, self.index, s.query, f, k=s.limit)
         self._remember([h.recipe_id for h in result.hits], [h.title for h in result.hits])
+        self._data = payloads.search(result, self.store)
         text = templates.render_search(result, self.store, s.constraints_text())
         return text, set(s.last_results)
 
@@ -166,6 +182,7 @@ class Orchestrator:
         result = match(self.store, request)
         shown = result.results or result.alternatives
         self._remember([m.recipe_id for m in shown], [m.title for m in shown])
+        self._data = payloads.match(result)
         return templates.render_match(result, s.constraints_text()), set(s.last_results)
 
     def _detail(self, patch: StatePatch) -> str:
@@ -176,6 +193,8 @@ class Orchestrator:
                     f"{len(s.last_results)} recipes.")
         if not s.focus_recipe_id:
             return "Which recipe? Search first, then ask for it by its number."
+        detail = payloads.recipe(self.store, s.focus_recipe_id)
+        self._data = {"type": "recipe", "recipe": detail} if detail else None
         return templates.render_recipe(self.store, s.focus_recipe_id, patch.show)
 
     def _stats(self, request: StatsRequest | None) -> tuple[str, set[str]]:
@@ -197,6 +216,7 @@ class Orchestrator:
         else:
             result = stats.rank_by_steps(self.store, f, k=request.k, order=request.order)
             self._remember([r["recipe_id"] for r in result.rows], [r["title"] for r in result.rows])
+        self._data = payloads.stats(result)
         ids = set(result.sample_ids) | {r["recipe_id"] for r in result.rows if "recipe_id" in r}
         return templates.render_stats(result, self.state.constraints_text()), ids
 
@@ -214,6 +234,9 @@ class Orchestrator:
         chosen_by = (f"the LLM ({llm.name}), from the evidenced candidates only, then checked "
                      "by code" if result.method == "llm"
                      else "the strongest evidence (rule-based rewrite)")
+        self._data = payloads.substitution(result, chosen_by)
+        if how:
+            self._data["note"] = how
         text = templates.render_substitution(result, chosen_by)
         return (f"{how}\n{text}" if how else text), result.evidence_ids()
 

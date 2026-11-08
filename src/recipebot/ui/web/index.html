@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recipe Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- Left navigation -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48"><path d="M14 26c-4 0-7-3-7-7s3-7 7-7c1-4 5-7 10-7s9 3 10 7c4 0 7 3 7 7s-3 7-7 7v10H14z" fill="#fff"/><rect x="14" y="36" width="20" height="5" rx="2" fill="#fff"/><path d="M20 20c1 2 3 3 4 3s3-1 4-3" stroke="#f97316" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">Recipe <span>Intelligence</span></div>
+        <div class="brand-tag">Answers grounded in 122,910 real recipes</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <button class="nav-item active" data-view="home"><span class="i i-home"></span>Home</button>
+      <button class="nav-item" data-view="chat"><span class="i i-chat"></span>AI Recipe Chat</button>
+      <button class="nav-item" data-view="cook"><span class="i i-basket"></span>What can I cook?</button>
+      <button class="nav-item" data-view="stats"><span class="i i-chart"></span>Statistics</button>
+      <div class="nav-sep"></div>
+      <button class="nav-item" data-view="how"><span class="i i-info"></span>How it works</button>
+    </nav>
+    <div class="side-card">
+      <div class="side-card-title">Active constraints</div>
+      <div id="constraints" class="chips small"><span class="muted">None. Say "I can't have dairy" or pick a diet.</span></div>
+      <div id="search-state" class="muted tiny"></div>
+      <button id="reset" class="btn ghost full">Start over</button>
+    </div>
+    <div id="llm-status" class="llm-status"><span class="dot"></span><span>Connecting…</span></div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main">
+
+    <!-- HOME -->
+    <section class="view" id="view-home">
+      <div class="hero">
+        <div class="hero-deco" aria-hidden="true"><span>🍅</span><span>🌿</span></div>
+        <div class="hero-text">
+          <h1>Meet your <span class="grad">Recipe Assistant</span></h1>
+          <h2>Search, analyse, match and adapt real recipes</h2>
+          <p>Every answer is computed from the Recipe Box dataset, with recipe IDs and evidence. Nothing is made up.</p>
+        </div>
+        <div class="hero-chef" aria-hidden="true">👩‍🍳</div>
+        <form class="ask" id="hero-form">
+          <span class="i i-spark"></span>
+          <input id="hero-input" placeholder="What would you like to cook or know?" autocomplete="off">
+          <button class="send" aria-label="Send"><span class="i i-send"></span></button>
+        </form>
+        <div class="try">
+          <span>Try:</span>
+          <button class="pill" data-ask="Find a penne pasta recipe.">"Find a penne pasta recipe"</button>
+          <button class="pill" data-ask="How many recipes contain both garlic and onion? What percentage of the dataset is that?">"Garlic and onion: how many?"</button>
+          <button class="pill" data-ask="Take this banana bread recipe and remove eggs.">"Banana bread without eggs"</button>
+        </div>
+      </div>
+
+      <div class="section-head"><h3><span class="i i-grid"></span>Explore by diet</h3><span class="muted small">Sets a constraint that stays on for your whole conversation</span></div>
+      <div class="tiles" id="diet-tiles"></div>
+
+      <div class="section-head"><h3><span class="i i-flame"></span>The dataset at a glance</h3><span class="muted small">Computed live from the data</span></div>
+      <div class="glance" id="glance"><div class="card loading">Loading…</div></div>
+    </section>
+
+    <!-- CHAT (full width) -->
+    <section class="view hidden" id="view-chat">
+      <div class="page-head"><h3><span class="i i-chat"></span>AI Recipe Chat</h3>
+        <p class="muted">Search recipes, ask follow-ups ("I cannot have dairy", "show me the second one"), ask for statistics, or ask to replace an ingredient. The chat panel on the right is the same conversation.</p></div>
+      <div class="examples" id="chat-examples"></div>
+    </section>
+
+    <!-- WHAT CAN I COOK -->
+    <section class="view hidden" id="view-cook">
+      <div class="page-head"><h3><span class="i i-basket"></span>What can I cook?</h3>
+        <p class="muted">Enter the ingredients you have. Recipes are ranked by how many of them they use, then how few extra ingredients they need, then fewest steps. Restrictions are never relaxed.</p></div>
+      <form class="card form" id="cook-form">
+        <label>Ingredients you have <span class="muted">(press Enter after each)</span></label>
+        <div class="tag-input" id="pantry"><input id="pantry-input" placeholder="e.g. eggs, then Enter"></div>
+        <label>Restrictions</label>
+        <div class="chips" id="cook-diets"></div>
+        <input id="cook-exclude" class="field" placeholder="Other ingredients to avoid, comma separated (e.g. cilantro, pork)">
+        <div class="row">
+          <div><label>At most</label><select id="cook-steps" class="field"><option value="">any number of</option><option>2</option><option>3</option><option>4</option><option>6</option><option>8</option><option>10</option></select><span class="muted small"> steps</span></div>
+          <div><label>Rank first by</label><select id="cook-pref" class="field"><option value="">using most of my ingredients</option><option value="fewest_extra">fewest extra ingredients</option><option value="fewest_steps">fewest steps</option></select></div>
+          <div><label>Results</label><select id="cook-limit" class="field"><option>5</option><option>10</option></select></div>
+        </div>
+        <button class="btn primary">Find recipes</button>
+      </form>
+      <div id="cook-results"></div>
+    </section>
+
+    <!-- STATISTICS -->
+    <section class="view hidden" id="view-stats">
+      <div class="page-head"><h3><span class="i i-chart"></span>Statistics</h3>
+        <p class="muted">Computed over the complete filtered dataset, never estimated. Each answer states its filters, how many recipes were analysed, and the method.</p></div>
+      <div class="presets" id="stat-presets"></div>
+      <form class="card form" id="stats-form">
+        <div class="row">
+          <div><label>Calculate</label><select id="st-op" class="field">
+            <option value="percentage">count and percentage of recipes</option>
+            <option value="top_ingredients">most common ingredients</option>
+            <option value="ingredient_count_stats">average / median ingredient count</option>
+            <option value="rank_by_steps">recipes with the fewest steps</option>
+          </select></div>
+          <div><label>Containing all of</label><input id="st-include" class="field" placeholder="garlic, onion"></div>
+          <div><label>Title contains</label><input id="st-title" class="field" placeholder="soup"></div>
+          <div><label>Excluding</label><input id="st-exclude" class="field" placeholder="dairy, vegan, peanuts…"></div>
+        </div>
+        <button class="btn primary">Calculate</button>
+      </form>
+      <div id="stats-results"></div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="view hidden" id="view-how">
+      <div class="page-head"><h3><span class="i i-info"></span>How it works</h3></div>
+      <div class="how">
+        <div class="card step"><b>1 · Understand</b><p>The LLM turns your message into a small structured request (e.g. <code>add_exclude: ["dairy"]</code>). High-precision guards fix anything it drops or invents.</p></div>
+        <div class="card step"><b>2 · Remember</b><p>Restrictions stay on for the whole conversation; "the second one" refers to the last results.</p></div>
+        <div class="card step"><b>3 · Compute</b><p>Python computes every fact from the dataset: search over all recipes, exact statistics, ingredient matching, substitution evidence.</p></div>
+        <div class="card step"><b>4 · Check</b><p>LLM output is validated: substitutes must have evidence, new ingredients must exist in the dataset, invented IDs or numbers are removed.</p></div>
+      </div>
+      <div class="card">
+        <b>What the dataset does not contain</b>
+        <p class="muted">Cooking times, servings, ratings, nutrition and photos are not in the Recipe Box data, so this app never shows them. Ask about them and it will say so rather than guess.</p>
+        <b>Allergy note</b>
+        <p class="muted">Allergen checks read recipe text with word lists and exclude uncertain items too, but they are not a medical safety guarantee.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Chat panel -->
+  <aside class="chat" id="chat">
+    <header class="chat-head">
+      <span class="i i-spark big"></span>
+      <div><div class="chat-title">Recipe Assistant</div><div class="chat-sub" id="chat-sub">…</div></div>
+      <button class="icon-btn" id="expand" title="Open full chat"><span class="i i-expand"></span></button>
+    </header>
+    <div class="messages" id="messages">
+      <div class="msg bot"><div class="avatar">👩‍🍳</div><div class="bubble">Hi! Ask me to find a recipe, tell me what's in your kitchen, ask for statistics, or ask me to replace an ingredient. Everything I tell you comes from the dataset.</div></div>
+    </div>
+    <form class="ask small" id="chat-form">
+      <span class="i i-spark"></span>
+      <input id="chat-input" placeholder="Ask anything about recipes…" autocomplete="off">
+      <button class="send" aria-label="Send"><span class="i i-send"></span></button>
+    </form>
+  </aside>
+</div>
+
+<!-- Recipe modal -->
+<div class="modal hidden" id="modal"><div class="modal-card" id="modal-card"></div></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

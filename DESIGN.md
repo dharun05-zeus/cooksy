@@ -19,12 +19,12 @@ method, and is checked for invented content before it is shown.
 | Semantic search (optional) | sentence-transformers `bge-small-en-v1.5` + FAISS | vague requests |
 | LLM | Ollama `qwen3:4b` (local, free) first; Gemini (google-genai) if a key is set | no quota or key needed for the interviewer; Gemini is faster when available |
 | Web search (optional) | ddgs (no key) | Gemini's Search grounding is not free on Gemini 3+ |
-| Interface | Typer + Rich CLI, Streamlit | the assignment accepts either |
+| Interface | Typer + Rich CLI; web UI = FastAPI JSON API + one HTML/CSS/JS page (no build step) | full control of the layout; the same orchestrator behind both |
 
 ## 3. Architecture
 
 ```
-User ──► CLI / Streamlit ──► Orchestrator (one turn)
+User ──► CLI / web UI ──► Orchestrator (one turn)
                               1. LLM parser → StatePatch (JSON, schema-validated)
                               2. Session state ← apply patch (constraints persist)
                               3. Route: search | detail | stats | match | substitute | clarify
@@ -218,7 +218,23 @@ Results on the assignment's examples: chocolate-chip cookies without butter → 
 cream in pasta without dairy → coconut milk (weak: one recipe each); banana bread without
 eggs → weak, scattered evidence, reported as such.
 
-## 13. Evaluation
+## 13. Web UI
+
+`recipebot web` serves a single page (`src/recipebot/ui/web/`) and a small JSON API
+(`ui/server.py`), one conversation per browser session.
+
+- **Chat** messages go through the parser (LLM), exactly like the CLI.
+- **Buttons and forms** (diet tiles, "What can I cook?", statistics presets, "Adapt this
+  recipe") send a structured StatePatch to `/api/action`. That skips the LLM, so they are
+  instant and deterministic, and they update the same conversation state, so a chat
+  follow-up such as "exclude eggs too" works after a form.
+- Each turn returns the engine result as JSON (`render/payloads.py`), drawn as cards; the
+  full text answer is one click away.
+- The UI only shows what the dataset has: no cooking times, servings, ratings, nutrition
+  or photos. The recipe card's tabs are Ingredients, Steps and Allergen check. All dataset
+  text is HTML-escaped before display.
+
+## 14. Evaluation
 
 `eval/run_eval.py` checks each part against something computed independently and writes
 `eval/REPORT.md`: normalization (hand-labelled sample), parser (40 labelled messages,
@@ -227,7 +243,7 @@ matching (constraints, lists and ranking re-derived per result), substitution (p
 of the adapted recipe), seven scripted conversations covering the assignment's required
 cases, and a one-shot comparison where the same LLM answers without the pipeline.
 
-## 14. Not implemented
+## 15. Not implemented
 
 - **Web search for weak substitution evidence** (optional in the brief). When local
   evidence is weak the assistant says so and declines rather than guessing; adding a

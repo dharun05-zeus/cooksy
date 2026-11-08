@@ -99,5 +99,17 @@ def chat(
             _run_turn(bot, text, debug)
 
 
+@app.command()
+def web(
+    port: Annotated[int, typer.Option(help="port to serve on")] = 8000,
+    host: Annotated[str, typer.Option(help="interface to bind")] = "127.0.0.1",
+) -> None:
+    """Start the web UI (http://localhost:8000)."""
+    import uvicorn
+
+    _say(f"Loading the dataset, then serving http://localhost:{port} ...", style="green")
+    uvicorn.run("recipebot.ui.server:app", host=host, port=port, log_level="warning")
+
+
 if __name__ == "__main__":
     app()

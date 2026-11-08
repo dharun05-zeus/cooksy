@@ -57,11 +57,14 @@ phrasings and says so at startup; every answer is still computed from the datase
 
 ## Use
 
-Web UI:
+Web UI (then open http://localhost:8000):
 
 ```bash
-uv run streamlit run src/recipebot/ui/streamlit_app.py
+uv run recipebot web
 ```
+
+Chat on the right; diet filters, "What can I cook?" and statistics forms on the left run
+instantly without the LLM and share the same conversation.
 
 Command line:
 
@@ -116,7 +119,7 @@ src/recipebot/
   llm/             Ollama and Gemini clients, message parser + guards, fallback parser
   dialogue/        session state and the orchestrator (one turn)
   render/          answer templates and the grounding check
-  ui/              CLI and Streamlit app
+  ui/              CLI, web API (FastAPI) and the web page (ui/web/)
 eval/              evaluation cases, runner, report, transcripts
 tests/             unit tests on a 9-record fixture dataset
 ```
