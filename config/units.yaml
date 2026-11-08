@@ -1,0 +1,44 @@
+# Measurement units. Volume converts to millilitres, mass to grams.
+# Count units ("can", "clove") cannot be converted; a can's size in brackets
+# ("1 (14.5 ounce) can") is used when present.
+# Aliases are matched case-insensitively, with or without a trailing dot.
+
+volume:
+  teaspoon: {factor: 4.93, aliases: [teaspoons, teaspoon, tsps, tsp, tea spoon]}
+  tablespoon: {factor: 14.79, aliases: [tablespoons, tablespoon, tbsps, tbsp, tbs, tbl]}
+  cup: {factor: 236.6, aliases: [cups, cup, c]}
+  fluid_ounce: {factor: 29.57, aliases: [fluid ounces, fluid ounce, fl ounces, fl ounce, fl oz, floz]}
+  pint: {factor: 473.2, aliases: [pints, pint, pt]}
+  quart: {factor: 946.4, aliases: [quarts, quart, qt]}
+  gallon: {factor: 3785.0, aliases: [gallons, gallon, gal]}
+  millilitre: {factor: 1.0, aliases: [milliliters, milliliter, millilitres, millilitre, ml]}
+  litre: {factor: 1000.0, aliases: [liters, liter, litres, litre, l]}
+
+mass:
+  ounce: {factor: 28.35, aliases: [ounces, ounce, oz]}
+  pound: {factor: 453.6, aliases: [pounds, pound, lbs, lb]}
+  gram: {factor: 1.0, aliases: [grams, gram, g, gr]}
+  kilogram: {factor: 1000.0, aliases: [kilograms, kilogram, kg]}
+
+count:
+  can: [cans, can, tins, tin]
+  package: [packages, package, pkgs, pkg, packets, packet, envelopes, envelope, sachets, sachet]
+  jar: [jars, jar]
+  bottle: [bottles, bottle]
+  box: [boxes, box]
+  bag: [bags, bag]
+  container: [containers, container, cartons, carton, tubs, tub]
+  stick: [sticks, stick]
+  clove: [cloves, clove]
+  head: [heads, head]
+  bunch: [bunches, bunch]
+  sprig: [sprigs, sprig]
+  slice: [slices, slice]
+  piece: [pieces, piece]
+  stalk: [stalks, stalk, ribs, rib]
+  pinch: [pinches, pinch]
+  dash: [dashes, dash]
+  drop: [drops, drop]
+  handful: [handfuls, handful]
+  sheet: [sheets, sheet]
+  fillet: [fillets, fillet]

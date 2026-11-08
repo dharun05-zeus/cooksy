@@ -1,0 +1,15 @@
+{
+  "a1": {
+    "title": "Garlic Onion Soup",
+    "ingredients": ["2 cloves garlic, minced ADVERTISEMENT", "1 onion, diced ADVERTISEMENT", "4 cups water ADVERTISEMENT", "ADVERTISEMENT"],
+    "instructions": "Chop the vegetables.\nBoil everything.\nServe hot.\n",
+    "picture_link": null
+  },
+  "a2": {},
+  "a3": {
+    "title": "Penne with Cream",
+    "ingredients": ["1 pound penne pasta ADVERTISEMENT", "1 cup heavy cream ADVERTISEMENT", "1 cup grated Parmesan cheese ADVERTISEMENT"],
+    "instructions": "Cook the pasta.\nAdd the cream and cheese.",
+    "picture_link": null
+  }
+}

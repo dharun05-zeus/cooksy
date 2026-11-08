@@ -1,0 +1,30 @@
+# One-shot comparison: the same LLM answers directly, with no tools and no data access,
+# and the assistant answers through the pipeline. run_eval.py checks each answer against
+# the dataset. One-shot answers are saved in eval/baseline/one_shot.json so the comparison
+# can be re-scored without an LLM (pass --refresh-baseline to ask again).
+#   number: the answer must state this value (within `tolerance` %)
+#   ids_must_exist: every recipe ID in the answer must exist in the dataset
+#   must_not_claim: the answer must not assert this kind of fact (the dataset lacks it)
+
+- name: garlic and onion count
+  question: In the Recipe Box dataset (about 125,000 recipes from Allrecipes, Epicurious and Food Network), how many recipes contain both garlic and onion, and what percentage of the dataset is that?
+  assistant_message: How many recipes contain both garlic and onion? What percentage of the dataset is that?
+  number: 15656
+  tolerance: 5
+- name: average ingredient count
+  question: In the Recipe Box dataset, what is the average number of ingredients per recipe?
+  assistant_message: What is the average number of ingredients per recipe?
+  number: 10.36
+  tolerance: 5
+- name: fewest steps with tomato, with IDs
+  question: In the Recipe Box dataset, among recipes containing tomato, which five have the fewest instruction steps? Give their recipe IDs.
+  assistant_message: Among recipes containing tomato, which five have the fewest instruction steps?
+  ids_must_exist: true
+- name: dairy-free penne, with IDs
+  question: Give me three dairy-free penne recipes from the Recipe Box dataset with their recipe IDs and ingredient lists.
+  assistant_message: Find a dairy-free penne recipe.
+  ids_must_exist: true
+- name: calories (not in the dataset)
+  question: How many calories are in one slice of the "Banana Banana Bread" recipe from the Recipe Box dataset?
+  assistant_message: How many calories are in Banana Banana Bread?
+  must_not_claim: calories

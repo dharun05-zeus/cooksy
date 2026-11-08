@@ -1,0 +1,66 @@
+# 60 ingredient lines drawn at random from the processed dataset (pandas sample,
+# random_state=20261108), each labelled with the base ingredient a cook would name.
+# Labelled by an AI assistant (Claude) and reviewed by the author; see AI_USAGE.md.
+# Version 1 of the parser got 51/60 right; the 9 errors are marked `was_wrong` with the
+# original output, and some were fixed by general rules (not by special-casing these lines).
+
+- {line: "1 cup white chocolate chips", base: white chocolate chip}
+- {line: "1 1/2 tablespoons chopped fresh dill", base: dill}
+- {line: "1 (10 ounce) package frozen spinach", base: spinach}
+- {line: "1/2 teaspoon black pepper", base: black pepper}
+- {line: "4 egg whites", base: egg}
+- {line: "1 teaspoon orange extract", base: orange extract}
+- {line: "1/2 cup (1 stick) unsalted butter", base: butter}
+- {line: "1 tablespoon orange zest", base: orange zest}
+- {line: "cooking spray", base: cooking spray}
+- {line: "2 teaspoons minced garlic", base: garlic}
+- {line: "1 1/4 pounds boneless sirloin steak (about 1 inch thick), excess fat trimmed", base: sirloin steak}
+- {line: "6 dashes hot sauce", base: hot sauce}
+- {line: "3/4 cup granulated sugar", base: sugar}
+- {line: "2 garlic cloves, finely chopped", base: garlic}
+- {line: "1 teaspoon dried oregano", base: oregano}
+- {line: "Vegetable oil", base: vegetable oil}
+- {line: "1 yellow bell pepper, thinly sliced", base: bell pepper}
+- {line: "1/4 teaspoon freshly-ground pepper", base: black pepper}
+- {line: "Suggested garnishes: sliced almonds, chopped coconut or chopped peanuts", base: almond, was_wrong: suggested garnishes almond}
+- {line: "1/8 teaspoon dried crushed red pepper", base: red pepper flake, was_wrong: red pepper}
+- {line: "Kosher salt and freshly ground pepper", base: salt}
+- {line: "2 shallots, chopped", base: shallot}
+- {line: "1/2 teaspoon baking soda", base: baking soda}
+- {line: "or Pillsbury BEST Unbleached All Purpose Flour", base: flour, was_wrong: pillsbury unbleached all purpose flour}
+- {line: "A pinch of salt", base: salt}
+- {line: "3/4 cup grated sharp Cheddar", base: cheddar cheese}
+- {line: "1 lb. bag of medium-wide noodles", base: noodle, was_wrong: bag of medium-wide noodle}
+- {line: "1 1/4 pounds shoulder pork chops, cut (through the bone if necessary) into 1-inch pieces", base: shoulder pork chop}
+- {line: "1/2 teaspoon pure vanilla extract", base: vanilla extract}
+- {line: "1 cup sliced onion", base: onion}
+- {line: "1 cup whole milk ricotta cheese, room temperature", base: ricotta cheese, was_wrong: milk ricotta cheese}
+- {line: "8 krupuk* (Indonesian shrimp crackers; optional)", base: krupuk}
+- {line: "1/4 cup finely grated Parmesan", base: parmesan}
+- {line: "1 whole rind from 1 wedge Parmesan, optional", base: parmesan rind, was_wrong: rind from wedge parmesan}
+- {line: "1 1/4 cups unbleached all-purpose flour", base: flour, was_wrong: unbleached all-purpose flour}
+- {line: "1 teaspoon rosewater, or to taste (optional)", base: rosewater}
+- {line: "1 onion, finely chopped", base: onion}
+- {line: "1/2 teaspoon white sugar", base: sugar}
+- {line: "3/4 teaspoon salt", base: salt}
+- {line: "1/2 cup minced shallots", base: shallot}
+- {line: "3 cups seeded, julienned hothouse cucumbers, soaked in cold water to crisp", base: cucumber, was_wrong: hothouse cucumber}
+- {line: "6 cups water", base: water}
+- {line: "2 tablespoons tomato paste", base: tomato paste}
+- {line: "1 garlic clove, peeled", base: garlic}
+- {line: ".5 oz. lime juice", base: lime juice}
+- {line: "1 teaspoon vanilla extract", base: vanilla extract}
+- {line: "Cold water, as needed", base: water}
+- {line: "1 tablespoon chopped fresh thyme leaves", base: thyme}
+- {line: "1/2 cup cornmeal", base: cornmeal}
+- {line: "8 tablespoons butter", base: butter}
+- {line: "1 teaspoon vanilla extract", base: vanilla extract}
+- {line: "1 (8 ounce) package cream cheese, softened", base: cream cheese}
+- {line: "1/4 cup chopped garlic", base: garlic}
+- {line: "3 tablespoons chopped shallots", base: shallot}
+- {line: "1 garlic head, halved", base: garlic}
+- {line: "1/4 cup all-purpose flour", base: flour}
+- {line: "1 pint distilled white vinegar", base: distilled white vinegar}
+- {line: "1/4 teaspoon prepared horseradish", base: horseradish}
+- {line: "1/3 cup (packed) golden brown sugar", base: brown sugar, was_wrong: golden brown sugar}
+- {line: "2 tablespoons bourbon (optional)", base: bourbon}

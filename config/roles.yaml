@@ -1,0 +1,123 @@
+# What an ingredient does in a dish. Used to explain a substitution and to predict its
+# effects. These are general cooking knowledge, not dataset facts, so every effect built
+# from this file is labelled as a prediction.
+#   baked: roles in baked goods (the recipe mentions baking or an oven)
+#   other: roles in everything else
+
+ingredients:
+  egg:
+    baked: [binding, leavening, moisture]
+    other: [binding, richness]
+  egg yolk:
+    baked: [richness, moisture]
+    other: [richness, thickening]
+  egg white:
+    baked: [leavening, structure]
+    other: [binding]
+  cream:
+    baked: [fat, moisture]
+    other: [fat, richness, thickening]
+  milk:
+    baked: [moisture, tenderness]
+    other: [moisture, richness]
+  butter:
+    baked: [fat, tenderness, flavor]
+    other: [fat, flavor]
+  sour cream:
+    baked: [moisture, fat, tang]
+    other: [richness, tang]
+  yogurt:
+    baked: [moisture, tang]
+    other: [richness, tang]
+  cream cheese:
+    baked: [fat, structure]
+    other: [richness, thickening]
+  parmesan:
+    other: [flavor, saltiness]
+  cheese:
+    other: [flavor, richness, binding]
+  flour:
+    baked: [structure]
+    other: [thickening]
+  sugar:
+    baked: [sweetness, moisture, browning]
+    other: [sweetness]
+  vegetable oil:
+    baked: [fat, moisture]
+    other: [fat]
+  peanut butter:
+    other: [flavor, richness, binding]
+
+role_effects:
+  binding: may hold together less well and be more crumbly
+  leavening: may rise less and be denser
+  moisture: may be drier
+  fat: may be less rich and less tender
+  richness: may taste lighter and less rich
+  thickening: the sauce may be thinner; simmering a little longer can help
+  flavor: the flavor will change
+  tenderness: may be firmer or tougher
+  structure: may be softer or less stable
+  tang: may taste less tangy
+  sweetness: may taste less sweet
+  browning: may brown less
+  saltiness: may need a little more salt
+
+# What common substitutes can provide. A candidate whose roles overlap the target's
+# roles is a good fit; one with no overlap is a poor fit and ranks last. Candidates not
+# listed here are "unknown fit" and rank in between.
+provides:
+  applesauce: [moisture, binding, sweetness]
+  banana: [moisture, binding, sweetness]
+  pumpkin puree: [moisture, binding]
+  yogurt: [moisture, tang, richness, binding]
+  greek yogurt: [moisture, tang, richness, binding]
+  silken tofu: [binding, moisture, richness, thickening]
+  tofu: [binding, structure]
+  flaxseed: [binding]
+  ground flaxseed: [binding]
+  chia seed: [binding]
+  baking powder: [leavening]
+  baking soda: [leavening]
+  buttermilk: [moisture, tang, tenderness]
+  egg substitute: [binding, leavening, moisture]
+  coconut milk: [fat, richness, moisture, thickening]
+  unsweetened coconut milk: [fat, richness, moisture, thickening]
+  coconut cream: [fat, richness, thickening]
+  cashew: [richness, thickening]
+  almond milk: [moisture]
+  soy milk: [moisture, richness]
+  rice milk: [moisture]
+  oat milk: [moisture, richness]
+  evaporated milk: [richness, moisture]
+  half-and-half: [fat, richness, moisture]
+  olive oil: [fat, moisture, flavor]
+  vegetable oil: [fat, moisture]
+  oil: [fat, moisture]
+  canola oil: [fat, moisture]
+  coconut oil: [fat, tenderness]
+  shortening: [fat, tenderness, structure]
+  vegetable shortening: [fat, tenderness, structure]
+  margarine: [fat, tenderness, flavor]
+  cornstarch: [thickening]
+  flour: [thickening, structure]
+  stock: [moisture, flavor]
+  chicken broth: [moisture, flavor]
+  vegetable broth: [moisture, flavor]
+  water: [moisture]
+  cooking spray: [greasing]
+  honey: [sweetness, moisture]
+  maple syrup: [sweetness, moisture]
+
+# Herbs and spices only add flavor; they are never a fit for fat, binding or thickening.
+flavor_only: [
+  basil, rosemary, mint, sage, thyme, oregano, parsley, cilantro, dill, chive, tarragon,
+  bay leaf, garlic, black pepper, salt, cumin, paprika, cinnamon, nutmeg, ginger, clove,
+  vanilla extract, lemon zest, orange zest, red pepper flake, cayenne pepper, allspice
+]
+
+# Parsed "ingredient" names that are not ingredients; never suggested as substitutes.
+ignore_candidates: [liquid, mixture, filling, topping, garnish, glaze, sauce, dough, batter, crust]
+
+# A recipe counts as baked if its instructions contain one of these words.
+baked_markers: [bake, baked, baking, oven, preheat]

@@ -1,0 +1,87 @@
+# Rules for turning a raw ingredient line into a canonical ingredient name.
+# All of this is data, so a rule can be inspected or changed without touching code.
+
+# A line matching any of these is a section heading ("For the sauce:"), not an ingredient.
+header_patterns:
+  - ':\s*$'
+
+# Instruction lines that are site boilerplate, not cooking steps.
+instruction_boilerplate:
+  - '^watch how to make this'
+  - '^photograph(s)? by'
+  - '^copyright'
+  - '^recipe courtesy'
+  - '^recipe from'
+  - '^©'
+  - '^(n/a\s*)+$'
+  - '^[^a-z]*$'          # no letters at all (";", ".;")
+
+# Titles that are placeholders left in the scraped data; such records count as untitled.
+placeholder_titles:
+  - '^title$'
+  - '^qa( v[\d.]+)?$'
+  - '^test( recipe)?$'
+
+# The name is cut at the first of these phrases ("salt, plus more to taste").
+cut_phrases:
+  - to taste
+  - for garnish
+  - for serving
+  - for dusting
+  - for greasing
+  - for brushing
+  - for frying
+  - for the pan
+  - for decoration
+  - as needed
+  - if desired
+  - if needed
+  - plus more
+  - plus extra
+  - such as
+  - preferably
+  - optional
+  - at room temperature
+
+# Words recorded as the ingredient's form, then removed from the name.
+# Forms are kept per line so matching can say "recipe uses canned tomatoes".
+form_words:
+  fresh: fresh
+  freshly: fresh
+  frozen: frozen
+  thawed: frozen
+  canned: canned
+  tinned: canned
+  dried: dried
+
+# Preparation, size and quality words removed from the name.
+descriptors: [
+  chopped, diced, minced, sliced, grated, shredded, crushed, cubed, julienned, mashed,
+  peeled, seeded, deseeded, cored, pitted, stemmed, trimmed, halved, quartered, rinsed,
+  drained, softened, melted, beaten, lightly, divided, packed, sifted, toasted, roasted,
+  finely, coarsely, roughly, thinly, thickly, very, well, large, small, medium, extra-large,
+  jumbo, big, medium-sized, medium-size, small-sized, small-size, large-sized, large-size,
+  ripe, organic, boneless, skinless, cooked, uncooked, raw, cold, chilled, warm,
+  lukewarm, room, temperature, about, heaping, heaped, scant, generous, level, rounded,
+  good-quality, quality, best, lean, extra-lean, low-sodium, reduced-sodium, low-fat,
+  reduced-fat, fat-free, nonfat, non-fat, skim, whole, light, dark, hard-boiled, hard-cooked,
+  extra, additional, more, plus, firmly, loosely, prepared, homemade, store-bought,
+  bite-size, bite-sized, inch, inches, thick, thin, cut, into, pieces, chunks, wedges, strips,
+  rings, cubes, lengthwise, crosswise, diagonally, removed, reserved, separated, torn,
+  freshly-ground, unsalted, salted, natural, pure, unbleached, bleached, part-skim,
+  wide, medium-wide, extra-wide, pillsbury
+]
+
+# Removed only at the start or end of a name ("of flour" → "flour"),
+# so "cream of chicken soup" keeps its "of".
+edge_stopwords: [a, an, the, of, and, or, with, to, in, for, on, some, each]
+
+# "ground X" keeps the word "ground" only for these meats; otherwise "ground cumin" → "cumin".
+ground_keep: [beef, pork, turkey, chicken, lamb, veal, meat, sausage, bison, chuck, sirloin, round, venison]
+
+# Words that inflect would wrongly singularise.
+no_singularize: [
+  asparagus, couscous, hummus, molasses, swiss, grits, bass, watercress, citrus, lemongrass,
+  schnapps, jus, anise, brussels, hollandaise, bitters, sprinkles, harissa, quinoa, pancetta,
+  feta, ricotta, mozzarella, pasta, salsa, quesadillas, christmas, cress, gas, glass, oats
+]

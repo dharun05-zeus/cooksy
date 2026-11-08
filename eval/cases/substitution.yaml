@@ -1,0 +1,37 @@
+# Substitution cases. The recipe is the top search hit for `dish` that contains the target.
+# Properties checked by run_eval.py:
+#   - the adapted ingredient list has no line with the target or a restricted ingredient
+#   - every unchanged line is exactly as in the dataset
+#   - the substitute is one of the evidenced candidates, and each cited recipe ID exists
+#   - weak or conflicting evidence is flagged with a caution
+# expect: adapt | no_target | refuse | decline_or_adapt
+
+- name: banana bread without eggs (PDF example; weak evidence)
+  dish: banana bread
+  target: eggs
+  expect: decline_or_adapt
+- name: chocolate chip cookies, butter, no dairy (strong evidence)
+  dish: chocolate chip cookies
+  target: butter
+  restrictions: [dairy]
+  expect: adapt
+- name: pasta with heavy cream, cream, no dairy (PDF example)
+  dish: pasta heavy cream
+  target: cream
+  restrictions: [dairy]
+  expect: adapt
+- name: pancakes without milk
+  dish: pancakes
+  target: milk
+  expect: adapt
+- name: requested replacement that breaks the restriction
+  dish: chocolate chip cookies
+  target: butter
+  restrictions: [dairy]
+  replacement: cream cheese
+  expect: refuse
+- name: target not in the recipe
+  dish: green salad vinaigrette
+  target: eggs
+  recipe_without_target: true
+  expect: no_target

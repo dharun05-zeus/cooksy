@@ -1,0 +1,59 @@
+# Scripted multi-turn conversations, run through the full assistant (parser + engines).
+# Each turn can check: reply_has / reply_lacks (substrings) and state (session fields).
+# Together they cover the assignment's required cases: multi-turn follow-ups, an aggregate
+# statistics query, a no-match case, a substitution with weak or conflicting evidence, and
+# an unsupported attribute.
+
+- name: Search refined by a follow-up restriction (PDF Task 1)
+  covers: [multi-turn follow-up, restriction applies to the active search]
+  turns:
+    - user: Find a penne pasta recipe.
+      expect: {reply_has: ["penne"]}
+    - user: I cannot have dairy.
+      expect: {reply_has: ["Evidence: no dairy", "Active constraints: no dairy"], state: {exclude_has: dairy, query_has: penne}}
+    - user: Show me the ingredients for the first one.
+      expect: {reply_has: ["Ingredients (as listed in the dataset)"]}
+
+- name: Aggregate statistics (PDF Task 1)
+  covers: [aggregate statistics, stated filters and denominator]
+  turns:
+    - user: How many recipes contain both garlic and onion? What percentage of the dataset is that?
+      expect: {reply_has: ["of 122,910 recipes (12.74%)", "Recipes analyzed: 122,910", "Method:"]}
+    - user: Among recipes containing tomato, which five have the fewest instruction steps?
+      expect: {reply_has: ["rank: 5", "deterministic tie-break"]}
+
+- name: Ingredient matching with a follow-up (PDF Task 2)
+  covers: [multi-turn follow-up, explainable ranking]
+  turns:
+    - user: I have eggs, onions, tomatoes, and rice. Suggest five recipes using as many of these as possible, with no peanuts and at most six instruction steps. Prefer recipes that need the fewest additional ingredients.
+      expect: {reply_has: ["uses 4 of your 4 ingredients", "Ranking rule: most of your ingredients used"], state: {max_steps: 6}}
+    - user: Exclude eggs too.
+      expect: {reply_has: ["'eggs' is excluded by your constraints"], state: {exclude_has: egg}}
+
+- name: No eligible recipe (PDF Task 2)
+  covers: [no-match case, constraint never relaxed silently]
+  turns:
+    - user: I have tempeh and kimchi. Suggest recipes with at most one instruction step.
+      expect: {reply_has: ["No eligible recipe found", "BREAKS a constraint", "VIOLATES"]}
+
+- name: Substitution with strong evidence (PDF Task 3)
+  covers: [substitution, restriction respected, other conflicts reported]
+  turns:
+    - user: Find chocolate chip cookies.
+      expect: {reply_has: ["cookie"]}
+    - user: I cannot have dairy. Replace the butter in the first one.
+      expect: {reply_has: ["Chosen substitute:", "Local evidence from the dataset", "not a guarantee"], state: {exclude_has: dairy}}
+
+- name: Substitution with weak or conflicting evidence (PDF Task 3)
+  covers: [weak or conflicting evidence, declining to guess]
+  turns:
+    - user: Take this banana bread recipe and remove eggs. Use only ingredients that appear in the dataset.
+      expect: {reply_has: ["Local evidence from the dataset", "Versions of this dish in the dataset made without eggs"], reply_has_any: ["weak", "conflicting", "None of the evidenced candidates"]}
+
+- name: Unsupported attribute (PDF Task 1)
+  covers: [refusing to fabricate]
+  turns:
+    - user: Find banana bread.
+      expect: {reply_has: ["banana"]}
+    - user: How many calories are in the first one?
+      expect: {reply_has: ["does not record"], reply_lacks: ["kcal"]}

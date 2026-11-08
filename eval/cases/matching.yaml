@@ -1,0 +1,22 @@
+# Ingredient matching. Every returned recipe is re-checked by run_eval.py:
+#   - no hard constraint is violated (exclusions incl. uncertain items, step limit)
+#   - matched / extra-required lists are recomputed from the recipe and compared
+#   - results are in the stated ranking order
+# expect_no_match: the case must report "no match" and only list violating alternatives.
+
+- name: PDF example (eggs, onions, tomatoes, rice; no peanuts; at most 6 steps)
+  request: {pantry: [{name: eggs}, {name: onions}, {name: tomatoes}, {name: rice}], exclude: [peanuts], max_steps: 6, limit: 5}
+- name: PDF follow-up, exclude eggs too
+  request: {pantry: [{name: eggs}, {name: onions}, {name: tomatoes}, {name: rice}], exclude: [peanuts, eggs], max_steps: 6, limit: 5}
+- name: vegan pantry
+  request: {pantry: [{name: chickpeas}, {name: spinach}, {name: garlic}], exclude: [vegan], limit: 5}
+- name: fewest steps first
+  request: {pantry: [{name: chicken}, {name: lemon}], preferences: [fewest_steps], limit: 5}
+- name: quantities given
+  request: {pantry: [{name: eggs, quantity: 4}, {name: rice, quantity: 2, unit: cups}, {name: onion}], max_steps: 6, limit: 5}
+- name: no-match case (tempeh and kimchi in a single step; 74 recipes use them, none in 1 step)
+  request: {pantry: [{name: tempeh}, {name: kimchi}], max_steps: 1, limit: 5}
+  expect_no_match: true
+- name: no-match case (impossible step limit)
+  request: {pantry: [{name: lobster}, {name: saffron}], max_steps: 1, exclude: [shellfish], limit: 5}
+  expect_no_match: true

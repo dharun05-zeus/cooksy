@@ -1,0 +1,128 @@
+# Allergen and diet categories, checked against each full ingredient line.
+#   terms       a whole-word match (plurals included) means the line contains the category
+#   exceptions  phrases removed before matching ("peanut butter" is not dairy)
+#   uncertain   the line may contain the category; hard constraints exclude these too
+# A line that matches a term but also has an uncertain_marker ("vegan butter")
+# is marked uncertain, not safe. This list is a best effort from recipe text and
+# is not a medical safety guarantee.
+
+uncertain_markers: [
+  dairy-free, dairy free, non-dairy, nondairy, vegan, plant-based, plant based, imitation,
+  gluten-free, gluten free, egg-free, egg free, nut-free, nut free, meatless, vegetarian,
+  soy-free, substitute, replacer, alternative
+]
+
+categories:
+  dairy:
+    terms: [
+      milk, butter, buttermilk, cream, sour cream, cheese, cheddar, parmesan, parmigiano,
+      mozzarella, ricotta, mascarpone, feta, brie, gruyere, gouda, provolone, romano, pecorino,
+      asiago, havarti, monterey jack, colby, gorgonzola, camembert, queso, paneer, cottage cheese,
+      yogurt, yoghurt, ghee, whey, casein, lactose, half-and-half, creme fraiche, kefir,
+      creme fraeche, creme, crema, quark, labneh, burrata, fontina, emmental, manchego,
+      ice cream, custard, alfredo, evaporated milk, condensed milk, milk chocolate
+    ]
+    exceptions: [
+      peanut butter, almond butter, cashew butter, sunflower butter, nut butter, apple butter,
+      cocoa butter, shea butter, butter bean, butter lettuce, coconut milk, coconut cream,
+      almond milk, soy milk, soymilk, oat milk, rice milk, cashew milk, hemp milk, cream of tartar,
+      cream of coconut, creme de menthe, creme de cacao, creme de cassis
+    ]
+    uncertain: [
+      margarine, chocolate, creamer, whipped topping, cool whip, pesto, pudding, ranch, caesar,
+      creamed corn, bread, cake mix, pancake mix, biscuit mix, baking mix, bisquick, brownie mix,
+      muffin mix, mashed potato flakes
+    ]
+
+  egg:
+    terms: [egg, egg yolk, egg white, yolk, mayonnaise, mayo, meringue, eggnog, aioli]
+    exceptions: [egg replacer, eggless]
+    uncertain: [egg noodle, fresh pasta, brioche, challah, custard]
+
+  peanut:
+    terms: [peanut, peanut butter, peanut oil, groundnut]
+    exceptions: [pine nut, brazil nut, macadamia nut, coconut]
+    uncertain: [mixed nut, nuts, satay, praline]
+
+  tree_nut:
+    terms: [
+      almond, walnut, pecan, cashew, pistachio, hazelnut, filbert, macadamia, pine nut, pignoli,
+      brazil nut, chestnut, praline, marzipan, nutella, frangipane
+    ]
+    exceptions: [water chestnut, butternut]
+    uncertain: [coconut, mixed nut, nuts, pesto, amaretto]
+
+  gluten:
+    terms: [
+      flour, wheat, bread, breadcrumb, bread crumb, panko, pasta, spaghetti, penne, macaroni,
+      fettuccine, linguine, lasagna, lasagne, noodle, couscous, barley, rye, semolina, bulgur,
+      farro, spelt, seitan, cracker, cookie, biscuit, cake mix, orzo, pie crust, pastry, phyllo,
+      filo, croissant, bun, pita, crouton, beer, malt, graham
+    ]
+    exceptions: [
+      rice flour, almond flour, coconut flour, corn flour, cornflour, tapioca flour, potato flour,
+      chickpea flour, buckwheat flour, rice noodle, rice pasta, rice vermicelli, cornbread mix
+    ]
+    uncertain: [soy sauce, oat, oatmeal, cornbread, tortilla, teriyaki, hoisin]
+
+  shellfish:
+    terms: [
+      shrimp, prawn, crab, lobster, crayfish, crawfish, langoustine, clam, mussel, oyster,
+      scallop, squid, calamari, octopus, oyster sauce
+    ]
+    exceptions: [oyster mushroom, crab apple, crabapple]
+    uncertain: [imitation crab, seafood, surimi]
+
+  fish:
+    terms: [
+      fish, salmon, tuna, cod, tilapia, halibut, trout, anchovy, anchovies, sardine, mackerel,
+      snapper, sea bass, catfish, swordfish, haddock, mahi, sole, flounder, herring, bonito,
+      fish sauce, nam pla, nuoc nam, caviar, roe
+    ]
+    exceptions: []
+    uncertain: [worcestershire, caesar, seafood, imitation crab, surimi, dashi]
+
+  soy:
+    terms: [soy, soya, soybean, tofu, tempeh, edamame, miso, soy sauce, tamari]
+    exceptions: []
+    uncertain: [teriyaki, hoisin, vegetable oil, margarine]
+
+  meat:
+    terms: [
+      chicken, beef, pork, bacon, ham, sausage, turkey, lamb, veal, prosciutto, pancetta, salami,
+      pepperoni, chorizo, duck, venison, bison, steak, ground beef, hamburger, meatball, hot dog,
+      bratwurst, kielbasa, lard, gelatin, gelatine, drippings, chuck, sirloin, brisket, spareribs,
+      mutton, goose, quail, rabbit, pheasant, liver
+    ]
+    exceptions: [vegetable broth, vegetable stock, veggie broth, mushroom broth, hamburger bun, hot dog bun, vegetable bouillon]
+    # Plain "stock" or "broth" may be vegetable; meat stocks are caught by "chicken", "beef"...
+    uncertain: [broth, stock, bouillon, worcestershire, bacon bits, refried beans, marshmallow]
+
+  animal_product:
+    terms: [honey, gelatin, gelatine, isinglass]
+    exceptions: []
+    uncertain: [marshmallow]
+
+# Words a user may say, mapped to the categories they exclude.
+aliases:
+  dairy: [dairy]
+  lactose: [dairy]
+  milk products: [dairy]
+  egg: [egg]
+  eggs: [egg]
+  peanut: [peanut]
+  peanuts: [peanut]
+  nut: [peanut, tree_nut]
+  nuts: [peanut, tree_nut]
+  tree nut: [tree_nut]
+  tree nuts: [tree_nut]
+  gluten: [gluten]
+  wheat: [gluten]
+  shellfish: [shellfish]
+  seafood: [fish, shellfish]
+  fish: [fish]
+  soy: [soy]
+  meat: [meat]
+  vegetarian: [meat, fish, shellfish]
+  pescatarian: [meat]
+  vegan: [meat, fish, shellfish, dairy, egg, animal_product]

@@ -1,0 +1,9 @@
+# Substitution examples from the assignment, plus a weak-evidence case.
+# Run: uv run recipebot chat --script examples/substitution_conversations.txt --debug
+Take this banana bread recipe and remove eggs. Use only ingredients that appear in the dataset.
+reset
+Find chocolate chip cookies.
+I cannot have dairy. Replace the butter in the first one.
+reset
+Find a pasta recipe with heavy cream.
+Replace the cream in the first one without dairy.

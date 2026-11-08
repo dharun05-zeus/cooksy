@@ -1,0 +1,24 @@
+# Statistics questions. Each answer from the engine is compared with an independent
+# reference computation in run_eval.py (plain Python sets over the processed recipes,
+# not the engine's filter code), so a bug in the engine's filtering shows up as a mismatch.
+
+- name: garlic and onion, count and percentage (PDF example)
+  request: {operation: percentage, include_all: [garlic, onion]}
+- name: garlic and onion including products (broad)
+  request: {operation: percentage, include_all: [garlic, onion], match_mode: broad}
+- name: recipes with cilantro
+  request: {operation: count, include_all: [cilantro]}
+- name: vegetarian recipes (excludes meat, fish, shellfish incl. uncertain)
+  request: {operation: count, exclude: [vegetarian]}
+- name: penne recipes without dairy
+  request: {operation: count, title_contains: [penne], exclude: [dairy]}
+- name: fewest steps among tomato recipes (PDF example)
+  request: {operation: rank_by_steps, include_all: [tomato], k: 5, order: fewest}
+- name: most steps among chicken recipes
+  request: {operation: rank_by_steps, include_all: [chicken], k: 3, order: most}
+- name: ingredient count mean and median
+  request: {operation: ingredient_count_stats}
+- name: ingredient count in soup recipes
+  request: {operation: ingredient_count_stats, title_contains: [soup]}
+- name: most common ingredients, staples excluded
+  request: {operation: top_ingredients, k: 10, exclude_staples: true}

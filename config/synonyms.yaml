@@ -1,0 +1,101 @@
+# synonyms: names for the same ingredient, mapped to one canonical name.
+# Keys are checked twice: on the name as written (so "crushed red pepper" is caught
+# before "crushed" is removed) and again after descriptors are removed.
+# Only true equivalents belong here. Different products stay separate
+# (tomato paste is not tomato; garlic powder is not garlic).
+# A list value means the line names several ingredients ("salt and pepper").
+synonyms:
+  scallion: green onion
+  spring onion: green onion
+  cilantro leaf: cilantro
+  coriander leaf: cilantro
+  fresh coriander: cilantro
+  garbanzo bean: chickpea
+  garbanzo: chickpea
+  confectioners sugar: powdered sugar
+  confectioners' sugar: powdered sugar
+  confectioner's sugar: powdered sugar
+  icing sugar: powdered sugar
+  courgette: zucchini
+  aubergine: eggplant
+  heavy whipping cream: heavy cream
+  whipping cream: heavy cream
+  double cream: heavy cream
+  half and half: half-and-half
+  half & half: half-and-half
+  bicarbonate of soda: baking soda
+  corn starch: cornstarch
+  pepper: black pepper
+  black peppercorn: black pepper
+  kosher salt: salt
+  sea salt: salt
+  table salt: salt
+  coarse salt: salt
+  fine salt: salt
+  hamburger: ground beef
+  yolk: egg yolk
+  crushed red pepper: red pepper flake
+  dried crushed red pepper: red pepper flake
+  milk ricotta cheese: ricotta cheese
+  milk ricotta: ricotta cheese
+  milk mozzarella cheese: mozzarella cheese
+  all purpose flour: all-purpose flour
+  crushed red pepper flakes: red pepper flake
+  red pepper flakes: red pepper flake
+  nonstick cooking spray: cooking spray
+  vegetable cooking spray: cooking spray
+  parmesan cheese: parmesan
+  parmigiano-reggiano: parmesan
+  parmigiano reggiano: parmesan
+  parmigiano-reggiano cheese: parmesan
+  cheddar: cheddar cheese
+  sharp cheddar: cheddar cheese
+  sharp cheddar cheese: cheddar cheese
+  clove garlic: garlic
+  salt and pepper: [salt, black pepper]
+  salt and black pepper: [salt, black pepper]
+  salt & pepper: [salt, black pepper]
+  salt and white pepper: [salt, white pepper]
+
+# families: varieties that count as the same base ingredient for matching and counting.
+# A recipe with "cherry tomatoes" contains "tomato"; one with "tomato paste" does not.
+families:
+  onion: [
+    yellow onion, white onion, red onion, sweet onion, vidalia onion, spanish onion, brown onion,
+    pearl onion, cipollini onion, boiling onion, purple onion, bermuda onion, maui onion,
+    walla walla onion, vidalia sweet onion, sweet yellow onion, sweet white onion,
+    yellow skinned onion, onion slice, red onion slice
+  ]
+  tomato: [cherry tomato, grape tomato, plum tomato, roma tomato, beefsteak tomato, heirloom tomato, vine tomato]
+  garlic: [
+    garlic clove, head garlic, garlic head, bulb garlic, garlic bulb, cloves garlic,
+    unpeeled garlic clove, elephant garlic, pureed garlic, garlic puree, bottled garlic
+  ]
+  egg: [egg yolk, egg white]
+  cream: [heavy cream, light cream, single cream]
+  bell pepper: [red bell pepper, green bell pepper, yellow bell pepper, orange bell pepper, green pepper]
+  potato: [russet potato, red potato, yukon gold potato, new potato, baking potato, white potato, idaho potato]
+  rice: [white rice, long-grain rice, long grain rice, long-grain white rice, long grain white rice, basmati rice, jasmine rice, brown rice, arborio rice, short-grain rice]
+  chicken: [chicken breast, chicken breast half, chicken thigh, chicken leg, chicken wing, chicken drumstick, chicken tender, whole chicken]
+  flour: [all-purpose flour, all purpose flour, plain flour]
+  sugar: [white sugar, granulated sugar, caster sugar]
+  brown sugar: [golden brown sugar, dark brown sugar, light brown sugar]
+  cucumber: [hothouse cucumber, english cucumber, persian cucumber, kirby cucumber, seedless cucumber]
+  milk: [whole milk, 2% milk, low-fat milk]
+  olive oil: [extra-virgin olive oil, extra virgin olive oil, virgin olive oil]
+  vegetable oil: [canola oil, corn oil, sunflower oil, safflower oil]
+  black pepper: [ground black pepper, cracked black pepper, coarsely ground black pepper]
+  carrot: [baby carrot]
+  mushroom: [button mushroom, white mushroom, cremini mushroom, baby bella mushroom]
+  lemon: [meyer lemon]
+  parsley: [flat-leaf parsley, italian parsley, flat leaf parsley, curly parsley, parsley leaf, flat-leaf parsley leaf, italian parsley leaf]
+  basil: [basil leaf, sweet basil]
+  mint: [mint leaf, spearmint leaf]
+  cilantro: [cilantro leaf, cilantro leaves with tender stem]
+  sage: [sage leaf]
+  thyme: [thyme leaf, thyme sprig]
+  oregano: [oregano leaf]
+  tarragon: [tarragon leaf]
+  rosemary: [rosemary leaf, rosemary sprig]
+  white wine: [dry white wine]
+  red wine: [dry red wine]

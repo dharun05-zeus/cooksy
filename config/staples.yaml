@@ -1,0 +1,3 @@
+# Ingredients assumed to be in every kitchen. Ingredient matching does not count
+# them as "extra required", and statistics can optionally leave them out.
+staples: [salt, black pepper, water, ice, cooking spray]

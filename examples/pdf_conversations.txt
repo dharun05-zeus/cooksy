@@ -1,0 +1,10 @@
+# The assignment's example conversations, one user message per line.
+# Run: uv run recipebot chat --script examples/pdf_conversations.txt
+Find a penne pasta recipe.
+I cannot have dairy.
+Show me the ingredients for the first one.
+reset
+How many recipes contain both garlic and onion? What percentage of the dataset is that?
+Among recipes containing tomato, which five have the fewest instruction steps?
+I have eggs, onions, tomatoes, and rice. Suggest five recipes using as many of these as possible, with no peanuts and at most six instruction steps. Prefer recipes that need the fewest additional ingredients.
+Exclude eggs too.

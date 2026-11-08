@@ -1,0 +1,1220 @@
+{
+  "date": "2026-11-08",
+  "llm": "no LLM (LLM_PROVIDER=none); using the offline fallback parser",
+  "parser": {
+    "cases": [
+      {
+        "message": "Find a penne pasta recipe.",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "search",
+            "got": "search",
+            "ok": true
+          },
+          {
+            "field": "query_has",
+            "expected": [
+              "penne"
+            ],
+            "got": "penne pasta",
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "I cannot have dairy.",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "search",
+            "got": "search",
+            "ok": true
+          },
+          {
+            "field": "exclude",
+            "expected": [
+              "dairy"
+            ],
+            "got": [
+              "dairy"
+            ],
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "no nuts please",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "search",
+            "got": "search",
+            "ok": true
+          },
+          {
+            "field": "exclude",
+            "expected": [
+              "nuts"
+            ],
+            "got": [
+              "nuts"
+            ],
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "show me some vegan curry recipes",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "search",
+            "got": "search",
+            "ok": true
+          },
+          {
+            "field": "query_has",
+            "expected": [
+              "curry"
+            ],
+            "got": "curry",
+            "ok": true
+          },
+          {
+            "field": "exclude",
+            "expected": [
+              "vegan"
+            ],
+            "got": [
+              "vegan"
+            ],
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "I'm allergic to shellfish, find me a paella",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "search",
+            "got": "search",
+            "ok": true
+          },
+          {
+            "field": "query_has",
+            "expected": [
+              "paella"
+            ],
+            "got": "me a paella",
+            "ok": true
+          },
+          {
+            "field": "exclude",
+            "expected": [
+              "shellfish"
+            ],
+            "got": [
+              "shellfish"
+            ],
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "gluten free brownies",
+        "passed": false,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "search",
+            "got": "search",
+            "ok": true
+          },
+          {
+            "field": "query_has",
+            "expected": [
+              "brownie"
+            ],
+            "got": null,
+            "ok": false
+          },
+          {
+            "field": "exclude",
+            "expected": [
+              "gluten"
+            ],
+            "got": [
+              "gluten"
+            ],
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "chicken soup without onions",
+        "passed": false,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "search",
+            "got": "search",
+            "ok": true
+          },
+          {
+            "field": "query_has",
+            "expected": [
+              "soup"
+            ],
+            "got": null,
+            "ok": false
+          },
+          {
+            "field": "exclude",
+            "expected": [
+              "onion"
+            ],
+            "got": [
+              "onions"
+            ],
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "something with salmon and asparagus",
+        "passed": false,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "search",
+            "got": "clarify",
+            "ok": false
+          },
+          {
+            "field": "query_has",
+            "expected": [
+              "salmon"
+            ],
+            "got": null,
+            "ok": false
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "show me the third one",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "detail",
+            "got": "detail",
+            "ok": true
+          },
+          {
+            "field": "result_number",
+            "expected": 3,
+            "got": 3,
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "what are the instructions for the first recipe?",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "detail",
+            "got": "detail",
+            "ok": true
+          },
+          {
+            "field": "result_number",
+            "expected": 1,
+            "got": 1,
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "How many recipes use cilantro?",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "stats",
+            "got": "stats",
+            "ok": true
+          },
+          {
+            "field": "stats_operation",
+            "expected": "count",
+            "got": "count",
+            "ok": true
+          },
+          {
+            "field": "stats_include",
+            "expected": [
+              "cilantro"
+            ],
+            "got": [
+              "cilantro"
+            ],
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "What percentage of recipes contain butter?",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "stats",
+            "got": "stats",
+            "ok": true
+          },
+          {
+            "field": "stats_operation",
+            "expected": "percentage",
+            "got": "percentage",
+            "ok": true
+          },
+          {
+            "field": "stats_include",
+            "expected": [
+              "butter"
+            ],
+            "got": [
+              "butter"
+            ],
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "How many recipes contain both garlic and onion? What percentage of the dataset is that?",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "stats",
+            "got": "stats",
+            "ok": true
+          },
+          {
+            "field": "stats_operation",
+            "expected": "percentage",
+            "got": "percentage",
+            "ok": true
+          },
+          {
+            "field": "stats_include",
+            "expected": [
+              "garlic",
+              "onion"
+            ],
+            "got": [
+              "garlic",
+              "onion"
+            ],
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "Among recipes containing tomato, which five have the fewest instruction steps?",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "stats",
+            "got": "stats",
+            "ok": true
+          },
+          {
+            "field": "stats_operation",
+            "expected": "rank_by_steps",
+            "got": "rank_by_steps",
+            "ok": true
+          },
+          {
+            "field": "stats_include",
+            "expected": [
+              "tomato"
+            ],
+            "got": [
+              "tomato"
+            ],
+            "ok": true
+          },
+          {
+            "field": "k",
+            "expected": 5,
+            "got": 5,
+            "ok": true
+          },
+          {
+            "field": "order",
+            "expected": "fewest",
+            "got": "fewest",
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "Which 3 chicken recipes have the most steps?",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "stats",
+            "got": "stats",
+            "ok": true
+          },
+          {
+            "field": "stats_operation",
+            "expected": "rank_by_steps",
+            "got": "rank_by_steps",
+            "ok": true
+          },
+          {
+            "field": "k",
+            "expected": 3,
+            "got": 3,
+            "ok": true
+          },
+          {
+            "field": "order",
+            "expected": "most",
+            "got": "most",
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "What are the most common ingredients in cookie recipes?",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "stats",
+            "got": "stats",
+            "ok": true
+          },
+          {
+            "field": "stats_operation",
+            "expected": "top_ingredients",
+            "got": "top_ingredients",
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "What is the average number of ingredients in soup recipes?",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "stats",
+            "got": "stats",
+            "ok": true
+          },
+          {
+            "field": "stats_operation",
+            "expected": "ingredient_count_stats",
+            "got": "ingredient_count_stats",
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "median ingredient count across the whole dataset",
+        "passed": false,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "stats",
+            "got": "clarify",
+            "ok": false
+          },
+          {
+            "field": "stats_operation",
+            "expected": "ingredient_count_stats",
+            "got": null,
+            "ok": false
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "How many vegetarian recipes are there?",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "stats",
+            "got": "stats",
+            "ok": true
+          },
+          {
+            "field": "stats_operation",
+            "expected": "count",
+            "got": "count",
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "how many recipes are in the dataset?",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "stats",
+            "got": "stats",
+            "ok": true
+          },
+          {
+            "field": "stats_operation",
+            "expected": "count",
+            "got": "count",
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "which ingredient appears most often?",
+        "passed": false,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "stats",
+            "got": "clarify",
+            "ok": false
+          },
+          {
+            "field": "stats_operation",
+            "expected": "top_ingredients",
+            "got": null,
+            "ok": false
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "I have eggs, onions, tomatoes, and rice. Suggest five recipes using as many of these as possible, with no peanuts and at most six instruction steps. Prefer recipes that need the fewest additional ingredients.",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "match",
+            "got": "match",
+            "ok": true
+          },
+          {
+            "field": "pantry",
+            "expected": [
+              "egg",
+              "onion",
+              "tomato",
+              "rice"
+            ],
+            "got": [
+              "eggs",
+              "onions",
+              "tomatoes",
+              "rice"
+            ],
+            "ok": true
+          },
+          {
+            "field": "exclude",
+            "expected": [
+              "peanut"
+            ],
+            "got": [
+              "peanuts"
+            ],
+            "ok": true
+          },
+          {
+            "field": "max_steps",
+            "expected": 6,
+            "got": 6,
+            "ok": true
+          },
+          {
+            "field": "limit",
+            "expected": 5,
+            "got": 5,
+            "ok": true
+          },
+          {
+            "field": "preferences",
+            "expected": [],
+            "got": [],
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "Exclude eggs too.",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "match",
+            "got": "match",
+            "ok": true
+          },
+          {
+            "field": "exclude",
+            "expected": [
+              "egg"
+            ],
+            "got": [
+              "eggs"
+            ],
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "I've got chicken, broccoli and soy sauce, what can I make?",
+        "passed": false,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "match",
+            "got": "clarify",
+            "ok": false
+          },
+          {
+            "field": "pantry",
+            "expected": [
+              "chicken",
+              "broccoli",
+              "soy sauce"
+            ],
+            "got": [],
+            "ok": false
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "I have 2 cups of rice and 4 eggs",
+        "passed": false,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "match",
+            "got": "match",
+            "ok": true
+          },
+          {
+            "field": "pantry",
+            "expected": [
+              "rice",
+              "egg"
+            ],
+            "got": [],
+            "ok": false
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "only show recipes with at most 4 steps",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "match",
+            "got": "match",
+            "ok": true
+          },
+          {
+            "field": "max_steps",
+            "expected": 4,
+            "got": 4,
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "Take this banana bread recipe and remove eggs.",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "substitute",
+            "got": "substitute",
+            "ok": true
+          },
+          {
+            "field": "substitute_target",
+            "expected": "egg",
+            "got": "eggs",
+            "ok": true
+          },
+          {
+            "field": "recipe_query_has",
+            "expected": [
+              "banana"
+            ],
+            "got": "banana bread",
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "Replace the cream in the first one without dairy.",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "substitute",
+            "got": "substitute",
+            "ok": true
+          },
+          {
+            "field": "substitute_target",
+            "expected": "cream",
+            "got": "cream",
+            "ok": true
+          },
+          {
+            "field": "result_number",
+            "expected": 1,
+            "got": 1,
+            "ok": true
+          },
+          {
+            "field": "exclude",
+            "expected": [
+              "dairy"
+            ],
+            "got": [
+              "dairy"
+            ],
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "can I make the second one without butter?",
+        "passed": false,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "substitute",
+            "got": "search",
+            "ok": false
+          },
+          {
+            "field": "substitute_target",
+            "expected": "butter",
+            "got": null,
+            "ok": false
+          },
+          {
+            "field": "result_number",
+            "expected": 2,
+            "got": null,
+            "ok": false
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "swap the sour cream for yogurt in the first recipe",
+        "passed": false,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "substitute",
+            "got": "substitute",
+            "ok": true
+          },
+          {
+            "field": "substitute_target",
+            "expected": "sour cream",
+            "got": "sour cream",
+            "ok": true
+          },
+          {
+            "field": "result_number",
+            "expected": 1,
+            "got": null,
+            "ok": false
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "what's the weather today?",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "clarify",
+            "got": "clarify",
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "start over",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "reset",
+            "got": "reset",
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "dairy is fine now",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "search",
+            "got": "search",
+            "ok": true
+          },
+          {
+            "field": "remove_exclude",
+            "expected": [
+              "dairy"
+            ],
+            "got": [
+              "dairy"
+            ],
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "quick vegetarian dinner with chickpeas",
+        "passed": false,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "search",
+            "got": "search",
+            "ok": true
+          },
+          {
+            "field": "query_has",
+            "expected": [
+              "chickpea"
+            ],
+            "got": null,
+            "ok": false
+          },
+          {
+            "field": "exclude",
+            "expected": [
+              "vegetarian"
+            ],
+            "got": [
+              "vegetarian"
+            ],
+            "ok": true
+          },
+          {
+            "field": "max_steps",
+            "expected": null,
+            "got": null,
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "lasagna for someone who is lactose intolerant",
+        "passed": false,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "search",
+            "got": "search",
+            "ok": true
+          },
+          {
+            "field": "query_has",
+            "expected": [
+              "lasagna"
+            ],
+            "got": null,
+            "ok": false
+          },
+          {
+            "field": "exclude",
+            "expected": [
+              "dairy"
+            ],
+            "got": [
+              "dairy"
+            ],
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "Find five easy cookie recipes",
+        "passed": false,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "search",
+            "got": "search",
+            "ok": true
+          },
+          {
+            "field": "query_has",
+            "expected": [
+              "cookie"
+            ],
+            "got": "five   cookie",
+            "ok": true
+          },
+          {
+            "field": "limit",
+            "expected": 5,
+            "got": null,
+            "ok": false
+          },
+          {
+            "field": "max_steps",
+            "expected": null,
+            "got": null,
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "Find a pasta recipe with heavy cream.",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "search",
+            "got": "search",
+            "ok": true
+          },
+          {
+            "field": "query_has",
+            "expected": [
+              "pasta"
+            ],
+            "got": "pasta  with heavy cream",
+            "ok": true
+          },
+          {
+            "field": "exclude",
+            "expected": [],
+            "got": [],
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "soups I can make in under 5 steps",
+        "passed": false,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "search",
+            "got": "search",
+            "ok": true
+          },
+          {
+            "field": "query_has",
+            "expected": [
+              "soup"
+            ],
+            "got": null,
+            "ok": false
+          },
+          {
+            "field": "max_steps",
+            "expected": 4,
+            "got": 4,
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "How many calories are in the first recipe?",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent_in",
+            "expected": [
+              "detail",
+              "clarify",
+              "stats"
+            ],
+            "got": "stats",
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      },
+      {
+        "message": "find tacos, but nothing with pork",
+        "passed": true,
+        "checks": [
+          {
+            "field": "intent",
+            "expected": "search",
+            "got": "search",
+            "ok": true
+          },
+          {
+            "field": "query_has",
+            "expected": [
+              "taco"
+            ],
+            "got": "tacos",
+            "ok": true
+          },
+          {
+            "field": "exclude",
+            "expected": [
+              "pork"
+            ],
+            "got": [
+              "pork"
+            ],
+            "ok": true
+          }
+        ],
+        "source": "rules",
+        "corrections": [],
+        "seconds": 0.0
+      }
+    ],
+    "passed": 27,
+    "total": 40,
+    "field_accuracy": {
+      "exclude": "13/13",
+      "intent": "34/39",
+      "intent_in": "1/1",
+      "k": "2/2",
+      "limit": "1/2",
+      "max_steps": "5/5",
+      "order": "2/2",
+      "pantry": "1/3",
+      "preferences": "1/1",
+      "query_has": "6/12",
+      "recipe_query_has": "1/1",
+      "remove_exclude": "1/1",
+      "result_number": "3/5",
+      "stats_include": "4/4",
+      "stats_operation": "9/11",
+      "substitute_target": "3/4"
+    },
+    "llm_used": 0,
+    "guard_corrections": 0,
+    "median_seconds": 0.0
+  },
+  "conversations": {
+    "cases": [
+      {
+        "name": "Search refined by a follow-up restriction (PDF Task 1)",
+        "covers": [
+          "multi-turn follow-up",
+          "restriction applies to the active search"
+        ],
+        "passed": true,
+        "problems": [],
+        "transcript": "transcripts/01_none.md"
+      },
+      {
+        "name": "Aggregate statistics (PDF Task 1)",
+        "covers": [
+          "aggregate statistics",
+          "stated filters and denominator"
+        ],
+        "passed": true,
+        "problems": [],
+        "transcript": "transcripts/02_none.md"
+      },
+      {
+        "name": "Ingredient matching with a follow-up (PDF Task 2)",
+        "covers": [
+          "multi-turn follow-up",
+          "explainable ranking"
+        ],
+        "passed": true,
+        "problems": [],
+        "transcript": "transcripts/03_none.md"
+      },
+      {
+        "name": "No eligible recipe (PDF Task 2)",
+        "covers": [
+          "no-match case",
+          "constraint never relaxed silently"
+        ],
+        "passed": true,
+        "problems": [],
+        "transcript": "transcripts/04_none.md"
+      },
+      {
+        "name": "Substitution with strong evidence (PDF Task 3)",
+        "covers": [
+          "substitution",
+          "restriction respected",
+          "other conflicts reported"
+        ],
+        "passed": true,
+        "problems": [],
+        "transcript": "transcripts/05_none.md"
+      },
+      {
+        "name": "Substitution with weak or conflicting evidence (PDF Task 3)",
+        "covers": [
+          "weak or conflicting evidence",
+          "declining to guess"
+        ],
+        "passed": true,
+        "problems": [],
+        "transcript": "transcripts/06_none.md"
+      },
+      {
+        "name": "Unsupported attribute (PDF Task 1)",
+        "covers": [
+          "refusing to fabricate"
+        ],
+        "passed": true,
+        "problems": [],
+        "transcript": "transcripts/07_none.md"
+      }
+    ],
+    "passed": 7,
+    "total": 7
+  }
+}
