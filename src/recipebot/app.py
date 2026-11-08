@@ -13,8 +13,8 @@ from recipebot.llm.parser import MessageParser
 
 
 def make_llm(settings: Settings, provider: str | None = None) -> tuple[LLMClient | None, str]:
-    """Pick the LLM: a local Ollama model if it is running, else Gemini if a key is set,
-    else none (the assistant still works, with the offline fallback parser).
+    """Pick the LLM: a local Ollama model if it is running, else Groq or Gemini if a key is
+    set, else none (the assistant still works, with the offline fallback parser).
     Returns the client and a one-line description for the user."""
     provider = (provider or settings.llm_provider).lower()
     notes = []
@@ -30,6 +30,13 @@ def make_llm(settings: Settings, provider: str | None = None) -> tuple[LLMClient
         else:
             client = OllamaClient(settings.ollama_model, settings.ollama_host)
             return client, f"{client.name}, local"
+    if provider in ("auto", "groq"):
+        if settings.groq_api_key:
+            from recipebot.llm.groq_client import GroqClient
+
+            client = GroqClient(settings.groq_api_key, settings.groq_model)
+            return client, client.name
+        notes.append("no GROQ_API_KEY in .env")
     if provider in ("auto", "gemini"):
         if settings.gemini_api_key:
             from recipebot.llm.gemini import GeminiClient

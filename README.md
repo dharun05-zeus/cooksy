@@ -62,8 +62,14 @@ ollama pull qwen3:4b
 The app finds it automatically. On a laptop CPU expect about 5–10 s per message and up to
 a minute for a substitution (the first message also loads the model); a GPU is much faster.
 
-**Alternatives.** A [Google AI Studio](https://aistudio.google.com) key from a project
-*without billing* (free tier): copy `.env.example` to `.env` and set `GEMINI_API_KEY`.
+**Fast hosted alternative (free): Groq.** Create a free key at
+[console.groq.com/keys](https://console.groq.com/keys), copy `.env.example` to `.env` and set
+`GROQ_API_KEY`. Replies take about a second. To use Groq even when Ollama is running, also
+set `LLM_PROVIDER=groq`. The free tier limits tokens per minute, so a full evaluation run
+may pause on rate limits; normal chatting is well within them.
+
+**Other alternative.** A [Google AI Studio](https://aistudio.google.com) key from a project
+*without billing* (free tier, small daily quota): set `GEMINI_API_KEY` in `.env`.
 **Without any LLM** the assistant still runs with a built-in fallback parser for common
 phrasings and says so at startup; every answer is still computed from the dataset.
 
@@ -132,7 +138,7 @@ src/recipebot/
   data/            loading the 3 JSON files, the build pipeline
   nlp/             ingredient parser, normalization, allergen check, step counting
   engines/         store, search (BM25), statistics, matching, substitution
-  llm/             Ollama and Gemini clients, message parser + guards, fallback parser
+  llm/             Ollama, Groq and Gemini clients, message parser + guards, fallback parser
   dialogue/        session state and the orchestrator (one turn)
   render/          answer templates and the grounding check
   ui/              CLI, web API (FastAPI) and the web page (ui/web/)
@@ -157,7 +163,7 @@ tests/             unit tests on a 9-record fixture dataset
 | home page text, example prompts, diet cards | `ui/web/index.html`; `DIETS`, `CHAT_EXAMPLES`, `STAT_PRESETS` in `app.js` |
 | how messages are understood (LLM prompt and examples) | `SYSTEM_PROMPT` in `src/recipebot/llm/parser.py`; corrections in `apply_guards` |
 | phrasings the offline parser knows | `src/recipebot/llm/rules.py` |
-| which LLM is used | `.env` (`LLM_PROVIDER`, `OLLAMA_MODEL`, `GEMINI_API_KEY`) |
+| which LLM is used | `.env` (`LLM_PROVIDER`, `OLLAMA_MODEL`, `GROQ_API_KEY`, `GEMINI_API_KEY`) |
 
 After changing a `config/` file that affects parsing (`units`, `normalization`, `synonyms`,
 `allergens`), rebuild the data with `uv run python scripts/build_index.py`; other changes

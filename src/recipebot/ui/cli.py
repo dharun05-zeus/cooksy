@@ -55,7 +55,7 @@ def _run_turn(bot: Orchestrator, text: str, debug: bool) -> None:
 @app.command()
 def chat(
     provider: Annotated[str | None, typer.Option(
-        help="auto | gemini | rules (default: LLM_PROVIDER)")] = None,
+        help="auto | ollama | groq | gemini | none (default: LLM_PROVIDER)")] = None,
     script: Annotated[Path | None, typer.Option(
         help="file with one user message per line")] = None,
     debug: Annotated[bool, typer.Option(

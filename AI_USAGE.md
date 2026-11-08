@@ -16,7 +16,8 @@ decisions.
 - Compared the options (rules only, Gemini's free tier, a local model) and chose an
   LLM-first design in which the LLM interprets requests and code produces every fact.
 - When my Gemini key turned out to be on a billed project, switched the default to a free
-  local model (Qwen3 4B via Ollama), so the interviewer needs no API key or quota.
+  local model (Qwen3 4B via Ollama), so the interviewer needs no API key or quota; later
+  added Groq as the free hosted option because Gemini's free quota runs out quickly.
 - Had the plan critically evaluated against the assignment before any code was written,
   required every weakness to be fixed, and had the revised plan checked again. This shaped
   the evidence-based substitution design, the separate ingredient-normalization module and
@@ -63,7 +64,8 @@ in my reviews and testing were fixed the same way.
 
 The assistant itself uses an LLM at run time (see DESIGN.md §11):
 
-- **Qwen3 4B via Ollama** (default, local), or **Gemini** if an API key is configured.
+- **Qwen3 4B via Ollama** (default, local), or **Groq** or **Gemini** if an API key is
+  configured.
 - The LLM turns messages into structured requests, rewords the recipe steps a substitution
   changes, and (optionally) writes a short summary. Code chooses the substitute and its
   quantity.

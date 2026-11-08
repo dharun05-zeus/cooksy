@@ -16,7 +16,7 @@ method, and is checked for invented content before it is shown.
 | Data | pandas + Parquet, Pydantic for record shapes | ~125k rows fit in memory; readable code |
 | Rules | YAML files in `config/` | normalization rules can be read and changed without code |
 | Keyword search | bm25s | exact dish and ingredient terms |
-| LLM | Ollama `qwen3:4b` (local, free) first; Gemini (google-genai) if a key is set | no quota or key needed for the interviewer; Gemini is faster when available |
+| LLM | Ollama `qwen3:4b` (local, free) first; then Groq (`llama-3.3-70b-versatile`, free key) or Gemini if a key is set | no quota or key needed for the interviewer; Groq is much faster and its free tier is generous; Gemini's free quota runs out quickly |
 | Interface | Typer + Rich CLI; web UI = FastAPI JSON API + one HTML/CSS/JS page (no build step) | full control of the layout; the same orchestrator behind both |
 
 ## 3. Architecture
@@ -169,8 +169,10 @@ The LLM handles language and judgment; code handles facts.
 | Substitution | rewords the steps that mention the replaced ingredient | finds evidence, ranks and selects the substitute, sets its quantity, builds the recipe, checks every step edit |
 | Reply opening (optional) | writes 2–3 sentences from the engine's facts | grounding check removes unsupported sentences |
 
-**Providers.** Ollama with `qwen3:4b` (local, free, no quota) is tried first, then Gemini if
-a key is set; with neither, a fallback parser keeps the assistant working. A permanent
+**Providers.** Ollama with `qwen3:4b` (local, free, no quota) is tried first, then Groq,
+then Gemini, each if a key is set; with none, a fallback parser keeps the assistant working.
+Groq's API is OpenAI-compatible, so its client is one HTTP call with `httpx` (no extra
+package): JSON mode, with the schema in the prompt and the reply validated by Pydantic. A permanent
 error (bad key, no credits, server down) switches the session to the fallback once, with
 one warning, instead of failing every turn.
 
@@ -292,10 +294,10 @@ applesauce (about 2/3 cup, estimated) and soy yogurt as equally weak alternative
 many phrased unlike the prompt examples), statistics (vs. a plain-Python reference),
 matching (constraints, lists and ranking re-derived per result), substitution (properties
 of the adapted recipe), eight scripted conversations covering the assignment's required
-cases, and a one-shot comparison where the same LLM answers without the pipeline. 151 unit
+cases, and a one-shot comparison where the same LLM answers without the pipeline. 155 unit
 tests (`pytest`) cover the parser rules, guards, state, engines, substitution scenarios
 (strong, weak, conflicting, missing quantity, ties, moisture risk, no reliable substitute,
-follow-ups) and the web API.
+follow-ups), the web API, and the Groq client against a fake server.
 
 ## 15. Not implemented
 
