@@ -228,12 +228,14 @@ class Orchestrator:
         if recipe_id is None:
             return how, set()
         self.state.focus_recipe_id = recipe_id
+        self.state.last_substitute_target = request.target
         llm = self.active_llm
         result = self.substitution.adapt(recipe_id, request.target, self.state.exclude,
                                          request.replacement, llm)
-        chosen_by = (f"the LLM ({llm.name}), from the evidenced candidates only, then checked "
-                     "by code" if result.method == "llm"
-                     else "the strongest evidence (rule-based rewrite)")
+        steps = (f"steps reworded by the LLM ({llm.name}) and checked by code"
+                 if result.method == "llm" else "steps rewritten by replacing the name")
+        chosen_by = (f"you (requested); {steps}" if result.requested
+                     else f"the ranking rules in code; {steps}")
         self._data = payloads.substitution(result, chosen_by)
         if how:
             self._data["note"] = how

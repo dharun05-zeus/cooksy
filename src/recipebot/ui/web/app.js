@@ -256,47 +256,100 @@ function statsCard(d) {
   </div>`;
 }
 
+const QTY_LABEL = { supported: "quantity from dataset", estimated: "estimated quantity", unknown: "quantity unknown" };
+const QTY_CLASS = { supported: "ok", estimated: "need", unknown: "bad" };
+const FIT_CLASS = { good: "ok", partial: "need", unknown: "", poor: "bad" };
+const list = (items, tag = "ul") => `<${tag} class="lines">${items.map((x) => `<li>${esc(x)}</li>`).join("")}</${tag}>`;
+
+function candidateBlock(c, i, chosen) {
+  const supporting = c.supporting.slice(0, 3).map((s) => `<div class="ev">${s.kind === "direct" ? "direct" : "indirect"}: ${esc(s.title)} ${idLink(s.id)}${s.line ? ` · “${esc(s.line)}”` : ""}</div>`).join("");
+  return `<div class="cand">
+    <div class="cand-head"><span class="rank">#${i + 1}</span><b>${esc(c.name)}</b>
+      <span class="badge ${esc(c.strength)}">${esc(c.strength)} evidence</span>
+      <span class="chip small ${FIT_CLASS[c.fit] || ""}">${esc(c.fit)} fit</span>
+      <span class="chip small">${c.direct ? "direct" : "indirect"} · ${c.support} recipe${c.support === 1 ? "" : "s"}</span>
+      <span class="chip small ${QTY_CLASS[c.quantity.status]}">${esc(QTY_LABEL[c.quantity.status])}${c.quantity.text ? `: ${esc(c.quantity.text)}` : ""}</span>
+      ${c.name === chosen ? `<span class="chip small ok">selected</span>` : ""}</div>
+    <div class="muted small">Roles: ${esc(c.coverage_text)}</div>
+    ${supporting}
+    <div class="muted tiny">Limitation: ${esc(c.limitation)}</div>
+  </div>`;
+}
+
 function substitutionCard(d) {
-  const cand = d.candidates.map((c) => `
-    <div style="margin:8px 0">
-      <b>${esc(c.name)}</b> <span class="badge ${esc(c.strength)}">${esc(c.strength)}</span>
-      <span class="chip">${esc(c.fit)} fit</span>
-      <div class="muted small">${esc(c.summary)}</div>
-      ${c.direct_examples.slice(0, 2).map((x) => `<div class="ev">direct: "${esc(x.line)}" ${idLink(x.id)}</div>`).join("")}
-      ${c.comparative_examples.length ? `<div class="ev">similar recipes without it: ${c.comparative_examples.map(idLink).join(", ")}</div>` : ""}
-    </div>`).join("") || `<p class="muted">No candidates found.</p>`;
   const a = d.adapted;
-  const adapted = a ? `
-    <div class="note"><b>Chosen substitute: ${esc(a.substitute)}</b> <span class="badge ${esc(a.strength || "none")}">${esc(a.strength || "")}</span><br>
-      <span class="muted small">Chosen by ${esc(d.chosen_by)}</span>
-      ${d.method === "fallback" && d.validation_errors.length ? `<br><span class="muted tiny">Rule-based rewrite shown because ${esc(d.validation_errors.slice(0, 2).join("; "))}.</span>` : ""}</div>
-    <b>Adapted ingredients</b> <span class="muted tiny">(✱ changed)</span>
-    <ul class="lines">${a.ingredients.map((x) => `<li class="${x.changed ? "changed" : ""}">${esc(x.text)}</li>`).join("")}</ul>
-    <b>Adapted steps</b>
-    <ol class="lines">${a.instructions.map((x) => `<li>${esc(x)}</li>`).join("")}</ol>
-    ${a.changes.length ? `<b>Changes</b><ul class="lines">${a.changes.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
-    ${a.predicted_effects.length ? `<b>Predicted effects</b> <span class="muted tiny">(not verified by the dataset)</span><ul class="lines">${a.predicted_effects.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
-    ${["weak", "conflicting", "none"].includes(a.strength) ? `<div class="warn">The evidence for ${esc(a.substitute)} is ${esc(a.strength)}; treat this adaptation as untested.</div>` : ""}
-  ` : "";
+  const chosen = a ? a.substitute : null;
+  const roles = Object.entries(d.roles).map(([name, rs]) => rs.length
+    ? `<span class="chip">${esc(name)}: ${rs.map((r, i) => (i === 0 ? `<b>${esc(r)}</b>` : esc(r))).join(", ")}</span>` : "").join("");
+  const warnings = [];
+  if (a && d.status === "incomplete") warnings.push(`<div class="warn"><b>Incomplete experimental adaptation.</b> Quantity not established by the dataset, so the ingredient list below is not a complete recipe.</div>`);
+  if (a && ["weak", "conflicting", "none"].includes(a.strength)) warnings.push(`<div class="caution">The evidence for ${esc(a.substitute)} is ${esc(a.strength)}; treat this adaptation as untested.</div>`);
+  if (a && d.moisture && ["high", "possible"].includes(d.moisture.risk)) warnings.push(`<div class="caution"><b>Moisture risk (${esc(d.moisture.risk)}).</b> ${esc(d.moisture.notes.find((n) => n.startsWith("Excess")) || "")}</div>`);
+  if (d.remaining_conflicts.length) warnings.push(`<div class="warn">Still in the recipe and not replaced: ${esc(d.remaining_conflicts.join("; "))}</div>`);
+
+  const pick = a ? `
+    <div class="pick-box">
+      <div class="muted tiny">Selected replacement · ${esc(d.chosen_by)}</div>
+      <div class="cand-head"><span class="name">${esc(a.substitute)}</span>
+        <span class="badge ${esc(a.strength)}">${esc(a.strength)} evidence</span>
+        <span class="chip small ${FIT_CLASS[a.fit] || ""}">${esc(a.fit)} functional fit</span></div>
+      <div class="qty"><span class="chip small ${QTY_CLASS[a.quantity.status]}">${esc(QTY_LABEL[a.quantity.status])}</span>
+        <b>${a.quantity.text ? esc(a.quantity.text) : "Quantity not established by the dataset."}</b>
+        <div class="muted tiny">${esc(a.quantity.basis)}</div></div>
+      <div class="muted small" style="margin-top:6px">Replaces: ${esc(d.target_lines.join("; "))}</div>
+    </div>` : "";
+
+  const texture = d.texture.length ? `
+    <div class="sub-section"><b>Expected texture changes</b> <span class="muted tiny">(predictions, not verified by the dataset)</span>
+      <table class="t"><tr><th>Property</th><th>Possible effect</th></tr>
+      ${d.texture.map((t) => `<tr><td>${esc(t.property)}</td><td>${esc(t.prediction)}</td></tr>`).join("")}</table></div>`
+    : d.expected_effects?.length ? `
+    <div class="sub-section"><b>Expected trade-offs of removing ${esc(d.target)}</b> <span class="muted tiny">(predictions from its role, not dataset facts)</span>${list(d.expected_effects)}</div>` : "";
+
+  const recipe = a ? `
+    <details class="sub-section" open><summary><b>Adapted recipe</b> <span class="muted tiny">(✱ changed)</span></summary>
+      <ul class="lines">${a.ingredients.map((x) => `<li class="${x.changed ? "changed" : ""}">${esc(x.text)}</li>`).join("")}</ul>
+      <div style="margin-top:8px"><b>Steps</b></div>${list(a.instructions, "ol")}
+      <div class="muted small" style="margin-top:6px">Baking: ${esc(d.baking || "not given in the original recipe")} <span class="tiny">(from the original recipe; not re-tested with the substitute)</span></div>
+      <details style="margin-top:6px"><summary class="muted small">Changes</summary>${list(a.changes)}</details>
+      <details style="margin-top:6px"><summary class="muted small">Original ingredients</summary>${list(d.original_ingredients)}</details>
+    </details>` : "";
+
+  const ranking = d.ranking_notes.length || d.uncertainty.length ? `
+    <details class="sub-section"><summary><b>Why this ranking</b></summary>
+      <div class="muted tiny">${esc(d.ranking_rule)}</div>
+      <ul class="lines ranking">${d.ranking_notes.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
+      ${d.uncertainty.map((u) => `<div class="caution" style="margin-top:6px">${esc(u)}</div>`).join("")}
+    </details>` : "";
+
+  const evidence = `
+    <details class="sub-section" ${a ? "" : "open"}><summary><b>Evidence from the dataset</b> <span class="muted tiny">${esc(d.comparison_scope)}</span></summary>
+      ${d.candidates.map((c, i) => candidateBlock(c, i, chosen)).join("") || `<p class="muted">No candidates found.</p>`}
+      ${d.same_dish_without.length ? `<div class="ev">Versions of this dish without ${esc(d.target)}: ${d.same_dish_without.map((x) => `${esc(x.title)} ${idLink(x.id)}`).join("; ")}</div>` : ""}
+      ${d.notes.map((n) => `<div class="ev">Note: "${esc(n.sentence)}" ${idLink(n.id)}</div>`).join("")}
+      <div class="muted tiny" style="margin-top:6px">${esc(d.evidence_types)}</div>
+    </details>`;
+
+  const details = a ? `
+    <details class="sub-section"><summary><b>Moisture check and limitations</b></summary>
+      ${d.moisture ? `<div class="muted small">Moisture risk: ${esc(d.moisture.risk)}</div>${list(d.moisture.notes)}` : ""}
+      <div style="margin-top:6px"><b>Limitations</b></div>${list(d.limitations)}
+    </details>` : "";
+
   return `<div class="rcard">
     ${d.note ? `<div class="muted small">${esc(d.note)}</div>` : ""}
     <div class="rtitle">Adapting: ${esc(d.recipe.title)}</div>${idLink(d.recipe.id)}
-    ${d.target_lines.length ? `<div style="margin-top:8px"><b>Replacing:</b> ${esc(d.target_lines.join("; "))}</div>` : ""}
-    <div class="facts">${Object.entries(d.roles).map(([name, roles]) => roles.length ? `<span class="chip">${esc(name)}: ${esc(roles.join(", "))}</span>` : "").join("")}
-      ${chips(d.restricted.map((r) => `no ${r}`), "bad")}</div>
-    <details ${a ? "" : "open"}><summary><b>Evidence from the dataset</b> <span class="muted tiny">${esc(d.comparison_scope)}</span></summary>
-      ${cand}
-      ${d.same_dish_without.length ? `<div class="ev">Versions of this dish without ${esc(d.target)}: ${d.same_dish_without.map((x) => `${esc(x.title)} ${idLink(x.id)}`).join("; ")}</div>` : ""}
-      ${d.notes.map((n) => `<div class="ev">Note: "${esc(n.sentence)}" ${idLink(n.id)}</div>`).join("")}
-      <div class="muted tiny">Direct = a recipe offers the swap itself. Comparative evidence is indirect: those recipes may differ in other ways too.</div>
-    </details>
+    ${d.target_lines.length ? `<div class="status ${esc(d.status)}">${esc(d.status_label)}</div>` : ""}
+    <div class="facts">${roles}${chips(d.restricted.map((r) => `no ${r}`), "bad")}</div>
     ${d.message ? `<div class="note">${esc(d.message)}</div>` : ""}
-    ${d.declined_by_llm ? `<div class="note">None of the evidenced candidates fits this ingredient's role well enough, so no adaptation is proposed.</div>` : ""}
-    ${adapted}
-    ${d.expected_effects?.length ? `<b>Expected texture and trade-offs</b> <span class="muted tiny">(predictions from the ingredient's role, not dataset facts)</span>
-      <ul class="lines">${d.expected_effects.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
-    ${d.remaining_conflicts.length ? `<div class="warn">Still in the recipe and not replaced: ${esc(d.remaining_conflicts.join("; "))}</div>` : ""}
-    ${a ? `<div class="muted tiny">Not a guarantee that the dish is safe for an allergy.</div>` : ""}
+    ${pick}
+    ${warnings.length ? `<div class="sub-section" style="display:grid;gap:6px">${warnings.join("")}</div>` : ""}
+    ${texture}
+    ${recipe}
+    ${ranking}
+    ${evidence}
+    ${details}
+    ${a ? `<div class="muted tiny" style="margin-top:8px">Not a guarantee that the dish is safe for an allergy.</div>` : ""}
   </div>`;
 }
 

@@ -60,6 +60,7 @@ Examples (state is shown only when it matters):
 "show me the second one" -> {"intent":"detail","result_number":2}
 "Take this banana bread recipe and remove eggs." -> {"intent":"substitute","substitute":{"target":"eggs","recipe_query":"banana bread"}}
 [last results shown] "Replace the cream in the first one without dairy" -> {"intent":"substitute","result_number":1,"substitute":{"target":"cream"},"add_exclude":["dairy"]}
+[last_substitution_target: eggs] "Use applesauce instead." -> {"intent":"substitute","substitute":{"target":"eggs","replacement":"applesauce"}}
 "what's the weather?" -> {"intent":"clarify","message":"I can only help with recipes from the dataset. What would you like to cook?"}
 """
 
@@ -73,6 +74,7 @@ def build_prompt(text: str, state: SessionState, history: list[tuple[str, str]])
         "pantry": [p.name for p in state.pantry],
         "last_results": [f"{i + 1}. {t}" for i, t in enumerate(state.last_result_titles)],
         "selected_recipe": state.focus_recipe_id,
+        "last_substitution_target": state.last_substitute_target,
         "last_stats_request": state.last_stats.model_dump(exclude_defaults=True)
         if state.last_stats else None,
     }
@@ -141,6 +143,14 @@ def apply_guards(llm: StatePatch, rules: StatePatch, text: str = "",
         if rules.stats.include_all and not fixed.stats.include_all:
             notes.append(f"stats include_all <- {rules.stats.include_all}")
             fixed.stats.include_all = rules.stats.include_all
+    # "Use applesauce instead" right after a substitution: keep its target, with the
+    # user's replacement, even if the LLM read it as a search.
+    follow_up = rules.substitute if rules.intent == "substitute" else None
+    if follow_up and follow_up.replacement and (
+            fixed.intent != "substitute" or not fixed.substitute
+            or not fixed.substitute.replacement):
+        notes.append(f"intent {fixed.intent} -> substitute with {follow_up.replacement}")
+        fixed.intent, fixed.substitute = "substitute", follow_up
     if rules.intent == "match" and fixed.intent != "match" and rules.pantry:
         notes.append(f"intent {fixed.intent} -> match")
         fixed.intent, fixed.pantry, fixed.replace_pantry = "match", rules.pantry, True

@@ -109,6 +109,14 @@ class RuleParser:
         if stats:
             return StatePatch(intent="stats", stats=stats)
 
+        # "Use applesauce instead" after a substitution: same target, the user's replacement.
+        instead = re.search(r"\b(?:use|try|what about|how about)\s+(?:the\s+)?([a-z ]+?)\s+"
+                            r"instead\b", t)
+        if instead and state.last_substitute_target:
+            return StatePatch(intent="substitute", add_exclude=excludes,
+                              substitute=SubstituteRequest(target=state.last_substitute_target,
+                                                           replacement=instead.group(1).strip()))
+
         swap = re.search(r"\b(?:remove|replace|substitute|swap|without using)\s+(?:the\s+)?"
                          r"([a-z ]+?)(?:\s+(?:in|from|with|for)\b|[.,?!]|$)", t)
         if swap and swap.group(1).strip() not in ("it", "this", "that"):

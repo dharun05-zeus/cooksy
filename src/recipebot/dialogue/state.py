@@ -88,6 +88,7 @@ class SessionState(BaseModel):
     preferences: list[SortKey] = []
     limit: int = 5
     focus_recipe_id: str | None = None
+    last_substitute_target: str | None = None  # so "use applesauce instead" has a target
     last_results: list[str] = []
     last_result_titles: list[str] = []
     last_stats: StatsRequest | None = None

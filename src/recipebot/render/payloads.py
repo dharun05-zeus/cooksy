@@ -7,8 +7,9 @@ from recipebot.engines.matching import MatchedRecipe, MatchResult
 from recipebot.engines.search import SearchResult
 from recipebot.engines.stats import StatsResult
 from recipebot.engines.store import RecipeStore
-from recipebot.engines.substitution import SubstitutionResult
+from recipebot.engines.substitution import RANKING_RULE, SubstitutionResult
 from recipebot.nlp.steps import instruction_lines, split_sentences
+from recipebot.render.templates import EVIDENCE_TYPES
 
 
 def recipe(store: RecipeStore, recipe_id: str) -> dict | None:
@@ -73,17 +74,23 @@ def stats(result: StatsResult) -> dict:
     return {"type": "stats", **result.model_dump()}
 
 
+def _quantity(q) -> dict:
+    return {"status": q.status, "text": q.text, "basis": q.basis,
+            "sources": [{"id": i, "line": t} for i, t in q.sources]}
+
+
 def substitution(result: SubstitutionResult, chosen_by: str) -> dict:
     ev = result.evidence
-    adapted = result.adapted
+    adapted, chosen, moisture = result.adapted, result.chosen, result.moisture
     original = {line.strip() for line in result.original_ingredients}
-    best = next((c for c in ev.candidates if adapted and c.name == adapted.substitute), None)
     return {
         "type": "substitution",
         "recipe": {"id": result.recipe_id, "title": result.title},
         "target": ev.target,
         "target_lines": [text for _, text in ev.target_lines],
+        "original_ingredients": result.original_ingredients,
         "roles": ev.roles,
+        "main_roles": ev.main_roles,
         "baked": ev.baked,
         "restricted": ev.restricted,
         "comparison_scope": ev.comparison_scope,
@@ -91,25 +98,40 @@ def substitution(result: SubstitutionResult, chosen_by: str) -> dict:
         "same_dish_without": [{"id": i, "title": t} for i, t in ev.same_dish_without],
         "notes": [{"id": i, "sentence": s} for i, s in ev.notes],
         "expected_effects": ev.expected_effects,
+        "evidence_types": EVIDENCE_TYPES,
+        "ranking_rule": RANKING_RULE,
+        "ranking_notes": ev.ranking_notes,
+        "uncertainty": ev.uncertainty,
         "candidates": [
             {"name": c.name, "strength": c.strength, "fit": c.fit, "summary": c.summary(),
-             "direct_examples": [{"id": i, "line": t} for i, t in c.direct_examples],
-             "comparative_examples": c.comparative_examples}
+             "evidence_type": c.evidence_type(), "direct": c.direct > 0,
+             "support": c.support, "coverage": c.coverage, "coverage_text": c.coverage_text(),
+             "covers_main": c.covers_main, "quantity": _quantity(c.quantity),
+             "supporting": c.supporting, "limitation": c.limitation(), "flags": c.flags}
             for c in ev.candidates
         ],
         "message": result.message,
+        "status": result.status,
+        "status_label": result.status_label,
         "chosen_by": chosen_by,
+        "requested": result.requested,
         "method": result.method,
         "validation_errors": result.validation_errors,
         "remaining_conflicts": result.remaining_conflicts,
-        "adapted": None if adapted is None or adapted.substitute.lower() == "none" else {
-            "substitute": adapted.substitute,
-            "strength": best.strength if best else None,
+        "baking": result.baking,
+        "moisture": None if moisture is None else {
+            "risk": moisture.risk, "notes": moisture.notes, "ratio": moisture.ratio,
+            "baseline": moisture.baseline, "after": moisture.after},
+        "texture": [{"property": p, "prediction": t} for p, t in result.texture],
+        "limitations": result.limitations,
+        "adapted": None if adapted is None or chosen is None else {
+            "substitute": chosen.name,
+            "strength": chosen.strength,
+            "fit": chosen.fit,
+            "quantity": _quantity(chosen.quantity),
             "ingredients": [{"text": line, "changed": line.strip() not in original}
                             for line in adapted.ingredients],
             "instructions": adapted.instructions,
             "changes": adapted.changes,
-            "predicted_effects": adapted.predicted_effects,
         },
-        "declined_by_llm": adapted is not None and adapted.substitute.lower() == "none",
     }

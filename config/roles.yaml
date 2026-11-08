@@ -6,8 +6,8 @@
 
 ingredients:
   egg:
-    baked: [binding, leavening, moisture]
-    other: [binding, richness]
+    baked: [binding, leavening, moisture, structure, emulsification]
+    other: [binding, richness, emulsification]
   egg yolk:
     baked: [richness, moisture]
     other: [richness, thickening]
@@ -54,27 +54,50 @@ role_effects:
   moisture: may be drier
   fat: may be less rich and less tender
   richness: may taste lighter and less rich
-  thickening: the sauce may be thinner; simmering a little longer can help
-  flavor: the flavor will change
+  thickening: may be thinner; simmering a little longer can help
+  flavor: may taste different
   tenderness: may be firmer or tougher
-  structure: may be softer or less stable
+  structure: may be more fragile and softer
+  emulsification: may be less smooth, as the batter can separate
   tang: may taste less tangy
   sweetness: may taste less sweet
   browning: may brown less
   saltiness: may need a little more salt
 
-# What common substitutes can provide. A candidate whose roles overlap the target's
-# roles is a good fit; one with no overlap is a poor fit and ranks last. Candidates not
-# listed here are "unknown fit" and rank in between.
+# How each role shows in the finished dish (the "property" column of texture predictions).
+role_property:
+  binding: Binding
+  leavening: Rise
+  moisture: Moisture
+  structure: Structure
+  emulsification: Batter consistency
+  fat: Richness and tenderness
+  richness: Richness
+  thickening: Thickness
+  tenderness: Tenderness
+  flavor: Flavor
+  tang: Tang
+  sweetness: Sweetness
+  browning: Browning
+  saltiness: Saltiness
+
+# What common substitutes can provide, fully. A candidate that provides the target's main
+# role (its first role above) is a good fit; one that provides only other roles, or the
+# main role only partly, is a partial fit; one with no overlap is a poor fit. Candidates
+# not listed here are "unknown fit". Ingredients that also count as wet ingredients in the
+# moisture check are the ones that provide moisture.
 provides:
-  applesauce: [moisture, binding, sweetness]
-  banana: [moisture, binding, sweetness]
-  pumpkin puree: [moisture, binding]
-  yogurt: [moisture, tang, richness, binding]
-  greek yogurt: [moisture, tang, richness, binding]
+  applesauce: [moisture, sweetness]
+  banana: [moisture, sweetness]
+  pumpkin puree: [moisture]
+  yogurt: [moisture, tang, richness]
+  greek yogurt: [moisture, tang, richness]
   silken tofu: [binding, moisture, richness, thickening]
-  soy yogurt: [binding, moisture, tang]
+  soy yogurt: [moisture, tang]
   egg replacer: [binding, leavening]
+  milk: [moisture, richness]
+  sour cream: [moisture, fat, tang]
+  cream: [fat, moisture, richness]
   tofu: [binding, structure]
   flaxseed: [binding]
   ground flaxseed: [binding]
@@ -82,7 +105,7 @@ provides:
   baking powder: [leavening]
   baking soda: [leavening]
   buttermilk: [moisture, tang, tenderness]
-  egg substitute: [binding, leavening, moisture]
+  egg substitute: [binding, leavening, moisture, structure, emulsification]
   coconut milk: [fat, richness, moisture, thickening]
   unsweetened coconut milk: [fat, richness, moisture, thickening]
   coconut cream: [fat, richness, thickening]
@@ -110,6 +133,31 @@ provides:
   cooking spray: [greasing]
   honey: [sweetness, moisture]
   maple syrup: [sweetness, moisture]
+
+# Roles a substitute provides only in part: applesauce holds a batter together a little,
+# but much less than egg does. Shown as "partly" and never as a full replacement.
+partially_provides:
+  applesauce: [binding]
+  banana: [binding]
+  pumpkin puree: [binding]
+  yogurt: [binding]
+  greek yogurt: [binding]
+  soy yogurt: [binding]
+  silken tofu: [structure, emulsification]
+  egg replacer: [structure]
+  flaxseed: [moisture]
+  ground flaxseed: [moisture]
+  chia seed: [moisture]
+  buttermilk: [leavening]
+
+# Uses of an ingredient that are not part of the dish itself. "Beaten egg or milk, for
+# brushing" says nothing about replacing the egg in a batter, so such "X or Y" lines are
+# only evidence when the target line is used the same way.
+surface_uses: [brush, brushing, wash, glaze, glazing, dusting, garnish, sprinkling, greasing]
+
+# Quantities found in a related recipe are scaled to this recipe by a shared ingredient,
+# one of these (the bulk of the dish). Without one, the quantity is not scaled.
+scale_anchors: [flour, pasta, rice]
 
 # Herbs and spices only add flavor; they are never a fit for fat, binding or thickening.
 flavor_only: [

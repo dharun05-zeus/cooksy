@@ -218,6 +218,30 @@ table.t th, table.t td { text-align: left; padding: 6px 8px; border-bottom: 1px 
 table.t th { color: var(--muted); font-weight: 600; }
 .warn { background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.35); border-radius: 10px; padding: 8px 10px; font-size: 12.5px; }
 .note { background: rgba(139,92,246,.12); border: 1px solid rgba(139,92,246,.35); border-radius: 10px; padding: 8px 10px; font-size: 12.5px; }
+.caution { background: rgba(249,115,22,.12); border: 1px solid rgba(249,115,22,.38); border-radius: 10px; padding: 8px 10px; font-size: 12.5px; }
+
+/* ---------- substitution card ---------- */
+.sub-section { margin-top: 12px; }
+.sub-section > b, .sub-section summary b { font-size: 13px; }
+.status { display: flex; align-items: center; gap: 8px; border-radius: 10px; padding: 8px 10px; margin: 10px 0 4px; font-size: 12.5px; font-weight: 600; }
+.status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex: none; }
+.status.supported { background: rgba(34,197,94,.12); color: #86efac; }
+.status.experimental { background: rgba(234,179,8,.12); color: #fde047; }
+.status.incomplete { background: rgba(249,115,22,.14); color: #fdba74; }
+.status.not_adapted { background: rgba(239,68,68,.12); color: #fca5a5; }
+.pick-box { border: 1px solid var(--line); background: var(--panel-2); border-radius: 12px; padding: 10px 12px; margin-top: 8px; }
+.pick-box .name { font-size: 17px; font-weight: 800; }
+.qty { margin-top: 6px; font-size: 12.5px; }
+.qty b { font-size: 13px; }
+.cand { border-top: 1px solid var(--line); padding: 8px 0; }
+.cand:first-of-type { border-top: 0; }
+.cand-head { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.cand-head .rank { color: var(--orange-2); font-weight: 700; }
+.chip.small { font-size: 11px; padding: 1px 8px; }
+details.sub-section summary { cursor: pointer; }
+details.sub-section[open] summary { margin-bottom: 4px; }
+.ranking li { font-size: 12px; }
+
 .tabs { display: flex; gap: 6px; margin: 10px 0 8px; background: var(--panel-2); padding: 4px; border-radius: 12px; }
 .tab { flex: 1; border: 0; background: transparent; padding: 7px; border-radius: 9px; font-weight: 600; color: var(--muted); }
 .tab.on { background: var(--grad); color: #fff; }

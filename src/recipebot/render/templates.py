@@ -7,7 +7,7 @@ from recipebot.engines.matching import MatchedRecipe, MatchResult
 from recipebot.engines.search import SearchResult
 from recipebot.engines.stats import StatsResult
 from recipebot.engines.store import RecipeStore
-from recipebot.engines.substitution import SubstitutionResult
+from recipebot.engines.substitution import RANKING_RULE, SubstitutionResult
 from recipebot.nlp.steps import instruction_lines, split_sentences
 
 
@@ -86,28 +86,38 @@ def _matched_block(i: int, m: MatchedRecipe) -> list[str]:
     return lines
 
 
+EVIDENCE_TYPES = ("Direct evidence: a recipe explicitly offers the ingredient as an alternative. "
+                  "Indirect evidence: a related recipe uses it without the removed ingredient "
+                  "but does not call it a replacement. The two are not equivalent.")
+
+
 def render_substitution(result: SubstitutionResult, chosen_by: str) -> str:
     ev = result.evidence
     lines = [f"Adapting: {result.title}  [{result.recipe_id}]"]
     if not ev.target_lines:
         return "\n".join(lines + [result.message])
-    lines.append("Replacing: " + "; ".join(text for _, text in ev.target_lines))
+    lines.append("Removing: " + "; ".join(text for _, text in ev.target_lines))
     for name, roles in ev.roles.items():
         if roles:
             dish = "baked dish" if ev.baked else "dish"
-            lines.append(f"Role of {name} in this {dish}: {', '.join(roles)} "
-                         "(general cooking knowledge)")
+            lines.append(f"Roles of {name} in this {dish} (general cooking knowledge): "
+                         + ", ".join([f"{roles[0]} (main)", *roles[1:]]))
     lines.append("Restrictions respected: " + ", ".join(f"no {r}" for r in ev.restricted))
+    if result.original_ingredients:
+        lines.append("Original ingredients: " + "; ".join(result.original_ingredients))
 
-    lines.append("\nLocal evidence from the dataset:")
+    lines.append("\nCandidates from the dataset, ranked (evidence strength and role fit are "
+                 "rated separately):")
     if ev.candidates:
         for i, c in enumerate(ev.candidates, 1):
-            lines.append(f"  {i}. {c.name}: {c.strength} evidence; {c.summary()}")
-            for rid, text in c.direct_examples[:2]:
-                lines.append(f"       direct: \"{text}\"  [{rid}]")
-            if c.comparative_examples:
-                lines.append("       similar recipes without it: "
-                             + ", ".join(c.comparative_examples))
+            q = c.quantity
+            lines.append(f"  {i}. {c.name}: evidence {c.strength} ({c.evidence_type()}); "
+                         f"role fit {c.fit} ({c.coverage_text()}); quantity {q.status}"
+                         + (f" ({q.text})" if q.text else ""))
+            for s in c.supporting[:3]:
+                line = f": \"{s['line']}\"" if s["line"] else ""
+                lines.append(f"       {s['kind']}: {s['title']} [{s['id']}]{line}")
+            lines.append(f"       limitation: {c.limitation()}")
     else:
         lines.append("  none found")
     lines.append(f"  Compared {ev.comparison_scope or f'{ev.neighbours} similar recipes'}; "
@@ -117,44 +127,61 @@ def render_substitution(result: SubstitutionResult, chosen_by: str) -> str:
                      + "; ".join(f"{title} [{rid}]" for rid, title in ev.same_dish_without))
     for rid, sentence in ev.notes:
         lines.append(f"  Instruction note: \"{sentence[:160]}\"  [{rid}]")
-    lines.append("  'Direct' = a recipe offers the swap itself; comparative evidence is indirect "
-                 "(those recipes may differ in other ways too).")
+    lines.append(f"  {EVIDENCE_TYPES}")
+    if ev.ranking_notes:
+        lines.append(f"\nRanking rules: {RANKING_RULE}.")
+        lines += [f"  - {note}" for note in ev.ranking_notes]
     if ev.expected_effects:
         lines.append(f"\nExpected trade-offs of removing {ev.target} (predictions from its role, "
                      "not dataset facts):")
         lines += [f"  - {effect}" for effect in ev.expected_effects]
 
     if result.message:
-        return "\n".join(lines + ["", result.message])
-    adapted = result.adapted
-    if adapted is None or adapted.substitute.lower() == "none":
-        return "\n".join(lines + ["", "None of the evidenced candidates fits this ingredient's "
-                                  "role well enough, so I am not proposing an adaptation."])
-    best = next((c for c in ev.candidates if c.name == adapted.substitute), ev.candidates[0])
-    lines.append(f"\nChosen substitute: {adapted.substitute} ({best.strength} evidence), "
-                 f"chosen by {chosen_by}.")
+        lines += ["", f"Adaptation status: {result.status_label}.", result.message]
+        lines += [f"Uncertainty: {u}" for u in ev.uncertainty]
+        return "\n".join(lines)
+    adapted, chosen = result.adapted, result.chosen
+    if adapted is None or chosen is None:
+        return "\n".join(lines + ["", "No adapted recipe is produced."])
+    q = chosen.quantity
+    lines += ["", f"Adaptation status: {result.status_label}.",
+              f"Selected replacement: {chosen.name} (evidence {chosen.strength}, role fit "
+              f"{chosen.fit}), selected by {chosen_by}.",
+              f"Replacement quantity ({q.status}): " + (f"{q.text}; " if q.text else "") + q.basis]
+    if result.status == "incomplete":
+        lines.append(f"This is an incomplete experimental adaptation: the {chosen.name} amount "
+                     "is not established, so the list below is not a complete recipe.")
     lines.append("\nAdapted ingredients (* = changed):")
     original = {line.strip() for line in result.original_ingredients}
     for line in adapted.ingredients:
         lines.append(f"  {' ' if line.strip() in original else '*'} {line}")
     lines.append("\nAdapted instructions:")
     lines += [f"  {i}. {s}" for i, s in enumerate(adapted.instructions, 1)]
+    lines.append("Baking (from the original recipe, not re-tested): "
+                 + (result.baking or "not given in the recipe"))
     if adapted.changes:
         lines.append("\nChanges:")
         lines += [f"  - {c}" for c in adapted.changes]
-    if adapted.predicted_effects:
-        lines.append("\nPredicted effects (not verified by the dataset):")
-        lines += [f"  - {e}" for e in adapted.predicted_effects]
+    if result.moisture and result.moisture.notes:
+        lines.append(f"\nMoisture check (risk: {result.moisture.risk}):")
+        lines += [f"  - {n}" for n in result.moisture.notes]
+    if result.texture:
+        lines.append("\nPredicted texture changes (predictions, not verified by the dataset):")
+        lines += [f"  - {prop}: {text}" for prop, text in result.texture]
     if result.remaining_conflicts:
         lines.append("\nWARNING: other ingredients in this recipe still break your restrictions "
                      "and were not replaced: " + "; ".join(result.remaining_conflicts)
                      + ". Ask me to replace them too.")
-    if best.strength in ("weak", "conflicting", "none"):
-        lines.append(f"\nCaution: the evidence for {adapted.substitute} is {best.strength}; "
+    if result.limitations:
+        lines.append("\nLimitations:")
+        lines += [f"  - {x}" for x in result.limitations]
+    if chosen.strength in ("weak", "conflicting", "none"):
+        lines.append(f"\nCaution: the evidence for {chosen.name} is {chosen.strength}; "
                      "treat this adaptation as untested.")
-    if result.validation_errors and result.method == "fallback":
-        lines.append("Note: a simple rule-based rewrite is shown because "
-                     + "; ".join(result.validation_errors[:2]) + ".")
+    if result.validation_errors:
+        lines.append("Note: some LLM step rewrites were not used ("
+                     + "; ".join(result.validation_errors[:2]) + "); those steps use the "
+                     "rule-based rewrite.")
     lines.append("This is not a guarantee that the dish is safe for an allergy.")
     return "\n".join(lines)
 
