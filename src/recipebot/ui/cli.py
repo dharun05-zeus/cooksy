@@ -105,9 +105,9 @@ def web(
     host: Annotated[str, typer.Option(help="interface to bind")] = "127.0.0.1",
 ) -> None:
     """Start the web UI (http://localhost:8000)."""
-    import uvicorn
-
     import logging
+
+    import uvicorn
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     _say("Loading the dataset (about 30-60 s)...", style="green")
