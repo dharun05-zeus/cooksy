@@ -527,7 +527,7 @@ def write_report(results: dict, provider: str) -> Path:
         out.append(f"| one-shot LLM vs assistant | {b['one_shot_correct']}/{b['total']} vs "
                    f"{b['system_correct']}/{b['total']} | same questions, answers checked "
                    f"against the dataset (one-shot: {b['one_shot_declined']} declined, "
-                   f"{b['one_shot_fabricated']} gave unsupported numbers; see the discussion) |")
+                   f"{b['one_shot_fabricated']} gave unsupported numbers; see below) |")
     if "normalization" in r:
         n = r["normalization"]
         out += ["", f"Normalization: the first parser version got {n['first_version_correct']}/"
@@ -583,13 +583,8 @@ def write_report(results: dict, provider: str) -> Path:
         for c in r["conversations"]["cases"]:
             out.append(f"- {'PASS' if c['passed'] else 'FAIL'} — [{c['name']}]({c['transcript']})"
                        f" ({', '.join(c['covers'])})")
-    # The written discussion analyses the LLM run, so it only belongs in that report; an
-    # offline run gets its own file and never overwrites the LLM report.
-    offline = provider == "none"
-    discussion = EVAL_DIR / "discussion.md"
-    if discussion.exists() and not offline:
-        out += ["", discussion.read_text(encoding="utf-8")]
-    path = EVAL_DIR / ("REPORT_offline.md" if offline else "REPORT.md")
+    # An offline run gets its own file and never overwrites the LLM report.
+    path = EVAL_DIR / ("REPORT_offline.md" if provider == "none" else "REPORT.md")
     path.write_text("\n".join(out) + "\n", encoding="utf-8")
     return path
 
