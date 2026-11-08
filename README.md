@@ -96,8 +96,9 @@ uv run python eval/run_eval.py
 uv run python eval/run_eval.py --provider none
 ```
 
-The second form runs without an LLM in about a minute (the parser then uses the fallback).
-Results go to `eval/REPORT.md`, `eval/results/` and `eval/transcripts/`. Unit tests:
+The second form runs without an LLM in about a minute (the parser then uses the fallback)
+and writes `eval/REPORT_offline.md`; the LLM run writes `eval/REPORT.md`. Raw results and
+conversation transcripts go to `eval/results/` and `eval/transcripts/`. Unit tests:
 
 ```bash
 uv run pytest

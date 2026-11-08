@@ -7,7 +7,8 @@ Usage:
     uv run python eval/run_eval.py --refresh-baseline # ask the one-shot LLM again
     uv run python eval/run_eval.py --report-only eval/results/ollama.json
 
-Writes eval/results/<provider>.json, eval/transcripts/*.md and eval/REPORT.md.
+Writes eval/results/<provider>.json, eval/transcripts/*.md and eval/REPORT.md
+(eval/REPORT_offline.md for --provider none).
 Every check compares the assistant's output with something computed independently:
 reference statistics in plain Python, constraints re-checked on each returned recipe,
 and recipe IDs looked up in the dataset.
@@ -579,10 +580,13 @@ def write_report(results: dict, provider: str) -> Path:
         for c in r["conversations"]["cases"]:
             out.append(f"- {'PASS' if c['passed'] else 'FAIL'} — [{c['name']}]({c['transcript']})"
                        f" ({', '.join(c['covers'])})")
+    # The written discussion analyses the LLM run, so it only belongs in that report; an
+    # offline run gets its own file and never overwrites the LLM report.
+    offline = provider == "none"
     discussion = EVAL_DIR / "discussion.md"
-    if discussion.exists():
+    if discussion.exists() and not offline:
         out += ["", discussion.read_text(encoding="utf-8")]
-    path = EVAL_DIR / "REPORT.md"
+    path = EVAL_DIR / ("REPORT_offline.md" if offline else "REPORT.md")
     path.write_text("\n".join(out) + "\n", encoding="utf-8")
     return path
 
