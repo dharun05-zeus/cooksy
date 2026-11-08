@@ -3,6 +3,9 @@
 Usage:
     uv run python scripts/download_data.py              # download from eightportions.com
     uv run python scripts/download_data.py --zip PATH   # use a copy you already have
+
+The site may refuse automated downloads (HTTP 403). Then download recipes_raw.zip in a
+browser from DATASET_PAGE and pass it with --zip; the checksum is verified either way.
 """
 
 from __future__ import annotations
@@ -11,6 +14,7 @@ import argparse
 import hashlib
 import shutil
 import sys
+import urllib.error
 import urllib.request
 import zipfile
 from pathlib import Path
@@ -19,6 +23,7 @@ from recipebot.config import get_settings, use_utf8_console
 from recipebot.data.loader import SOURCE_FILES
 
 DATASET_URL = "https://eightportions.com/recipes_raw.zip"
+DATASET_PAGE = "https://eightportions.com/datasets/Recipes/"
 # SHA-256 of recipes_raw.zip (53,355,492 bytes) as published, checked on 2026-11-06.
 EXPECTED_SHA256 = "1ae20f3260313d501edf23c22c6f1875e87917f5a8e2ff13b40450719322c81b"
 
@@ -31,10 +36,24 @@ def sha256_of(path: Path) -> str:
     return digest.hexdigest()
 
 
-def download(url: str, target: Path) -> None:
+def download(url: str, target: Path) -> bool:
+    """Download to a temporary file and rename it when complete, so an interrupted download
+    is never mistaken for the dataset. Returns False (with instructions) if it fails."""
     print(f"Downloading {url} ...")
-    with urllib.request.urlopen(url, timeout=60) as response, target.open("wb") as out:
-        shutil.copyfileobj(response, out)
+    partial = target.with_suffix(".part")
+    try:
+        with urllib.request.urlopen(url, timeout=60) as response, partial.open("wb") as out:
+            shutil.copyfileobj(response, out)
+    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        partial.unlink(missing_ok=True)
+        reason = f"HTTP {exc.code}" if isinstance(exc, urllib.error.HTTPError) else str(exc)
+        print(f"\nThe automatic download failed ({reason}); the site may refuse automated "
+              "downloads.\nDownload it in a browser instead:\n"
+              f"  1. open {DATASET_PAGE} and download recipes_raw.zip (about 53 MB)\n"
+              "  2. run:  uv run python scripts/download_data.py --zip PATH/TO/recipes_raw.zip")
+        return False
+    partial.replace(target)
+    return True
 
 
 def extract(zip_path: Path, raw_dir: Path) -> None:
@@ -62,8 +81,8 @@ def main() -> int:
 
     if args.zip:
         shutil.copyfile(args.zip, zip_path)
-    elif not zip_path.exists():
-        download(DATASET_URL, zip_path)
+    elif not zip_path.exists() and not download(DATASET_URL, zip_path):
+        return 2
 
     if not args.skip_checksum:
         actual = sha256_of(zip_path)

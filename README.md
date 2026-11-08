@@ -41,6 +41,15 @@ uv run python scripts/build_index.py
 The download is 53 MB (checksum-verified); the build takes 3–5 minutes and writes
 `data/processed/`.
 
+If the download step reports a failure (the dataset site can refuse automated downloads with
+HTTP 403), download `recipes_raw.zip` in a browser from the
+[dataset page](https://eightportions.com/datasets/Recipes/) and pass it to the script; the
+checksum is still verified:
+
+```bash
+uv run python scripts/download_data.py --zip PATH/TO/recipes_raw.zip
+```
+
 ### LLM (free, local): Ollama + Qwen3 4B
 
 1. Install [Ollama](https://ollama.com/download) and start it.
